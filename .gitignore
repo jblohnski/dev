@@ -99,3 +99,7 @@ __MACOSX/
 
 # skip all projects/ content as they are indepedebnt projects
 projects/
+
+# local/export artifacts
+audit/Archive.zip
+audit/*.zip
