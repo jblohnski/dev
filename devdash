@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+ROOT="$HOME/dev"
+
+# --- robust terminal styling (never hard-fail) ---
+: "${TERM:=xterm-256color}"
+
+tp() { tput "$@" 2>/dev/null || true; }
+
+BOLD="$(tp bold)"
+DIM="$(tp dim)"          # may be empty if unsupported
+RESET="$(tp sgr0)"
+
+SEC="$(tp setaf 1)"      # red
+DIAG="$(tp setaf 6)"     # cyan
+UTIL="$(tp setaf 2)"     # green
+OTHER="$(tp setaf 7)"    # gray
+
+color_for_tag() {
+  case "$1" in
+    sec*)  printf "%s" "$SEC" ;;
+    diag*) printf "%s" "$DIAG" ;;
+    util*) printf "%s" "$UTIL" ;;
+    *)     printf "%s" "$OTHER" ;;
+  esac
+}
+
+clear
+printf "%sDEV DASHBOARD%s\n" "$BOLD" "$RESET"
+printf "%s────────────────────────────────────────────%s\n\n" "${DIM:-}" "$RESET"
+
+i=1
+TMP="$(mktemp -t devdash.XXXXXX)"
+
+# Discover runnable scripts
+while IFS= read -r file; do
+  [ ! -x "$file" ] && continue
+
+  name="$(basename "$file")"
+
+  desc="$(grep -m1 '^# @desc:' "$file" | sed 's/# @desc:[ ]*//')"
+  tags="$(grep -m1 '^# @tags:' "$file" | sed 's/# @tags:[ ]*//')"
+  run="$(grep -m1 '^# @run:'  "$file" | sed 's/# @run:[ ]*//')"
+
+  [ -z "$desc" ] && desc="(no description)"
+  [ -z "$tags" ] && tags="misc"
+  [ -z "$run"  ] && run="user"
+
+  tagcolor="$(color_for_tag "$tags")"
+
+  printf "%s%2d%s  %-18s  %s%-14s%s  %s\n" \
+    "$BOLD" "$i" "$RESET" \
+    "$name" \
+    "$tagcolor" "$tags" "$RESET" \
+    "$desc"
+
+  printf "%s|%s|%s\n" "$i" "$file" "$run" >> "$TMP"
+  i=$((i+1))
+done < <(find "$ROOT" -type f \( -name "*.sh" -o -name "*.zsh" \))
+
+printf "\n%sSelect number to run (Enter = quit)%s\n" "${DIM:-}" "$RESET"
+read -r choice
+
+[ -z "$choice" ] && rm -f "$TMP" && exit 0
+
+entry="$(grep -E "^${choice}\|" "$TMP" || true)"
+rm -f "$TMP"
+
+if [ -z "$entry" ]; then
+  printf "%sInvalid selection.%s\n" "$SEC" "$RESET"
+  exit 1
+fi
+
+cmd="$(printf "%s" "$entry" | cut -d'|' -f2)"
+runmode="$(printf "%s" "$entry" | cut -d'|' -f3)"
+
+printf "\n%s→ Running %s%s\n\n" "$BOLD" "$(basename "$cmd")" "$RESET"
+
+if [ "$runmode" = "sudo" ]; then
+  sudo "$cmd"
+else
+  "$cmd"
+fi

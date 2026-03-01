@@ -1,0 +1,99 @@
+fad/
+arkenfox/
+ 
+# Python compiled files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# Virtual environment
+venv
+env
+.venv
+ENV
+
+# FastAPI/Pydantic specific
+*.cache
+
+# Testing
+.pytest_cache
+
+# IDE/Editor files
+.idea
+.vscode
+*.sublime-workspace
+*.sublime-project
+
+# Environment variables
+.env
+.env.dev
+.env.prod
+
+# System files
+.DS_Store
+Thumbs.db
+
+package-lock.json
+node_modules
+dist
+
+
+# ======================
+# audit – minimal ignore
+# Mac + Python + shell
+# ======================
+
+# ---- runtime output (core audit artifacts) ----
+baseline/
+archives/
+current/
+report/
+state/
+*.log
+*.out
+*.diff
+*.snapshot
+*.tmp
+
+
+# packet captures / net work
+*.pcap
+*.pcapng
+
+# ---- Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# virtualenv (if you ever use one)
+.venv/
+venv/
+
+# ---- macOS filesystem noise ----
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+__MACOSX/
+
+# ---- editor noise ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- keep the real project ----
+!collectors/
+!pymaudit/
+!scripts/
+!*.sh
+!*.py
+!README.md
+
+# skip all projects/ content as they are indepedebnt projects
+projects/
