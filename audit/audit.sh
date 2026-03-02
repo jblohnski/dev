@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# @desc: Run baseline/current audit collection and reporting
+# @tags: audit ops diagnostics
+# @run: user
+# @alias: aud
+# @owner: firstparty
+
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -2,6 +2,8 @@
 # @desc: Harden macOS security defaults (remote access, firewall, privacy)
 # @tags: sec system macos
 # @run: sudo
+# @alias: harden
+# @owner: firstparty
 
 set -euo pipefail
 

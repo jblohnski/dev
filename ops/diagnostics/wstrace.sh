@@ -2,6 +2,8 @@
 # @desc: Trace WindowServer-related faults/errors for UI stutter and beachballs
 # @tags: diag logs ui macos
 # @run: user
+# @alias: wstrace
+# @owner: firstparty
 
 set -euo pipefail
 

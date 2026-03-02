@@ -2,6 +2,8 @@
 # @desc: Summarize macOS unified logs for hangs/beachballs (system + Firefox)
 # @tags: diag logs macos
 # @run: user
+# @alias: logsum
+# @owner: firstparty
 
 set -euo pipefail
 

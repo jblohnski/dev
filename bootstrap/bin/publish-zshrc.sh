@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
+# @desc: Publish tracked zsh profile to home zshrc
+# @tags: bootstrap shell profile
+# @run: user
+# @alias: pz
+# @owner: firstparty
+
 set -euo pipefail
 
-SRC="${1:-$HOME/dev/.zshrc}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+SRC="${1:-$REPO_ROOT/bootstrap/zsh/.zshrc}"
 DST="${2:-$HOME/.zshrc}"
 
 if [[ ! -f "$SRC" ]]; then
