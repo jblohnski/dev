@@ -1,104 +1,51 @@
-# maudit — minimal macOS audit toolkit
+# audit — quick macOS snapshot
 
-`maudit` captures a snapshot of high-signal macOS system state, compares it against a baseline, and generates a compact executive summary plus both normalized and raw diffs.
+This is a lightweight, glanceable audit for macOS with a network/process-first view.
 
-## Quick start
+## What it does
 
-Create/refresh a baseline:
+- Runs a fast local assessment
+- Writes exactly one JSON snapshot
+- Prints a short color summary in stdout
+- Highlights essential anomalies only
+- Tracks lightweight network delta between runs
 
-```bash
-./audit.sh --baseline
-```
-
-Run an audit (current snapshot + analysis + baseline comparison):
+## Usage
 
 ```bash
 ./audit.sh
 ```
 
-Optional: show collector output during the run:
+Optional:
 
 ```bash
-./audit.sh --verbose
+./audit.sh --out /tmp/my_snapshot.json
+./audit.sh --id maple
+./audit.sh --no-color
 ```
 
-If you want partial results even when a collector or analyzer fails:
+## JSON output
 
-```bash
-AUDIT_ALLOW_PARTIAL=1 ./audit.sh
-```
+Default path:
 
-Reset all generated state (baseline/current/report/archives):
+- `audit-<word>.json`
 
-```bash
-./audit.sh --reset
-```
+Top-level sections:
 
-## Outputs
+- `cat` (`audit`)
+- `id` (short run word)
+- `ts` (timestamp UTC)
+- `host`
+- `sys` (system snapshot)
+- `sec` (security flags)
+- `net` (default iface/gateway, interfaces, DNS, DHCP, connections, delta)
+- `proc` (top network-active processes + top CPU processes)
+- `dsk` (disk snapshot)
+- `per` (persistence counts)
+- `findings` (anomaly list)
 
-After `./audit.sh`, results are written to:
+Notes:
 
-- `current/` — latest snapshot
-- `report/`:
-  - `summary.md` — human-readable executive summary + key metrics
-  - `summary.json` — machine-readable metrics + diff stats
-  - `diff_normalized.txt` — baseline vs current diff with volatile lines normalized out
-  - `diff_raw.txt` — raw `diff -ru` output (noisy, forensic reference)
-  - `collectors/` — per-collector stdout/stderr logs for the run
-
-## Non-clobbering behavior
-
-Before writing new data, `maudit` archives any existing `baseline/`, `current/`, and `report/` directories into:
-
-- `archives/baseline_<timestamp>/`
-- `archives/current_<timestamp>/`
-- `archives/report_<timestamp>/`
-
-Snapshots are built in temporary directories and then swapped into place (atomic move), so partially-written runs are avoided.
-
-## Structure
-
-- `collectors/` — individual data collectors (shell scripts)
-- `scripts/analyze_run.py` — normalization + metrics extraction + executive summary generation
-- `baseline/` — trusted reference snapshot
-- `current/` — latest snapshot
-- `report/` — summary + diffs
-- `archives/` — previous snapshots/reports (auto-created)
-
-## Notes
-
-- Baseline should be created on a known-clean system state.
-- By default, run failures in collectors/analyzer return a non-zero exit status.
-- The “risk level” in `summary.md` is a simple heuristic for triage; use the raw artifacts for deeper validation.
-
-
-```sh
-# compress excluding .git/ and similar project meta-data files
-alias zipa='zip -r audit.zip audit \
-  -x "audit/.git/*" \
-  -x "audit/archives/*" \
-  -x "audit/__pycache__/*" \
-  -x "audit/*/__pycache__/*" \
-  -x "audit/*.pyc" \
-  -x "audit/*.pyo" \
-  -x "audit/baseline/*" \
-  -x "audit/current/*" \
-  -x "audit/report/*" \
-  -x "audit/state/*" \
-  -x "audit/*.log" \
-  -x "audit/*.pcap*" \
-  -x "audit/.DS_Store" \
-  -x "audit/*/.DS_Store" \
-  -x "audit/._*"'
-
-```
-
-```sh
-
-# create project ython venv
-builtin cd ~/dev/audit
-python3 -m venv .venv
-source .venv/bin/activate
-pip install jinja2
-
-```
+- JSON shape is intentionally flexible and may evolve.
+- Delta source file is `state/net-last.json` (auto-written, git-ignored).
+- This tool is for quick assessment, not deep forensic capture.

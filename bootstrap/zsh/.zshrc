@@ -114,6 +114,30 @@ alias sniffdns='sudo tcpdump -n -i any port 53'
 alias snifftls='sudo tcpdump -n -i any port 443'
 
 # ------------------------------------------------------------------------------
+# Audit helpers
+# ------------------------------------------------------------------------------
+alias a='~/dev/audit/audit.sh'
+alias an='~/dev/audit/audit.sh --no-color'
+
+# ------------------------------------------------------------------------------
+# Shell profile helpers
+# ------------------------------------------------------------------------------
+# publish_zshrc_reload: publish tracked profile, then reload current shell config
+publish_zshrc_reload() {
+  local script="$HOME/dev/bootstrap/bin/publish-zshrc.sh"
+  if [[ ! -x "$script" ]]; then
+    echo "zup: missing script: $script" >&2
+    return 1
+  fi
+
+  "$script" || return $?
+  source "$HOME/.zshrc"
+  hash -r
+  echo "zup: shell profile published and reloaded"
+}
+alias zup='publish_zshrc_reload'
+
+# ------------------------------------------------------------------------------
 # Prompt (ghost-free, Terminal.app safe)
 # ------------------------------------------------------------------------------
 autoload -Uz colors && colors

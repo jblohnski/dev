@@ -9,6 +9,8 @@ archives/
 current/
 report/
 state/
+audit-*.json
+snapshot-*.json
 *.log
 *.out
 *.diff
