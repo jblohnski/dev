@@ -17,6 +17,10 @@ COLLECTORS_DIR="$ROOT_DIR/collectors"
 SCRIPTS_DIR="$ROOT_DIR/scripts"
 
 RUN_TS="$(date +"%Y%m%d_%H%M%S")"
+AUDIT_VERBOSE=0
+AUDIT_ALLOW_PARTIAL="${AUDIT_ALLOW_PARTIAL:-0}"
+COLLECTOR_FAIL_COUNT=0
+COLLECTOR_FAIL_LIST=""
 
 usage() {
   cat <<EOF
@@ -30,6 +34,7 @@ Notes:
   - Snapshots are written atomically via temp dirs, then swapped into place.
   - Previous baseline/current/report are moved to: archives/<name>_<timestamp>/
   - Full collector logs for a run are stored under: report/collectors/
+  - Set AUDIT_ALLOW_PARTIAL=1 to allow collector/analyzer failures without a non-zero exit.
 EOF
 }
 
@@ -58,6 +63,8 @@ run_collectors() {
   local target_dir="$1"
   local collector_log_dir="$2"
   local verbose="${3:-0}"
+  local fail_count=0
+  local failed=()
 
   mkdir -p "$target_dir" "$collector_log_dir"
 
@@ -82,7 +89,7 @@ run_collectors() {
   for c in "${collectors[@]}"; do
     local path="$COLLECTORS_DIR/$c"
     if [[ ! -f "$path" ]]; then
-      warn "[audit] missing collector: $c\n"
+      warn "[audit] missing collector: $c"
       continue
     fi
 
@@ -107,6 +114,8 @@ PY
       log "  - ${c%.sh}: OK (${dur_ms}ms) ${lastline}"
     else
       log "  - ${c%.sh}: FAIL (${dur_ms}ms) (see collectors/${c%.sh}.log)"
+      fail_count=$((fail_count + 1))
+      failed+=("${c%.sh}")
       if [[ "$verbose" -eq 1 ]]; then
         log "----- ${c%.sh} output -----"
         sed -n '1,200p' "$logf" || true
@@ -119,6 +128,9 @@ PY
       sed -n '1,40p' "$logf" | sed 's/^/      /' || true
     fi
   done
+
+  COLLECTOR_FAIL_COUNT="$fail_count"
+  COLLECTOR_FAIL_LIST="${failed[*]:-}"
 }
 
 print_exec_summary() {
@@ -148,6 +160,17 @@ make_baseline() {
 
   local collector_logs="$tmp/.collector_logs"
   run_collectors "$tmp" "$collector_logs" "${AUDIT_VERBOSE:-0}"
+  if [[ "${COLLECTOR_FAIL_COUNT:-0}" -gt 0 ]]; then
+    warn "[audit] collector failures during baseline: ${COLLECTOR_FAIL_LIST}"
+    if [[ "${AUDIT_ALLOW_PARTIAL:-0}" -ne 1 ]]; then
+      mkdir -p "$ARCHIVE_DIR"
+      local failed_dir="$ARCHIVE_DIR/failed_baseline_${RUN_TS}"
+      mv "$tmp" "$failed_dir"
+      warn "[audit] baseline aborted (strict mode); failed snapshot preserved: $failed_dir"
+      exit 2
+    fi
+    warn "[audit] continuing baseline because AUDIT_ALLOW_PARTIAL=1"
+  fi
 
   date > "$tmp/BASELINE_CREATED_AT.txt"
 
@@ -157,7 +180,7 @@ make_baseline() {
 
 make_current_and_report() {
   if [[ ! -d "$BASELINE_DIR" ]]; then
-    warn "[audit] no baseline present. run: ./audit.sh --baseline\n"
+    warn "[audit] no baseline present. run: ./audit.sh --baseline"
     exit 1
   fi
 
@@ -172,33 +195,45 @@ make_current_and_report() {
   log "[audit] creating current snapshot..."
   local collector_logs="$tmp_report/collectors"
   run_collectors "$tmp_current" "$collector_logs" "${AUDIT_VERBOSE:-0}"
+  local run_failed=0
+  if [[ "${COLLECTOR_FAIL_COUNT:-0}" -gt 0 ]]; then
+    warn "[audit] collector failures during current run: ${COLLECTOR_FAIL_LIST}"
+    run_failed=1
+  fi
 
   # Keep raw diff for forensics (noisy by design)
   diff -ru "$BASELINE_DIR" "$tmp_current" > "$tmp_report/diff_raw.txt" || true
 
   # Normalized diff + metrics + summary
   if [[ -x "$SCRIPTS_DIR/analyze_run.py" ]]; then
-    python3 "$SCRIPTS_DIR/analyze_run.py" --current "$tmp_current" --baseline "$BASELINE_DIR" --report "$tmp_report"
+    if ! python3 "$SCRIPTS_DIR/analyze_run.py" --current "$tmp_current" --baseline "$BASELINE_DIR" --report "$tmp_report"; then
+      warn "[audit] analyzer failed: scripts/analyze_run.py"
+      run_failed=1
+    fi
   else
-    warn "[audit] missing analyzer: scripts/analyze_run.py\n"
+    warn "[audit] missing analyzer: scripts/analyze_run.py"
+    run_failed=1
   fi
 
   mv "$tmp_current" "$CURRENT_DIR"
   mv "$tmp_report" "$REPORT_DIR"
 
   log "[audit] report written to:"
-  log "  - $REPORT_DIR/summary.md"
-  log "  - $REPORT_DIR/summary.json"
-  log "  - $REPORT_DIR/diff_normalized.txt"
-  log "  - $REPORT_DIR/diff_raw.txt"
-  log "  - $REPORT_DIR/collectors/"
+  [[ -f "$REPORT_DIR/summary.md" ]] && log "  - $REPORT_DIR/summary.md"
+  [[ -f "$REPORT_DIR/summary.json" ]] && log "  - $REPORT_DIR/summary.json"
+  [[ -f "$REPORT_DIR/diff_normalized.txt" ]] && log "  - $REPORT_DIR/diff_normalized.txt"
+  [[ -f "$REPORT_DIR/diff_raw.txt" ]] && log "  - $REPORT_DIR/diff_raw.txt"
+  [[ -d "$REPORT_DIR/collectors" ]] && log "  - $REPORT_DIR/collectors/"
 
   print_exec_summary "$REPORT_DIR/summary.md"
+
+  if [[ "$run_failed" -eq 1 && "${AUDIT_ALLOW_PARTIAL:-0}" -ne 1 ]]; then
+    warn "[audit] run completed with failures (strict mode); set AUDIT_ALLOW_PARTIAL=1 to allow partial success"
+    exit 2
+  fi
 }
 
 # ---- arg handling ----
-
-AUDIT_VERBOSE=0
 
 case "${1:-}" in
   --baseline)

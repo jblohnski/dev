@@ -26,20 +26,26 @@ note_sus() {
 }
 
 check_codesign() {
-  local file="$1"
-  local label="$2"
+  local target="$1"
+  local detail_file="$2"
+  local label="$3"
 
-  if grep -qi "code object is not signed" "$file" \
-     || grep -qi "invalid" "$file" \
-     || ! grep -q "Authority=Apple" "$file"
+  # Avoid relying on Authority=Apple; some Apple binaries report Authority=(unavailable).
+  if ! codesign --verify --verbose=2 "$target" >/dev/null 2>&1; then
+    note_sus "trust anomaly: $label failed codesign verification"
+    return
+  fi
+
+  if grep -qi "code object is not signed" "$detail_file" \
+     || grep -qi "invalid" "$detail_file"
   then
-    note_sus "trust anomaly: $label not Apple-signed or invalid"
+    note_sus "trust anomaly: $label shows invalid signature metadata"
   fi
 }
 
-check_codesign "$OUTDIR/amfid_codesign.txt" "amfid"
-check_codesign "$OUTDIR/trustd_codesign.txt" "trustd"
-check_codesign "$OUTDIR/syspolicyd_codesign.txt" "syspolicyd"
+check_codesign "/usr/libexec/amfid" "$OUTDIR/amfid_codesign.txt" "amfid"
+check_codesign "/usr/libexec/trustd" "$OUTDIR/trustd_codesign.txt" "trustd"
+check_codesign "/usr/libexec/syspolicyd" "$OUTDIR/syspolicyd_codesign.txt" "syspolicyd"
 
 # SIP check
 if ! grep -qi "enabled" "$OUTDIR/sip_status.txt"; then

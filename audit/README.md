@@ -22,6 +22,12 @@ Optional: show collector output during the run:
 ./audit.sh --verbose
 ```
 
+If you want partial results even when a collector or analyzer fails:
+
+```bash
+AUDIT_ALLOW_PARTIAL=1 ./audit.sh
+```
+
 Reset all generated state (baseline/current/report/archives):
 
 ```bash
@@ -62,6 +68,7 @@ Snapshots are built in temporary directories and then swapped into place (atomic
 ## Notes
 
 - Baseline should be created on a known-clean system state.
+- By default, run failures in collectors/analyzer return a non-zero exit status.
 - The “risk level” in `summary.md` is a simple heuristic for triage; use the raw artifacts for deeper validation.
 
 

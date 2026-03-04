@@ -8,15 +8,15 @@ mkdir -p "$OUTDIR"
 
 {
   echo "=== DEFAULT ROUTE ==="
-  route get default
+  route get default 2>&1 || echo "WARN: route get default failed (permissions restricted)"
 
   echo
   echo "=== DNS CONFIG ==="
-  scutil --dns
+  scutil --dns 2>&1 || echo "WARN: scutil --dns failed (permissions restricted)"
 
   echo
   echo "=== INTERFACES ==="
-  ifconfig
+  ifconfig 2>&1 || echo "WARN: ifconfig failed (permissions restricted)"
 } > "$OUTFILE"
 
 echo "[net_path] route + dns captured"

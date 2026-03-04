@@ -16,7 +16,10 @@ echo "[proc_watch] sampling short-lived processes (5s window)..."
 
 # sample repeatedly to catch ephemeral processes
 for i in {1..10}; do
-  ps -axo pid,ppid,user,uid,command >> "$OUTFILE"
+  ps -axo pid,ppid,user,uid,command >> "$OUTFILE" 2>/dev/null || {
+    echo "WARN: ps sample failed (permissions restricted)" >> "$OUTFILE"
+    break
+  }
   sleep 0.5
 done
 

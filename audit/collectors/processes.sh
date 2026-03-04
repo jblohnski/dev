@@ -3,4 +3,9 @@ set -euo pipefail
 
 OUT="$1/processes.txt"
 
-ps -axo pid,ppid,user,comm | sort > "$OUT"
+if ! ps -axo pid,ppid,user,comm 2>/dev/null | sort > "$OUT"; then
+  {
+    echo "WARN: unable to read full process list (permissions restricted)"
+    date
+  } > "$OUT"
+fi

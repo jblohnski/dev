@@ -37,20 +37,24 @@ for f in "${TARGETS[@]}"; do
   ((TOTAL++)) || true
 
   SIG="$(codesign -dv --verbose=4 "$f" 2>&1 || true)"
+  set +e
+  VERIFY_OUT="$(codesign --verify --verbose=2 "$f" 2>&1)"
+  VERIFY_RC=$?
+  set -e
 
   {
     echo "---- $f ----"
     echo "$SIG"
+    echo "verify: $VERIFY_OUT"
     echo
   } >> "$OUTFILE"
 
   # Suspicion conditions:
-  #  - codesign error
-  #  - missing authority chain
-  #  - not Apple signed
-  if grep -qi "code object is not signed" <<< "$SIG" \
-     || grep -qi "invalid" <<< "$SIG" \
-     || ! grep -q "Authority=Apple" <<< "$SIG"
+  #  - explicit verification failure
+  #  - signature metadata indicates invalid/unsigned
+  if [[ "$VERIFY_RC" -ne 0 ]] \
+     || grep -qi "code object is not signed" <<< "$SIG" \
+     || grep -qi "invalid" <<< "$SIG"
   then
     ((BAD++)) || true
     echo "[sus] signing issue: $f"

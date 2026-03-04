@@ -12,12 +12,12 @@ echo "[net_live] capturing socket snapshot..."
   echo "=== NETSTAT SNAPSHOT ==="
   date
   echo
-  netstat -anv
+  netstat -anv 2>&1 || echo "WARN: netstat -anv failed (permissions restricted)"
   echo
   echo "=== ROUTING TABLE ==="
-  netstat -rn
+  netstat -rn 2>&1 || echo "WARN: netstat -rn failed (permissions restricted)"
 } > "$OUTFILE"
 
 # summary only to stdout
-EST=$(netstat -an | grep ESTABLISHED | wc -l | tr -d ' ')
+EST="$(netstat -an 2>/dev/null | grep ESTABLISHED | wc -l | tr -d ' ' || echo 0)"
 echo "[net_live] established sockets: $EST"
