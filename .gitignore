@@ -1,105 +1,44 @@
+# Workspace subprojects not managed in this repo
 projects/
 proposals/
-fad/
 arkenfox/
- 
-# Python compiled files
+
+
+# Python
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
-__pycache__/
 *.so
-
-# Virtual environment
-venv
-env
-.venv
-ENV
-
-# FastAPI/Pydantic specific
-*.cache
-
-# Testing
-.pytest_cache
-
-# IDE/Editor files
-.idea
-.vscode
-*.sublime-workspace
-*.sublime-project
-
-# Environment variables
-.env
-.env.dev
-.env.prod
-
-# System files
-.DS_Store
-Thumbs.db
-
-package-lock.json
-node_modules
-dist
-
-
-# ======================
-# audit – minimal ignore
-# Mac + Python + shell
-# ======================
-
-# ---- runtime output (core audit artifacts) ----
-baseline/
-archives/
-current/
-report/
-state/
-*.log
-*.out
-*.diff
-*.snapshot
-*.tmp
-
-
-# packet captures / net work
-*.pcap
-*.pcapng
-
-# ---- Python ----
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# virtualenv (if you ever use one)
+.pytest_cache/
 .venv/
 venv/
+env/
+ENV/
 
-# ---- macOS filesystem noise ----
-.DS_Store
-._*
-.Spotlight-V100
-.Trashes
-.fseventsd
-__MACOSX/
+# Local env/config
+.env
+.env.*
+*.cache
 
-# ---- editor noise ----
-.vscode/
+# Node/build artifacts
+node_modules/
+dist/
+package-lock.json
+
+# Editor/system noise
 .idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
 *.swp
 *.swo
 *~
+.DS_Store
+Thumbs.db
+._*
 
-# ---- keep the real project ----
-!collectors/
-!pymaudit/
-!scripts/
-!*.sh
-!*.py
-!README.md
-
-# skip all projects/ content as they are indepedebnt projects
-projects/
-
-# local/export artifacts
-audit/Archive.zip
-audit/*.zip
+# Archives / captures (avoid committing generated data)
+*.zip
+*.pcap
+*.pcapng

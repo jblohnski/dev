@@ -15,7 +15,7 @@ state/
 *.snapshot
 *.tmp
 
-# packet captures / net work
+# packet captures / network captures
 *.pcap
 *.pcapng
 
@@ -25,29 +25,15 @@ __pycache__/
 *.pyo
 *.pyd
 
-# virtualenv (if you ever use one)
+# virtualenv
 .venv/
 venv/
 
-# ---- macOS filesystem noise ----
+# macOS/editor noise
 .DS_Store
 ._*
-.Spotlight-V100
-.Trashes
-.fseventsd
-__MACOSX/
-
-# ---- editor noise ----
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# ---- keep the real project ----
-!collectors/
-!pymaudit/
-!scripts/
-!*.sh
-!*.py
-!README.md
