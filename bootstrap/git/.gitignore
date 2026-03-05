@@ -1,0 +1,44 @@
+# Workspace subprojects not managed in this repo
+projects/
+proposals/
+arkenfox/
+
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.venv/
+venv/
+env/
+ENV/
+
+# Local env/config
+.env
+.env.*
+*.cache
+
+# Node/build artifacts
+node_modules/
+dist/
+package-lock.json
+
+# Editor/system noise
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+._*
+
+# Archives / captures (avoid committing generated data)
+*.zip
+*.pcap
+*.pcapng
