@@ -77,7 +77,7 @@ Targeted Zeek run by src/dst/port/timestamp:
 ```
 
 ## Shell Sync Requirements
-`bootstrap/zsh/.zshrc` is the source of truth.
+`bootstrap/.zshrc` is the source of truth.
 
 Required command layer:
 - fast audit runner

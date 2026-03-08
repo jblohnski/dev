@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LOG_DIR="${1:-/Users/jagov/dev/zlogs}"
+LOG_DIR="${1:-${ZEEK_LOG_DIR:-$HOME/zlogs}}"
 
 if ! command -v lnav >/dev/null 2>&1; then
   echo "error: lnav is not installed or not in PATH" >&2

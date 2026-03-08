@@ -8,7 +8,7 @@ Top-level groups are intentionally separated by lifecycle:
 
 1. `bootstrap/`:
    Files used to initialize or publish local environment/profile state.
-   Example: shell profile, terminal profiles, dotfile publish scripts.
+   Example: shell profile, terminal profiles, git/editor defaults.
 2. `ops/`:
    Operational scripts that interrogate, harden, or manipulate live system state.
    Example: router checks, macOS hardening, Firefox hardening.
@@ -25,15 +25,15 @@ Top-level groups are intentionally separated by lifecycle:
 
 Canonical tracked shell profile path:
 
-- `bootstrap/zsh/.zshrc`
+- `bootstrap/.zshrc`
 
 Publish workflow:
 
 ```bash
-./bootstrap/bin/publish-zshrc.sh
+pz
 ```
 
-This validates syntax and copies tracked profile to `~/.zshrc` with backup.
+`pz` copies `~/dev/bootstrap/.zshrc` to `~/.zshrc` and reloads it in the current shell.
 
 ## Ops vs Audit
 

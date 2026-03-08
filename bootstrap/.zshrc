@@ -56,6 +56,17 @@ has() { command -v "$1" >/dev/null 2>&1 }
 ## audit
 export AUDIT_DIR="$HOME/dev/audit"
 export ZEEK_LOG_DIR="${ZEEK_LOG_DIR:-$HOME/zlogs}"
+
+## bootstrap
+export DEV_BOOTSTRAP_DIR="$HOME/dev/bootstrap"
+export DEV_ZSHRC_SRC="${DEV_ZSHRC_SRC:-$DEV_BOOTSTRAP_DIR/.zshrc}"
+# pz: publish tracked zsh config to home and reload current shell
+pz() {
+  [[ -f "$DEV_ZSHRC_SRC" ]] || { echo "pz: source not found: $DEV_ZSHRC_SRC"; return 1; }
+  cp "$DEV_ZSHRC_SRC" "$HOME/.zshrc" || return 1
+  source "$HOME/.zshrc"
+}
+
 # a: run audit
 alias a='builtin cd "$AUDIT_DIR" && ./audit.sh'
 # azk: run zeek snapshot workflow
