@@ -42,6 +42,10 @@ This validates syntax and copies tracked profile to `~/.zshrc` with backup.
 
 Rule: keep scripts that *act* in `ops/`; keep scripts that *measure/compare* in `audit/`.
 
+## Zeek Integration
+
+See [DEV_AUDIT_ZEEK_INTEGRATION.md](DEV_AUDIT_ZEEK_INTEGRATION.md) for the integrated Zeek datamining workflow, anchor-based investigation model (`uid` or `src/dst/port/timestamp`), and artifact structure.
+
 ## Metadata Convention (for legend/dashboard)
 
 Runnable scripts should include:

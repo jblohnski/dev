@@ -57,12 +57,30 @@ has() { command -v "$1" >/dev/null 2>&1 }
 export AUDIT_DIR="$HOME/dev/audit"
 # a: run audit
 alias a='builtin cd "$AUDIT_DIR" && ./audit.sh'
-# ab: baseline
-alias ab='builtin cd "$AUDIT_DIR" && ./audit.sh --baseline'
-# ac: clear
-alias ac='builtin cd "$AUDIT_DIR" && ./audit.sh --clear'
-# ao: summarize audit run
-alias ao='builtin cd "$AUDIT_DIR" && python3 scripts/analyze_run.py --current current --baseline baseline --report report && python3 scripts/render_dashboard.py --bundle report/audit_bundle.json --out report/summary.html'
+# azk: run zeek snapshot workflow
+alias azk='builtin cd "$AUDIT_DIR" && ./zeek-audit.sh'
+# azu: zeek by uid
+azu() {
+  local uid="${1:?uid required}"
+  local run="${2:-uid-$(date +%Y%m%d-%H%M%S)}"
+  builtin cd "$AUDIT_DIR" && ./zeek-audit.sh "$AUDIT_DIR/zlogs" "$run" -- --uid "$uid"
+}
+# azt: zeek by tuple (src dst port ts [run])
+azt() {
+  local src="${1:?src_ip required}"
+  local dst="${2:?dst_ip required}"
+  local port="${3:?dst_port required}"
+  local ts="${4:?timestamp required (epoch or ISO)}"
+  local run="${5:-tuple-$(date +%Y%m%d-%H%M%S)}"
+  builtin cd "$AUDIT_DIR" && ./zeek-audit.sh "$AUDIT_DIR/zlogs" "$run" -- \
+    --src-ip "$src" --dst-ip "$dst" --dst-port "$port" --ts "$ts"
+}
+# arpt: open latest zeek markdown report path
+arpt() {
+  local f
+  f="$(command ls -1t "$AUDIT_DIR"/report/zeek/zeek-*.md 2>/dev/null | head -n 1 || true)"
+  [[ -n "$f" ]] && print "$f" || print "no zeek markdown report found"
+}
 # az: zip up audit project only code
 az() {
   zip -r audit.zip audit \

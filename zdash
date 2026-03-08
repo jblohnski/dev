@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+LOG_DIR="${1:-/Users/jagov/dev/zlogs}"
+
+if ! command -v lnav >/dev/null 2>&1; then
+  echo "error: lnav is not installed or not in PATH" >&2
+  exit 1
+fi
+
+if [ ! -d "$LOG_DIR" ]; then
+  echo "error: log directory not found: $LOG_DIR" >&2
+  exit 1
+fi
+
+shopt -s nullglob
+LOG_FILES=("$LOG_DIR"/*.log)
+shopt -u nullglob
+
+if [ ${#LOG_FILES[@]} -eq 0 ]; then
+  echo "error: no .log files found in $LOG_DIR" >&2
+  exit 1
+fi
+
+run_query() {
+  local title="$1"
+  local query="$2"
+  printf '\n=== %s ===\n' "$title"
+  lnav -n "${LOG_FILES[@]}" -c ";$query" -c ':quit'
+}
+
+run_query "Timespan + Total Connections" \
+  'SELECT MIN(log_time) AS start, MAX(log_time) AS end, COUNT(*) AS total_conn_rows FROM bro_conn_log;'
+
+run_query "Connections per Hour" \
+  'SELECT strftime("%Y-%m-%d %H:00", log_time) AS hour, COUNT(*) AS conns FROM bro_conn_log GROUP BY hour ORDER BY hour;'
+
+run_query "Top Services" \
+  'SELECT bro_service, COUNT(*) AS c FROM bro_conn_log GROUP BY bro_service ORDER BY c DESC LIMIT 15;'
+
+run_query "Top Source Hosts" \
+  'SELECT bro_id_orig_h AS src, COUNT(*) AS c FROM bro_conn_log GROUP BY src ORDER BY c DESC LIMIT 15;'
+
+run_query "Top Destination Hosts" \
+  'SELECT bro_id_resp_h AS dst, COUNT(*) AS c FROM bro_conn_log GROUP BY dst ORDER BY c DESC LIMIT 15;'
+
+run_query "Top DNS Queries" \
+  'SELECT bro_query, COUNT(*) AS c FROM bro_dns_log GROUP BY bro_query ORDER BY c DESC LIMIT 20;'
+
+run_query "DNS Query Types" \
+  'SELECT bro_qtype_name AS qtype, COUNT(*) AS c FROM bro_dns_log GROUP BY qtype ORDER BY c DESC;'
+
+run_query "Top TLS SNI" \
+  'SELECT bro_server_name, COUNT(*) AS c FROM bro_ssl_log WHERE bro_server_name IS NOT NULL GROUP BY bro_server_name ORDER BY c DESC LIMIT 20;'
+
+run_query "Weird Events" \
+  'SELECT bro_name, COUNT(*) AS c FROM bro_weird_log GROUP BY bro_name ORDER BY c DESC LIMIT 20;'

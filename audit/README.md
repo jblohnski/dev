@@ -22,7 +22,35 @@ Optional:
 ./audit.sh --out /tmp/my_snapshot.json
 ./audit.sh --id maple
 ./audit.sh --no-color
+./audit.sh --zeek-dir ./zlogs
+./audit.sh --no-zeek
+./audit.sh --zeek-ipinfo
 ```
+
+## Zeek integration
+
+The audit workflow now auto-ingests Zeek logs when available.
+
+- Primary path: `audit/zlogs/`
+- Fallback path: `../zlogs/`
+- Required file: `conn.log`
+- Optional files: `dns.log`, `ssl.log`, `http.log`, `quic.log`, `files.log`, `weird.log`
+
+Standalone Zeek report command:
+
+```bash
+./zeek-audit.sh
+./zeek-audit.sh ./zlogs run01
+./zeek-audit.sh ./zlogs run01 -- --uid CtvOlP1Ej5cQULCyA5
+./zeek-audit.sh ./zlogs run02 -- --src-ip 192.168.1.157 --dst-ip 75.102.5.99 --dst-port 443 --ts 2026-03-06T20:45:25Z
+```
+
+Artifacts are written under `audit/report/`:
+
+- `zeek/zeek-<id>.json`
+- `zeek/zeek-<id>.summary.txt`
+- `zeek/zeek-<id>.md`
+- `zeek/zeek-<id>.graph.dot` (and PNG if Graphviz `dot` exists)
 
 ## JSON output
 
@@ -43,6 +71,7 @@ Top-level sections:
 - `dsk` (disk snapshot)
 - `per` (persistence counts)
 - `findings` (anomaly list)
+- `zeek` (present when Zeek logs are found and parsed)
 
 Notes:
 

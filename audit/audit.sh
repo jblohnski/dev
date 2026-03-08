@@ -18,6 +18,9 @@ OUT_JSON=""
 RUN_ID=""
 NO_COLOR=0
 NET_STATE_FILE="$ROOT_DIR/state/net-last.json"
+ZEEK_MODE=1
+ZEEK_DIR=""
+ZEEK_IPINFO=0
 
 usage() {
   cat <<EOF
@@ -26,6 +29,9 @@ Usage:
   ./audit.sh --out /path/to/output.json
   ./audit.sh --id shortword
   ./audit.sh --no-color
+  ./audit.sh --zeek-dir /path/to/zlogs
+  ./audit.sh --no-zeek
+  ./audit.sh --zeek-ipinfo
 
 Output:
   - Writes one JSON snapshot (default: audit-<word>.json)
@@ -45,6 +51,18 @@ while [[ $# -gt 0 ]]; do
       ;;
     --no-color)
       NO_COLOR=1
+      shift
+      ;;
+    --zeek-dir)
+      ZEEK_DIR="${2:-}"
+      shift 2
+      ;;
+    --no-zeek)
+      ZEEK_MODE=0
+      shift
+      ;;
+    --zeek-ipinfo)
+      ZEEK_IPINFO=1
       shift
       ;;
     -h|--help)
@@ -98,6 +116,22 @@ count_files() {
   local dir="$1"
   [[ -d "$dir" ]] || { echo 0; return; }
   find "$dir" -maxdepth 1 -type f 2>/dev/null | wc -l | tr -d ' '
+}
+
+resolve_zeek_log_dir() {
+  local preferred="$1"
+  local candidates=()
+
+  if [[ -n "$preferred" ]]; then
+    candidates+=("$preferred")
+  fi
+  candidates+=("$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs")
+
+  local d
+  for d in "${candidates[@]}"; do
+    [[ -d "$d" && -f "$d/conn.log" ]] && { printf "%s" "$d"; return; }
+  done
+  printf ""
 }
 
 TS="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
@@ -175,6 +209,35 @@ SYS_LAUNCH_AGENTS="$(count_files "/Library/LaunchAgents")"
 SYS_LAUNCH_DAEMONS="$(count_files "/Library/LaunchDaemons")"
 LOGIN_ITEMS_COUNT="$(num_or_zero "$(osascript -e 'tell application \"System Events\" to get count of every login item' 2>/dev/null || true)")"
 
+ZEEK_ANALYZER="$ROOT_DIR/analysis/zeek_snapshot.py"
+ZEEK_LOG_DIR_RESOLVED=""
+ZEEK_REPORT_DIR="$ROOT_DIR/report/zeek"
+ZEEK_REPORT_JSON="$ZEEK_REPORT_DIR/zeek-${RUN_ID}.json"
+ZEEK_REPORT_BULLETS="$ZEEK_REPORT_DIR/zeek-${RUN_ID}.summary.txt"
+ZEEK_REPORT_MD="$ZEEK_REPORT_DIR/zeek-${RUN_ID}.md"
+ZEEK_REPORT_DOT="$ZEEK_REPORT_DIR/zeek-${RUN_ID}.graph.dot"
+ZEEK_SUMMARY_HEADLINE=""
+
+if [[ "$ZEEK_MODE" -eq 1 && -f "$ZEEK_ANALYZER" ]]; then
+  ZEEK_LOG_DIR_RESOLVED="$(resolve_zeek_log_dir "$ZEEK_DIR")"
+  if [[ -n "$ZEEK_LOG_DIR_RESOLVED" ]]; then
+    mkdir -p "$ZEEK_REPORT_DIR"
+    ZEEK_ENRICH_ARG=""
+    [[ "$ZEEK_IPINFO" -eq 1 ]] && ZEEK_ENRICH_ARG="--enrich-ipinfo"
+    if python3 "$ZEEK_ANALYZER" \
+      --log-dir "$ZEEK_LOG_DIR_RESOLVED" \
+      --out-json "$ZEEK_REPORT_JSON" \
+      --out-bullets "$ZEEK_REPORT_BULLETS" \
+      --out-md "$ZEEK_REPORT_MD" \
+      --out-dot "$ZEEK_REPORT_DOT" \
+      ${ZEEK_ENRICH_ARG:+$ZEEK_ENRICH_ARG} >/dev/null 2>&1; then
+      if [[ -f "$ZEEK_REPORT_BULLETS" ]]; then
+        ZEEK_SUMMARY_HEADLINE="$(head -n 1 "$ZEEK_REPORT_BULLETS" | sed 's/^- //')"
+      fi
+    fi
+  fi
+fi
+
 anomalies_json='[]'
 add_anomaly() {
   local sev="$1"; local cat="$2"; local msg="$3"
@@ -200,6 +263,7 @@ export DEFAULT_GW DEFAULT_IFACE DNS_SERVERS_RAW LISTENING_TCP_COUNT ESTABLISHED_
 export ACTIVE_IFACES_RAW DHCP_IP DHCP_SERVER DHCP_LEASE
 export TOP_REMOTE_RAW TOP_PROC_RAW TOP_CPU_RAW
 export ROOT_USED_PCT ROOT_FREE_HUMAN USER_LAUNCH_AGENTS SYS_LAUNCH_AGENTS SYS_LAUNCH_DAEMONS LOGIN_ITEMS_COUNT
+export ZEEK_MODE ZEEK_DIR ZEEK_LOG_DIR_RESOLVED ZEEK_REPORT_DIR ZEEK_REPORT_JSON ZEEK_REPORT_BULLETS ZEEK_REPORT_MD ZEEK_REPORT_DOT ZEEK_SUMMARY_HEADLINE
 export anomalies_json
 
 JSON_DOC="$(python3 - <<'PY'
@@ -270,6 +334,14 @@ delta = {
 }
 cur_net["delta"] = delta
 
+zeek_obj = None
+zeek_report = Path(os.environ.get("ZEEK_REPORT_JSON", ""))
+if str(os.environ.get("ZEEK_MODE", "1")).strip() != "0" and zeek_report.exists():
+    try:
+        zeek_obj = json.loads(zeek_report.read_text())
+    except Exception:
+        zeek_obj = {"error": "failed_to_parse_zeek_report", "path": str(zeek_report)}
+
 doc = {
   "cat": "audit",
   "id": os.environ.get("RUN_ID", ""),
@@ -304,6 +376,9 @@ doc = {
   },
   "findings": json.loads(os.environ.get("anomalies_json", "[]")),
 }
+
+if zeek_obj is not None:
+  doc["zeek"] = zeek_obj
 
 state_file.parent.mkdir(parents=True, exist_ok=True)
 state_file.write_text(json.dumps({"ts": doc["ts"], "net": doc["net"]}, indent=2) + "\n")
@@ -353,6 +428,11 @@ printf "%sINFO%s  ifaces=%s\n" "$DIM" "$RST" "${ifaces_show:-unknown}"
 printf "%sINFO%s  dhcp iface=%s ip=%s server=%s lease=%s\n" "$DIM" "$RST" "${DEFAULT_IFACE:-unknown}" "${DHCP_IP:-}" "${DHCP_SERVER:-}" "${DHCP_LEASE:-}"
 printf "%sINFO%s  proc(top-net)=%s\n" "$DIM" "$RST" "${top_proc_show:-none}"
 printf "%sINFO%s  net-delta=%s\n" "$DIM" "$RST" "$delta_show"
+if [[ -f "$ZEEK_REPORT_JSON" ]]; then
+  printf "%sINFO%s  zeek=%s (%s)\n" "$DIM" "$RST" "${ZEEK_LOG_DIR_RESOLVED:-unknown}" "${ZEEK_SUMMARY_HEADLINE:-snapshot ready}"
+else
+  [[ "$ZEEK_MODE" -eq 1 ]] && printf "%sINFO%s  zeek=not found (use --zeek-dir or place logs in audit/zlogs)\n" "$DIM" "$RST"
+fi
 printf "%sINFO%s  disk root_used=%s%% free=%s  persistence ua=%s sa=%s sd=%s li=%s\n" "$DIM" "$RST" "$(show_num "$ROOT_USED_PCT")" "$ROOT_FREE_HUMAN" "$(show_num "$USER_LAUNCH_AGENTS")" "$(show_num "$SYS_LAUNCH_AGENTS")" "$(show_num "$SYS_LAUNCH_DAEMONS")" "$(show_num "$LOGIN_ITEMS_COUNT")"
 
 if [[ "$anom_count" -gt 0 ]]; then
@@ -367,3 +447,9 @@ else
 fi
 
 printf "%sJSON:%s %s\n" "$DIM" "$RST" "$OUT_JSON"
+if [[ -f "$ZEEK_REPORT_JSON" ]]; then
+  printf "%sZEEK:%s %s\n" "$DIM" "$RST" "$ZEEK_REPORT_JSON"
+  printf "%sZEEK:%s %s\n" "$DIM" "$RST" "$ZEEK_REPORT_BULLETS"
+  printf "%sZEEK:%s %s\n" "$DIM" "$RST" "$ZEEK_REPORT_MD"
+  printf "%sZEEK:%s %s\n" "$DIM" "$RST" "$ZEEK_REPORT_DOT"
+fi
