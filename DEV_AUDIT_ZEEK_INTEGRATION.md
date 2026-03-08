@@ -9,7 +9,7 @@ Unify `dev/audit` with Zeek log datamining so investigations can pivot from one 
 - connection graph (`.dot`, optional `.png`)
 
 ## Top-Down Workflow
-1. Capture or place Zeek logs in `audit/zlogs/` (fallback `dev/zlogs/`).
+1. Capture or place Zeek logs in `audit/zlogs/` (fallback `dev/zlogs/`, then `~/zlogs/`).
 2. Run `audit.sh` for the full machine snapshot with embedded Zeek section.
 3. Run `zeek-audit.sh` for focused network forensics.
 4. For targeted drill-down, pass one anchor:
@@ -90,4 +90,3 @@ Required command layer:
 - Markdown: comprehensive narrative for human review
 - Summary TXT: terse bullets for quick triage
 - DOT/PNG: topology and weight visualization
-

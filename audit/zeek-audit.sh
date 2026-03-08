@@ -31,7 +31,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   exit 0
 fi
 
-LOG_DIR="${1:-$ROOT_DIR/zlogs}"
+LOG_DIR="${1:-${ZEEK_LOG_DIR:-$ROOT_DIR/zlogs}}"
 RUN_ID="${2:-$(date +%Y%m%d-%H%M%S)}"
 
 EXTRA=()
@@ -45,14 +45,17 @@ elif [[ $# -gt 2 ]]; then
 fi
 
 if [[ ! -d "$LOG_DIR" || ! -f "$LOG_DIR/conn.log" ]]; then
-  FALLBACK="$ROOT_DIR/../zlogs"
-  if [[ -d "$FALLBACK" && -f "$FALLBACK/conn.log" ]]; then
-    LOG_DIR="$FALLBACK"
-  fi
+  for fallback in "$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$HOME/zlogs"; do
+    if [[ -d "$fallback" && -f "$fallback/conn.log" ]]; then
+      LOG_DIR="$fallback"
+      break
+    fi
+  done
 fi
 
 if [[ ! -d "$LOG_DIR" || ! -f "$LOG_DIR/conn.log" ]]; then
-  echo "error: conn.log not found in '$LOG_DIR' (or fallback ../zlogs)" >&2
+  echo "error: conn.log not found in '$LOG_DIR'" >&2
+  echo "checked: \$ROOT_DIR/zlogs, \$ROOT_DIR/../zlogs, \$HOME/zlogs" >&2
   exit 1
 fi
 

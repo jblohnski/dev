@@ -3,6 +3,7 @@ projects/
 proposals/
 arkenfox/
 zlogs/
+audit/zlogs/
 
 # Python
 __pycache__/

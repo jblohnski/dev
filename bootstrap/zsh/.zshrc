@@ -55,15 +55,16 @@ has() { command -v "$1" >/dev/null 2>&1 }
 
 ## audit
 export AUDIT_DIR="$HOME/dev/audit"
+export ZEEK_LOG_DIR="${ZEEK_LOG_DIR:-$HOME/zlogs}"
 # a: run audit
 alias a='builtin cd "$AUDIT_DIR" && ./audit.sh'
 # azk: run zeek snapshot workflow
-alias azk='builtin cd "$AUDIT_DIR" && ./zeek-audit.sh'
+alias azk='builtin cd "$AUDIT_DIR" && ./zeek-audit.sh "$ZEEK_LOG_DIR"'
 # azu: zeek by uid
 azu() {
   local uid="${1:?uid required}"
   local run="${2:-uid-$(date +%Y%m%d-%H%M%S)}"
-  builtin cd "$AUDIT_DIR" && ./zeek-audit.sh "$AUDIT_DIR/zlogs" "$run" -- --uid "$uid"
+  builtin cd "$AUDIT_DIR" && ./zeek-audit.sh "$ZEEK_LOG_DIR" "$run" -- --uid "$uid"
 }
 # azt: zeek by tuple (src dst port ts [run])
 azt() {
@@ -72,7 +73,7 @@ azt() {
   local port="${3:?dst_port required}"
   local ts="${4:?timestamp required (epoch or ISO)}"
   local run="${5:-tuple-$(date +%Y%m%d-%H%M%S)}"
-  builtin cd "$AUDIT_DIR" && ./zeek-audit.sh "$AUDIT_DIR/zlogs" "$run" -- \
+  builtin cd "$AUDIT_DIR" && ./zeek-audit.sh "$ZEEK_LOG_DIR" "$run" -- \
     --src-ip "$src" --dst-ip "$dst" --dst-port "$port" --ts "$ts"
 }
 # arpt: open latest zeek markdown report path

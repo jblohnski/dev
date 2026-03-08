@@ -125,7 +125,10 @@ resolve_zeek_log_dir() {
   if [[ -n "$preferred" ]]; then
     candidates+=("$preferred")
   fi
-  candidates+=("$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs")
+  if [[ -n "${ZEEK_LOG_DIR:-}" ]]; then
+    candidates+=("$ZEEK_LOG_DIR")
+  fi
+  candidates+=("$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$HOME/zlogs")
 
   local d
   for d in "${candidates[@]}"; do

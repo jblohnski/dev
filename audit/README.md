@@ -33,8 +33,25 @@ The audit workflow now auto-ingests Zeek logs when available.
 
 - Primary path: `audit/zlogs/`
 - Fallback path: `../zlogs/`
+- Home path: `~/zlogs/`
+- Env override: `ZEEK_LOG_DIR=/absolute/path`
 - Required file: `conn.log`
 - Optional files: `dns.log`, `ssl.log`, `http.log`, `quic.log`, `files.log`, `weird.log`
+
+Background capture quickstart (replace `en0` if needed):
+
+```bash
+mkdir -p ~/zlogs ~/dev/audit/state
+sudo nohup zeek -i en0 "Log::default_logdir=$HOME/zlogs" \
+  > ~/dev/audit/state/zeek-capture.out 2>&1 &
+echo $! > ~/dev/audit/state/zeek-capture.pid
+```
+
+Stop capture:
+
+```bash
+sudo kill "$(cat ~/dev/audit/state/zeek-capture.pid)"
+```
 
 Standalone Zeek report command:
 
