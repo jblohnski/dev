@@ -1,4 +1,8 @@
 #!/bin/zsh
+# @desc: Analyze macsm watch run artifacts and summarize diffs
+# @tags: audit macsm analysis
+# @run: user
+
 # macsm_analyze.sh
 # Analyze a macsm.sh run directory and summarize:
 #  - which change events occurred

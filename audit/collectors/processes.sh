@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Capture sorted process list snapshot
+# @tags: audit collector process snapshot
+# @run: user
+
 set -euo pipefail
 
 OUT="$1/processes.txt"

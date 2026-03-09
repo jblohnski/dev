@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Remove pfkit anchor and restore pf config
+# @tags: ops pf firewall uninstall
+# @run: sudo
+
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Capture active network connections via lsof
+# @tags: audit collector network lsof
+# @run: user
+
 set -euo pipefail
 
 OUT="$1/network.txt"

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Collect non-Apple launch agents and daemons
+# @tags: audit collector launch persistence
+# @run: user
+
 set -euo pipefail
 
 OUTDIR="${1:-./current}"

@@ -1,4 +1,8 @@
 #!/bin/zsh
+# @desc: Watch macOS accessibility/audio preference changes
+# @tags: audit macsm watcher
+# @run: user
+
 # macsm.sh
 # macOS (zsh) watcher for:
 #  - Accessibility Zoom / Universal Access (e.g., 3-finger rectangle magnifier behavior)

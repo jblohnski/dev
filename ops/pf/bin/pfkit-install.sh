@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Install pfkit anchor and pf.conf wiring
+# @tags: ops pf firewall install
+# @run: sudo
+
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then

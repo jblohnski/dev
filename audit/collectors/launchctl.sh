@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Dump launchctl system and GUI trees
+# @tags: audit collector launchctl persistence
+# @run: user
+
 set -euo pipefail
 
 OUT="$1/launchctl_dump.txt"

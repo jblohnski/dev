@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Run Zeek correlation report generation
+# @tags: audit zeek forensics
+# @run: user
+
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

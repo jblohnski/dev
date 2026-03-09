@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Stream blocked packets from pflog0
+# @tags: ops pf firewall monitor
+# @run: sudo
+
 set -euo pipefail
 
 # Shows PF blocked packets if logging is enabled in base pf.conf.

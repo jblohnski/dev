@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Render and load pfkit anchor rules
+# @tags: ops pf firewall apply
+# @run: sudo
+
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
