@@ -33,6 +33,7 @@ The audit workflow now auto-ingests Zeek logs when available.
 
 - Primary path: `audit/zlogs/`
 - Fallback path: `../zlogs/`
+- Local direct-log fallback: `audit/*.log`
 - Home path: `~/zlogs/`
 - Env override: `ZEEK_LOG_DIR=/absolute/path`
 - Required file: `conn.log`
@@ -41,16 +42,27 @@ The audit workflow now auto-ingests Zeek logs when available.
 Background capture quickstart (replace `en0` if needed):
 
 ```bash
-mkdir -p ~/zlogs ~/dev/audit/state
-sudo nohup zeek -i en0 "Log::default_logdir=$HOME/zlogs" \
-  > ~/dev/audit/state/zeek-capture.out 2>&1 &
-echo $! > ~/dev/audit/state/zeek-capture.pid
+./zeek-capture.sh start en0
 ```
 
-Stop capture:
+That wrapper starts Zeek with the project’s expected write-path parameters:
 
 ```bash
-sudo kill "$(cat ~/dev/audit/state/zeek-capture.pid)"
+sudo zeek -i en0 -C "Log::default_logdir=$HOME/zlogs"
+```
+
+- `-i en0`: capture from the selected interface
+- `-C`: ignore checksum validation issues common with NIC offload
+- `Log::default_logdir=...`: write `conn.log`, `dns.log`, and related files into the configured log directory
+
+Useful variants:
+
+```bash
+./zeek-capture.sh status
+./zeek-capture.sh stop
+ZEEK_LOG_DIR=./zlogs ./zeek-capture.sh start en0
+./zeek-capture.sh start en0 -- Site::local_nets+=192.168.1.0/24
+./zeek-logsync.sh
 ```
 
 Standalone Zeek report command:

@@ -71,6 +71,18 @@ pz() {
 alias a='builtin cd "$AUDIT_DIR" && ./audit.sh'
 # azk: run zeek snapshot workflow
 alias azk='builtin cd "$AUDIT_DIR" && ./zeek-audit.sh "$ZEEK_LOG_DIR"'
+# azks: start background zeek capture writing logs into $ZEEK_LOG_DIR
+azks() {
+  local iface="${1:-${ZEEK_CAPTURE_IFACE:-en0}}"
+  shift || true
+  builtin cd "$AUDIT_DIR" && ./zeek-capture.sh start "$iface" "$@"
+}
+# azkt: stop background zeek capture
+alias azkt='builtin cd "$AUDIT_DIR" && ./zeek-capture.sh stop'
+# azkp: show background zeek capture status
+alias azkp='builtin cd "$AUDIT_DIR" && ./zeek-capture.sh status'
+# azkm: merge stray local zeek logs into $ZEEK_LOG_DIR
+alias azkm='builtin cd "$AUDIT_DIR" && ./zeek-logsync.sh'
 # azu: zeek by uid
 azu() {
   local uid="${1:?uid required}"

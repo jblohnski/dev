@@ -62,6 +62,11 @@ cd ~/dev/audit
 ./audit.sh
 ```
 
+Start background capture writing Zeek logs into the configured log dir:
+```bash
+./zeek-capture.sh start en0
+```
+
 Targeted Zeek run by UID:
 ```bash
 ./zeek-audit.sh ./zlogs case01 -- --uid CtvOlP1Ej5cQULCyA5
@@ -81,6 +86,7 @@ Targeted Zeek run by src/dst/port/timestamp:
 
 Required command layer:
 - fast audit runner
+- Zeek capture start/stop/status runner
 - Zeek snapshot runner
 - UID/tuple drill-down wrappers
 - single command to re-publish shell profile to `~/.zshrc`

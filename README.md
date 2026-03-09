@@ -46,6 +46,8 @@ Rule: keep scripts that *act* in `ops/`; keep scripts that *measure/compare* in 
 
 See [DEV_AUDIT_ZEEK_INTEGRATION.md](DEV_AUDIT_ZEEK_INTEGRATION.md) for the integrated Zeek datamining workflow, anchor-based investigation model (`uid` or `src/dst/port/timestamp`), and artifact structure.
 
+Capture logs with the tracked wrapper in `audit/zeek-capture.sh`; it starts Zeek with `-C` and `Log::default_logdir=$ZEEK_LOG_DIR` so `audit.sh` and `zeek-audit.sh` read from a predictable log directory.
+
 ## Metadata Convention (for legend/dashboard)
 
 Runnable scripts should include:

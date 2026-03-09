@@ -19,6 +19,8 @@ Rough file-by-file operation map inferred from script metadata headers.
 - `audit/macsm-anlyz.sh`: Analyze macsm watch run artifacts and summarize diffs (`run=user`, `tags=audit macsm analysis`)
 - `audit/macsm.sh`: Watch macOS accessibility/audio preference changes (`run=user`, `tags=audit macsm watcher`)
 - `audit/zeek-audit.sh`: Run Zeek correlation report generation (`run=user`, `tags=audit zeek forensics`)
+- `audit/zeek-capture.sh`: Start, stop, and inspect background Zeek capture writing logs to the configured log dir (`run=user`, `tags=audit zeek capture logs`)
+- `audit/zeek-logsync.sh`: Merge local Zeek log files into the canonical configured log dir (`run=user`, `tags=audit zeek logs sync`)
 - `ops/browser/firefox-harden.sh`: Apply arkenfox profile and Firefox hardening overrides (`run=user`, `tags=ops browser firefox hardening`)
 - `ops/diagnostics/logsum.sh`: Summarize macOS unified logs for hangs/beachballs (system + Firefox) (`run=user`, `tags=diag logs macos`)
 - `ops/diagnostics/wstrace.sh`: Trace WindowServer-related faults/errors for UI stutter and beachballs (`run=user`, `tags=diag logs ui macos`)

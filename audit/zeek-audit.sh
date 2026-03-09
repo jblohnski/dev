@@ -49,7 +49,7 @@ elif [[ $# -gt 2 ]]; then
 fi
 
 if [[ ! -d "$LOG_DIR" || ! -f "$LOG_DIR/conn.log" ]]; then
-  for fallback in "$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$HOME/zlogs"; do
+  for fallback in "$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$ROOT_DIR" "$HOME/zlogs"; do
     if [[ -d "$fallback" && -f "$fallback/conn.log" ]]; then
       LOG_DIR="$fallback"
       break
