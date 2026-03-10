@@ -53,11 +53,18 @@ export INFOPATH="/opt/homebrew/share/info${INFOPATH:+:$INFOPATH}"
 
 has() { command -v "$1" >/dev/null 2>&1 }
 
+source_if_exists() {
+  local file="$1"
+  [[ -f "$file" ]] && source "$file"
+}
+
 ## bootstrap
 
 export DEV_BOOTSTRAP_DIR="${DEV_BOOTSTRAP_DIR:-$HOME/dev/bootstrap}"
 export DEV_SHELL_DIR="${DEV_SHELL_DIR:-$DEV_BOOTSTRAP_DIR/shell}"
 export DEV_ZSHRC_SRC="${DEV_ZSHRC_SRC:-$DEV_BOOTSTRAP_DIR/.zshrc}"
+
+source_if_exists "$DEV_SHELL_DIR/inventory.sh"
 
 # pz: link tracked zsh config into home and reload current shell
 pz() {
@@ -170,34 +177,6 @@ azip() {
     -x "audit/._*"
 }
 
-comp() {
-  local cmd="${1:-scan}"
-  [[ $# -gt 0 ]] && shift
-
-  case "$cmd" in
-    scan)
-      python3 "$HOME/dev/component-scan.sh" summary "$@"
-      ;;
-    records)
-      python3 "$HOME/dev/component-scan.sh" records "$@"
-      ;;
-    dash)
-      "$HOME/dev/devdash" "$@"
-      ;;
-    *)
-      echo "comp commands: scan records dash"
-      return 1
-      ;;
-  esac
-}
-
-# comp.scan: show component summary
-alias comp.scan='comp scan'
-# comp.records: emit component records
-alias comp.records='comp records'
-# comp.dash: open dev dashboard
-alias comp.dash='comp dash'
-
 ## dev
 
 # devzip: zip up only sources for a given directory
@@ -227,12 +206,6 @@ devzip() {
 
 # dz: shorthand for devzip
 alias dz='devzip'
-# dd: dev dashboard
-alias dd='$HOME/dev/devdash'
-# ds: component summary
-alias ds='python3 "$HOME/dev/component-scan.sh" summary'
-# dr: component records
-alias dr='python3 "$HOME/dev/component-scan.sh" records'
 # ed: open in Sublime
 alias ed='subl'
 
@@ -360,92 +333,9 @@ cmp() {
   fi
 }
 
-__scan_cmds() {
-  local file="${ZDOTDIR:-$HOME}/.zshrc"
-  command awk '
-    function reset_pending(){ pk=""; pd="" }
-    BEGIN { reset_pending(); group="misc" }
-    /^[[:space:]]*##[[:space:]]+/ {
-      line=$0
-      sub(/^[[:space:]]*##[[:space:]]+/, "", line)
-      group=tolower(line)
-      next
-    }
-    /^[[:space:]]*#[[:space:]]*[A-Za-z0-9_.-]+:[[:space:]]+/ {
-      line=$0
-      sub(/^[[:space:]]*#[[:space:]]*/, "", line)
-      split(line, a, /:[[:space:]]+/)
-      pk=a[1]
-      pd=line
-      sub(/^[^:]+:[[:space:]]+/, "", pd)
-      next
-    }
-    /^[[:space:]]*alias[[:space:]]+[A-Za-z0-9_.-]+=/ {
-      line=$0
-      sub(/^[[:space:]]*alias[[:space:]]+/, "", line)
-      split(line, a, /=/)
-      name=a[1]
-      if (pk != "" && pk == name)
-        print group "|" name "|" pd
-      reset_pending()
-      next
-    }
-    /^[[:space:]]*[A-Za-z0-9_]+[[:space:]]*\(\)[[:space:]]*\{/ {
-      line=$0
-      sub(/^[[:space:]]*/, "", line)
-      sub(/[[:space:]]*\(\)[[:space:]]*\{.*/, "", line)
-      name=line
-      if (pk != "" && pk == name)
-        print group "|" name "|" pd
-      reset_pending()
-      next
-    }
-    /^[[:space:]]*[^#[:space:]]/ { reset_pending() }
-  ' "$file"
-}
-
-l() {
-  local -A groups
-  local -a order
-  local max=0
-  local g name desc
-
-  while IFS='|' read -r g name desc; do
-    groups[$g]+="${name}|${desc}"$'\n'
-    [[ " ${order[*]} " != *" $g "* ]] && order+=("$g")
-    (( ${#name} > max )) && max=${#name}
-  done < <(__scan_cmds)
-
-  (( max += 2 ))
-
-  echo
-  print -P "${CLR_HDR}commands${CLR_RESET}"
-  for g in "${order[@]}"; do
-    local -a entries
-    local last_parent=""
-    print
-    print -P " %B%F{15}${g}%f%b"
-    entries=("${(@f)groups[$g]}")
-    for entry in "${entries[@]}"; do
-      IFS='|' read -r name desc <<< "$entry"
-      [[ -n "$name" ]] || continue
-      if [[ "$name" == *.* ]]; then
-        local parent="${name%%.*}"
-        local child="${name#*.}"
-        if [[ "$parent" != "$last_parent" ]]; then
-          print -P "   ${CLR_NAME}${parent}${CLR_RESET}"
-          last_parent="$parent"
-        fi
-        print -P "     ${CLR_ACCENT}${child}${CLR_RESET}  ${CLR_DESC}${desc}${CLR_RESET}"
-      else
-        last_parent=""
-        print -P "   ${CLR_NAME}${name}${CLR_RESET}  ${CLR_DESC}${desc}${CLR_RESET}"
-      fi
-    done
-  done
-  echo
-}
-
 [[ -z "${__SHELL_LEGEND_DONE:-}" ]] && l && export __SHELL_LEGEND_DONE=1
 
-PROMPT='%F{109}%n@%m%f %F{110}%~%f %F{244}%~%f '
+source_if_exists /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source_if_exists /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+PROMPT='%F{109}%n@%m%f %F{110}%~%f %F{244}›%f '

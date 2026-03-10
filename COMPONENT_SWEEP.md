@@ -47,3 +47,4 @@ Reduce coupling between top-level components (`bootstrap`, `audit`, `ops`) and m
 5. Dashboard alignment
 - Keep `devdash` as control surface.
 - Add a “component index” view generated from READMEs + metadata scan.
+- Status: `component-scan.sh` now feeds both `devdash` and the shell legend.

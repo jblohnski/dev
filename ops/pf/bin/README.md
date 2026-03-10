@@ -1,3 +1,8 @@
+<!-- @component: ops-pf-bin -->
+<!-- @kind: support -->
+<!-- @desc: PF operational entrypoints and watch helpers -->
+<!-- @tags: ops pf support -->
+
 # bin
 
 PF operational entrypoints.

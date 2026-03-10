@@ -68,7 +68,11 @@ Directory components can declare explicit metadata in `README.md` comment header
 Shared inventory entrypoint:
 
 - `./component-scan.sh summary`
+- `./component-scan.sh legend`
 - `./component-scan.sh records`
+- `./component-scan.sh validate`
+
+`component-scan.sh` is the canonical inventory source for both the shell legend and `devdash`.
 
 ## Near-Term Cleanup Queue
 

@@ -1,3 +1,8 @@
+<!-- @component: ops-pf -->
+<!-- @kind: support -->
+<!-- @desc: PF firewall toolkit and operational rule wiring -->
+<!-- @tags: ops pf support -->
+
 # pfkit_v2 (macOS)
 
 Goal:
