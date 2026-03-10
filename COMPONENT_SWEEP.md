@@ -38,6 +38,7 @@ Reduce coupling between top-level components (`bootstrap`, `audit`, `ops`) and m
 3. Readme aggregation model
 - Add a lightweight tree-walk script that discovers component READMEs and prints a rollup index.
 - Use metadata tags as the legend source for dashboards.
+- Status: `component-scan.sh` is the shared inventory source for `devdash`.
 
 4. Data boundary enforcement
 - Re-check ignores for runtime artifacts (`zlogs`, `audit/report`, `audit/state`, captures).

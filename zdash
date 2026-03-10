@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Summarize Zeek log datasets with lnav queries
+# @tags: zeek dashboard logs
+# @run: user
+
 set -euo pipefail
 
 LOG_DIR="${1:-${ZEEK_LOG_DIR:-$HOME/zlogs}}"

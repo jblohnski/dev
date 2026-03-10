@@ -1,3 +1,8 @@
+<!-- @component: dev -->
+<!-- @kind: component -->
+<!-- @desc: Personal machine automation and diagnostics workspace -->
+<!-- @tags: workspace automation diagnostics -->
+
 # dev
 
 Personal machine automation and diagnostics repo for `~/dev`.
@@ -33,7 +38,7 @@ Publish workflow:
 pz
 ```
 
-`pz` copies `~/dev/bootstrap/.zshrc` to `~/.zshrc` and reloads it in the current shell.
+`pz` links `~/dev/bootstrap/.zshrc` into `~/.zshrc` and reloads it in the current shell, so shell updates apply by reference. `pzcp` is available as a copy fallback.
 
 ## Ops vs Audit
 
@@ -57,6 +62,13 @@ Runnable scripts should include:
 # @tags: space-separated taxonomy tags
 # @run: user|sudo
 ```
+
+Directory components can declare explicit metadata in `README.md` comment headers. See [COMPONENT_PROTOCOL.md](COMPONENT_PROTOCOL.md).
+
+Shared inventory entrypoint:
+
+- `./component-scan.sh summary`
+- `./component-scan.sh records`
 
 ## Near-Term Cleanup Queue
 

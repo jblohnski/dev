@@ -1,3 +1,8 @@
+<!-- @component: ops -->
+<!-- @kind: component -->
+<!-- @desc: Operational scripts that act on live system state -->
+<!-- @tags: ops runtime system -->
+
 # ops
 
 Operational scripts that act on live system state.

@@ -1,3 +1,8 @@
+<!-- @component: audit-analysis -->
+<!-- @kind: subcomponent -->
+<!-- @desc: Analysis engines used by the audit component -->
+<!-- @tags: audit analysis -->
+
 # analysis
 
 Analysis engines for the `audit` component.

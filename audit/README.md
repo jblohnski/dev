@@ -1,3 +1,8 @@
+<!-- @component: audit -->
+<!-- @kind: component -->
+<!-- @desc: Quick macOS audit and Zeek analysis pipeline -->
+<!-- @tags: audit macos zeek -->
+
 # audit — quick macOS snapshot
 
 This is a lightweight, glanceable audit for macOS with a network/process-first view.

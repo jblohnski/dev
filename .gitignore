@@ -3,7 +3,8 @@ projects/
 proposals/
 arkenfox/
 zlogs/
-audit/zlogs/
+
+_gpt-dictation.txt
 
 # Python
 __pycache__/
