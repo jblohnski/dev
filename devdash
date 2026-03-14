@@ -35,6 +35,8 @@ current_group=""
 
 while IFS=$'\t' read -r kind source path component group name cmd run keywords desc; do
   [[ "$kind" == "cmd" ]] || continue
+  # Skip shell-only legend entries to keep devdash focused on file-backed commands
+  [[ "$source" == "shell" ]] && continue
 
   if [[ "$component" != "$current_component" ]]; then
     printf "\n%s%s%s\n" "$BOLD$HDR" "$component" "$RESET"

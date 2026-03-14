@@ -25,6 +25,8 @@ Top-level groups are intentionally separated by lifecycle:
    Upstream/vendor material and related support scripts.
 6. `projects/`:
    Independent project sandboxes, excluded from this repo workflow.
+7. `wifiscan/`:
+   Native Wi-Fi scan component backed by CoreWLAN for modern macOS where `airport` is no longer dependable.
 
 ## Shell Profile Source of Truth
 
@@ -62,6 +64,7 @@ Allowed component tags in `README.md` headers:
 <!-- @kind: component|subcomponent|support -->
 <!-- @desc: one-line summary -->
 <!-- @keywords: space-delimited taxonomy keywords -->
+<!-- @taxonomy: optional semantic lineage such as net/scan -->
 ```
 
 Allowed command tags in executable scripts:
@@ -71,6 +74,7 @@ Allowed command tags in executable scripts:
 # @desc: one-line summary
 # @cmd: command name shown in legend
 # @keywords: space-delimited taxonomy keywords
+# @taxonomy: optional semantic lineage such as net/scan
 # @run: user|sudo
 ```
 
@@ -82,6 +86,7 @@ Allowed command tags in `bootstrap/shell/*.sh`:
 # @desc: one-line summary
 # @cmd: command name shown in legend
 # @keywords: space-delimited taxonomy keywords
+# @taxonomy: optional semantic lineage such as net/scan
 # @run: user|sudo
 ```
 
@@ -101,9 +106,31 @@ Shared inventory entrypoint:
 - `./component-scan.sh summary`
 - `./component-scan.sh legend`
 - `./component-scan.sh records`
+- `./component-scan.sh manifest`
+- `./component-scan.sh catalog`
 - `./component-scan.sh validate`
 
 `component-scan.sh` is the canonical inventory source for both the shell legend and `devdash`.
+
+Canonical machine schema:
+
+- `INVENTORY_SCHEMA.md`
+- `inventory.schema.json`
+- kept as a plain JSON contract, not a JSON Schema-spec document
+- `DISCOVERY_RULES.md`
+- `operation.schema.json`
+- `operation_contract.py`
+
+Discovery rules, terse version:
+
+- walk `~/dev` recursively
+- prune excluded directories before descent
+- create directory records from `README.md`
+- create command records from executable `.sh` and `.zsh` files with metadata
+- allow `@taxonomy` to override path-derived lineage
+- keep `key` shorthand and `path_key` authoritative
+
+The detailed walk/extraction contract lives in `DISCOVERY_RULES.md`.
 
 ## Near-Term Cleanup Queue
 

@@ -15,6 +15,7 @@ GRN="$(tput setaf 2)"
 YEL="$(tput setaf 3)"
 BLU="$(tput setaf 4)"
 RST="$(tput sgr0)"
+AIRPORT="/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport"
 
 echo "${BLU}== Router / Wi-Fi Hardening Audit ==${RST}"
 echo
@@ -25,6 +26,9 @@ echo
 GW=$(ip route 2>/dev/null | awk '/default/ {print $3}' | head -1 || true)
 if [ -z "${GW}" ]; then
   GW=$(route -n get default 2>/dev/null | awk '/gateway/ {print $2}' || true)
+fi
+if [ -z "${GW}" ]; then
+  GW=$(netstat -rn -f inet 2>/dev/null | awk '$1 == "default" {print $2; exit}' || true)
 fi
 
 if [ -z "${GW}" ]; then
@@ -75,9 +79,14 @@ echo
 # -------------------------------------------------
 # 6. Check Wi-Fi encryption (macOS only)
 # -------------------------------------------------
-if command -v airport >/dev/null 2>&1; then
+if [ -x "${AIRPORT}" ]; then
   echo "${BLU}== Wi-Fi Security Info ==${RST}"
-  airport -I | grep -E 'SSID|security'
+  WIFI_INFO=$("${AIRPORT}" -I 2>/dev/null | grep -E ' SSID|link auth|auth|BSSID|channel' || true)
+  if [ -n "${WIFI_INFO}" ]; then
+    echo "${WIFI_INFO}"
+  else
+    echo "${YEL}[!] Wi-Fi details unavailable${RST}"
+  fi
 fi
 echo
 

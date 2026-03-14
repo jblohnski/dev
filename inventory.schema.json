@@ -1,0 +1,62 @@
+{
+  "name": "dev_manifest_schema",
+  "version": "1.1.0",
+  "format": "plain-json-contract",
+  "root": {
+    "schema_version": "string",
+    "generated_at": "datetime-string",
+    "root": "absolute-path",
+    "index": "manifest-index-object",
+    "items": "manifest-item-array"
+  },
+  "index": {
+    "name": "manifest_index",
+    "root_key": "dir:.",
+    "eligible_dirs": ["repo-relative-dir"],
+    "skipped_dirs": ["repo-relative-dir"],
+    "counts": {
+      "eligible_dirs": "int",
+      "skipped_dirs": "int",
+      "readmes_seen": "int",
+      "dir_records": "int",
+      "components": "int",
+      "subcomponents": "int",
+      "support_dirs": "int",
+      "scripts_seen": "int",
+      "scripts_eligible": "int",
+      "script_records": "int",
+      "shell_files_seen": "int",
+      "shell_records": "int",
+      "command_records_manifest": "int",
+      "items_emitted": "int"
+    },
+    "skipped": {
+      "excluded_dirs": "int",
+      "non_executable_scripts": "int",
+      "scripts_missing_desc": "int"
+    }
+  },
+  "item": {
+    "key": "short-taxonomy-key",
+    "path_key": "unique-structural-key",
+    "path": "repo-relative-path",
+    "docs_path": "repo-relative-readme-path",
+    "record_type": "dir|cmd",
+    "entity_type": "component|subcomponent|support|command",
+    "source": "readme|script|shell",
+    "component_id": "string",
+    "parent_component_id": "string|null",
+    "parent_key": "string|null",
+    "group": "string|null",
+    "name": "string",
+    "cmd": "string|null",
+    "run": "user|sudo|null",
+    "desc": "string",
+    "keywords": ["string"],
+    "alias": "string|null",
+    "declared_taxonomy": "string|null",
+    "taxonomy_source": "explicit|derived",
+    "taxonomy_key": "lineage-string",
+    "taxonomy_path": ["lineage-segment"]
+  }
+}
