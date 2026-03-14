@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 MD_META_RE = re.compile(r"^<!-- @\s*([a-z]+):\s*(.*?)\s*-->$")
-SH_META_RE = re.compile(r"^# @\s*([a-z]+):\s*(.*?)\s*$")
+SH_META_RE = re.compile(r"^#\s*@([a-z]+)(?::\s*(.*?)\s*|\s+(.+?)\s*)?$")
 SECTION_RE = re.compile(r"^##\s+(.+?)\s*$")
 LEGEND_RE = re.compile(r"^#\s*([A-Za-z0-9_.-]+):\s+(.+?)\s*$")
 ALIAS_RE = re.compile(r"^alias\s+([A-Za-z0-9_.-]+)=")
@@ -36,6 +36,25 @@ SHELL_SECTION_OWNER = {
     "util": "dev",
 }
 COMPONENT_ORDER = ["bootstrap", "audit", "ops", "dev", "projects", "proposals", "zlogs", "arkenfox"]
+RESERVED_GROUP_KEYWORDS = {
+    "automation",
+    "command",
+    "commands",
+    "component",
+    "components",
+    "inventory",
+    "metadata",
+    "script",
+    "scripts",
+    "shell",
+    "support",
+    "tool",
+    "tools",
+    "user",
+    "sudo",
+    "workspace",
+}
+KEYWORD_ALIASES = {"diag": "diagnostics", "sec": "security"}
 
 
 class Style:
@@ -121,10 +140,27 @@ def parse_sh_meta(script: Path) -> dict[str, str]:
     for line in script.read_text(errors="ignore").splitlines():
         match = SH_META_RE.match(line.rstrip())
         if match:
-            meta[match.group(1)] = match.group(2)
+            value = match.group(2) if match.group(2) is not None else match.group(3)
+            meta[match.group(1)] = value or ""
         elif meta and line.strip() and not line.startswith("#"):
             break
     return meta
+
+
+def meta_keywords(meta: dict[str, str], fallback: str = "") -> str:
+    return meta.get("keywords") or meta.get("tags") or fallback
+
+
+def split_keywords(raw: str) -> list[str]:
+    return [KEYWORD_ALIASES.get(part.strip().lower(), part.strip().lower()) for part in raw.split() if part.strip()]
+
+
+def derive_group(component: str, keywords: str, fallback: str) -> str:
+    component_parts = {part for part in re.split(r"[-_/]", component.lower()) if part}
+    for keyword in split_keywords(keywords):
+        if keyword not in RESERVED_GROUP_KEYWORDS and keyword not in component_parts:
+            return keyword
+    return fallback
 
 
 def shell_owner(section: str) -> str:
@@ -159,7 +195,7 @@ def build_dir_records(root: Path) -> list[dict[str, str]]:
         kind = meta.get("kind", "support")
         component = meta.get("component", directory.name if rel != "." else "dev")
         desc = meta.get("desc", parse_md_desc(readme))
-        tags = meta.get("tags", component)
+        keywords = meta_keywords(meta, component)
         parent = "" if rel == "." else top_component(rel)
         records.append(
             {
@@ -172,7 +208,8 @@ def build_dir_records(root: Path) -> list[dict[str, str]]:
                 "owner": component,
                 "group": parent or "root",
                 "parent": parent,
-                "tags": tags,
+                "keywords": keywords,
+                "tags": keywords,
                 "desc": desc,
             }
         )
@@ -251,10 +288,12 @@ def build_script_records(
                 "rel": rel,
                 "component": owner,
                 "owner": owner,
-                "group": script_group(dir_rel, owner, by_rel, explicit_paths),
-                "name": script.name,
+                "group": derive_group(owner, meta_keywords(meta, owner), script_group(dir_rel, owner, by_rel, explicit_paths)),
+                "name": meta.get("name", meta.get("alias", script.stem)),
+                "cmd": meta.get("cmd", meta.get("alias", script.name)),
                 "run": meta.get("run", "user"),
-                "tags": meta.get("tags", owner),
+                "keywords": meta_keywords(meta, owner),
+                "tags": meta_keywords(meta, owner),
                 "alias": meta.get("alias", ""),
                 "desc": desc,
             }
@@ -265,21 +304,34 @@ def build_script_records(
 def parse_shell_commands(shell_file: Path, root: Path) -> list[dict[str, str]]:
     records: list[dict[str, str]] = []
     section = "dev"
-    pending_name = ""
-    pending_desc = ""
+    component = shell_owner(section)
+    pending: dict[str, str] = {}
     rel = rel_str(shell_file, root)
     for raw in shell_file.read_text(errors="ignore").splitlines():
         line = raw.rstrip()
         section_match = SECTION_RE.match(line)
         if section_match:
             section = section_match.group(1).strip().lower()
-            pending_name = ""
-            pending_desc = ""
+            component = shell_owner(section)
+            pending = {}
+            continue
+        meta_match = SH_META_RE.match(line)
+        if meta_match:
+            key = meta_match.group(1)
+            value = meta_match.group(2) if meta_match.group(2) is not None else meta_match.group(3) or ""
+            if key == "component":
+                component = value or shell_owner(section)
+                pending = {}
+            else:
+                pending[key] = value
             continue
         legend_match = LEGEND_RE.match(line)
         if legend_match:
-            pending_name = legend_match.group(1).strip()
-            pending_desc = legend_match.group(2).strip()
+            pending = {
+                "name": legend_match.group(1).strip(),
+                "cmd": legend_match.group(1).strip(),
+                "desc": legend_match.group(2).strip(),
+            }
             continue
 
         matched_name = ""
@@ -292,8 +344,10 @@ def parse_shell_commands(shell_file: Path, root: Path) -> list[dict[str, str]]:
                 matched_name = func_match.group(1)
 
         if matched_name:
-            if pending_name and matched_name == pending_name:
-                owner = shell_owner(section)
+            expected_cmd = pending.get("cmd", matched_name)
+            if matched_name == expected_cmd and pending.get("desc"):
+                owner = pending.get("component") or component
+                keywords = meta_keywords(pending, f"shell {owner} {shell_group(section)}")
                 records.append(
                     {
                         "type": "cmd",
@@ -302,21 +356,21 @@ def parse_shell_commands(shell_file: Path, root: Path) -> list[dict[str, str]]:
                         "rel": rel,
                         "component": owner,
                         "owner": owner,
-                        "group": shell_group(section),
-                        "name": matched_name,
-                        "run": "user",
-                        "tags": f"shell {owner} {shell_group(section)}",
-                        "alias": matched_name,
-                        "desc": pending_desc,
+                        "group": derive_group(owner, keywords, shell_group(section)),
+                        "name": pending.get("name", matched_name),
+                        "cmd": expected_cmd,
+                        "run": pending.get("run", "user"),
+                        "keywords": keywords,
+                        "tags": keywords,
+                        "alias": expected_cmd,
+                        "desc": pending["desc"],
                     }
                 )
-            pending_name = ""
-            pending_desc = ""
+            pending = {}
             continue
 
         if line.strip() and not line.lstrip().startswith("#"):
-            pending_name = ""
-            pending_desc = ""
+            pending = {}
     return records
 
 
@@ -341,14 +395,15 @@ def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
                     record["component"],
                     record["kind"],
                     record["parent"],
-                    record["tags"],
                     "-",
+                    "-",
+                    record["keywords"],
                     record["desc"],
                 ]
             )
         )
     for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], x["alias"] or x["name"])):
-        alias = record["alias"] or "-"
+        cmd = record.get("cmd", record["alias"] or record["name"])
         print(
             "\t".join(
                 [
@@ -358,31 +413,37 @@ def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
                     record["component"],
                     record["group"],
                     record["name"],
+                    cmd,
                     record["run"],
-                    record["tags"],
-                    alias,
+                    record["keywords"],
                     record["desc"],
                 ]
             )
         )
 
 
+def display_records(cmd_records: list[dict[str, str]]) -> list[dict[str, str]]:
+    selected: list[dict[str, str]] = []
+    seen: dict[tuple[str, str, str, str], int] = {}
+    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], x["alias"] or x["name"])):
+        key = (record["component"], record["group"], record["desc"], record["run"])
+        current = seen.get(key)
+        if current is None:
+            seen[key] = len(selected)
+            selected.append(record)
+            continue
+        incumbent = selected[current]
+        if incumbent["source"] != "shell" and record["source"] == "shell":
+            selected[current] = record
+    return selected
+
+
 def render_command_group(commands: list[dict[str, str]], show_paths: bool, style: Style) -> None:
-    last_parent = ""
     for record in commands:
-        display = record["alias"] or record["name"]
+        cmd = record.get("cmd", record["alias"] or record["name"])
         desc = record["desc"]
-        if record["source"] == "shell" and "." in display:
-            parent, child = display.split(".", 1)
-            if parent != last_parent:
-                print(f"    {style.wrap(parent, style.name)}")
-                last_parent = parent
-            print(f"      {style.wrap(child, style.accent)}  {style.wrap(desc, style.desc)}")
-        else:
-            last_parent = ""
-            suffix = f"  [{record['source']}]" if record["source"] == "script" else ""
-            suffix_text = style.wrap(suffix, style.desc) if suffix else ""
-            print(f"    {style.wrap(display, style.name)}{suffix_text}  {style.wrap(desc, style.desc)}")
+        cmd_text = style.wrap(cmd, style.accent)
+        print(f"    {cmd_text}  {style.wrap(desc, style.desc)}")
         if show_paths:
             print(f"      {style.wrap('@ ' + record['path'], style.desc)}")
 
@@ -398,7 +459,7 @@ def print_summary(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
     subcomponents = [record for record in dir_records if record["kind"] == "subcomponent"]
 
     cmds_by_component: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], x["alias"] or x["name"])):
+    for record in display_records(cmd_records):
         cmds_by_component[record["component"]].append(record)
 
     for component in components:
@@ -428,7 +489,7 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
     print(style.wrap("commands", style.hdr))
     print()
     grouped_by_component: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], x["alias"] or x["name"])):
+    for record in display_records(cmd_records):
         grouped_by_component[record["component"]].append(record)
 
     for component in sorted(grouped_by_component, key=order_key):
@@ -470,9 +531,11 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
             continue
         if rel.startswith("bootstrap/shell/"):
             continue
-        for key in ("desc", "tags", "run"):
+        for key in ("desc", "run"):
             if key not in meta:
                 warnings.append(f"{rel}: missing script metadata @{key}")
+        if "keywords" not in meta and "tags" not in meta:
+            warnings.append(f"{rel}: missing script metadata @keywords")
         if "run" in meta and meta["run"] not in VALID_RUN:
             errors.append(f"{rel}: invalid @run '{meta['run']}'")
 

@@ -23,10 +23,10 @@ Canonical record fields:
 - `path`: repo-relative path to the source file or directory
 - `component`: owning component id
 - `group`: display subgroup inside the owning component
-- `name`: command name when `type=cmd`
+- `name`: human-facing command label when `type=cmd`
+- `cmd`: command token shown in legends and used by shell-backed records
 - `run`: `user` | `sudo` when `type=cmd`
-- `tags`: taxonomy tags
-- `alias`: preferred display alias when present
+- `keywords`: taxonomy keywords
 - `desc`: one-line summary
 
 Interpretation rules:
@@ -43,7 +43,7 @@ Declare component identity near the top of `README.md` with HTML comments:
 <!-- @component: audit -->
 <!-- @kind: component -->
 <!-- @desc: Quick macOS audit and Zeek analysis pipeline -->
-<!-- @tags: audit macos zeek -->
+<!-- @keywords: audit macos zeek -->
 ```
 
 Fields:
@@ -51,7 +51,7 @@ Fields:
 - `@component`: stable component id
 - `@kind`: `component` | `subcomponent` | `support`
 - `@desc`: one-line summary used in rollups
-- `@tags`: space-separated taxonomy tags
+- `@keywords`: space-separated taxonomy keywords
 
 Rules:
 
@@ -67,8 +67,10 @@ If a `README.md` exists without metadata, discovery may still show the directory
 Runnable scripts should declare:
 
 ```bash
+# @name: human label
 # @desc: one-line description
-# @tags: space-separated taxonomy tags
+# @cmd: command token shown in legends
+# @keywords: space-separated taxonomy keywords
 # @run: user|sudo
 ```
 
@@ -81,9 +83,12 @@ Optional:
 
 Rules:
 
+- `@name`, `@desc`, and `@cmd` form the canonical command triplet.
 - `@desc` is required for dashboard inclusion.
 - `@run` controls invocation mode in dashboards.
+- `@keywords` is expected and drives taxonomy grouping.
 - `@alias` is display metadata only; it does not create shell aliases automatically.
+- `@tags` is accepted as a legacy alias for `@keywords`.
 - Executable scripts in tracked components are expected to declare all core metadata fields.
 
 ## Shell Metadata
@@ -94,7 +99,9 @@ Rules:
 
 - Shell legend commands are discovered from `bootstrap/shell/*.sh`.
 - `## section` headers define shell groups.
-- `# name: description` comment lines define legend metadata for the next alias or function of the same name.
+- `# @component` on its own resets shell metadata to the current section owner.
+- Shell commands should declare `@name`, `@desc`, `@cmd`, and `@keywords` before the alias or function they describe.
+- Legacy `# name: description` lines are still parsed while older wrappers are migrated.
 - Canonical shell sections are:
   - `bootstrap`
   - `audit`

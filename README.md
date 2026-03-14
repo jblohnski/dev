@@ -1,7 +1,7 @@
 <!-- @component: dev -->
 <!-- @kind: component -->
 <!-- @desc: Personal machine automation and diagnostics workspace -->
-<!-- @tags: workspace automation diagnostics -->
+<!-- @keywords: workspace automation diagnostics -->
 
 # dev
 
@@ -19,8 +19,8 @@ Top-level groups are intentionally separated by lifecycle:
    Example: router checks, macOS hardening, Firefox hardening.
 3. `audit/`:
    Analysis pipeline that captures snapshots, compares baseline vs current, and reports findings.
-4. `pfkit/`:
-   PF-specific firewall toolkit (kept separate due to privileged/network policy scope).
+4. `ops/pf/`:
+   PF-specific firewall toolkit and related privileged/network policy helpers.
 5. `arkenfox/`:
    Upstream/vendor material and related support scripts.
 6. `projects/`:
@@ -55,13 +55,44 @@ Capture logs with the tracked wrapper in `audit/zeek-capture.sh`; it starts Zeek
 
 ## Metadata Convention (for legend/dashboard)
 
-Runnable scripts should include:
+Allowed component tags in `README.md` headers:
+
+```md
+<!-- @component: stable-component-id -->
+<!-- @kind: component|subcomponent|support -->
+<!-- @desc: one-line summary -->
+<!-- @keywords: space-delimited taxonomy keywords -->
+```
+
+Allowed command tags in executable scripts:
 
 ```bash
-# @desc: one-line description
-# @tags: space-separated taxonomy tags
+# @name: human label
+# @desc: one-line summary
+# @cmd: command name shown in legend
+# @keywords: space-delimited taxonomy keywords
 # @run: user|sudo
 ```
+
+Allowed command tags in `bootstrap/shell/*.sh`:
+
+```bash
+# @component
+# @name: human label
+# @desc: one-line summary
+# @cmd: command name shown in legend
+# @keywords: space-delimited taxonomy keywords
+# @run: user|sudo
+```
+
+Rules:
+
+- `@component` on its own resets shell metadata to the current section owner.
+- `@keywords` is expected for discoverable commands and components.
+- The canonical command triplet is `name`, `desc`, `cmd`.
+- Legend output and `devdash` both consume that triplet.
+- Command grouping is derived from declared keywords, not from ad hoc display comments.
+- `@tags` is treated as a legacy alias for `@keywords` while older files are cleaned up.
 
 Directory components can declare explicit metadata in `README.md` comment headers. See [COMPONENT_PROTOCOL.md](COMPONENT_PROTOCOL.md).
 

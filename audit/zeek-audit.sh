@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# @name: Zeek Report
 # @desc: Run Zeek correlation report generation
-# @tags: audit zeek forensics
+# @cmd: za
+# @keywords: audit zeek report
 # @run: user
 
 set -euo pipefail

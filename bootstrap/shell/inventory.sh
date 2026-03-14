@@ -1,5 +1,10 @@
 ## dev
 
+# @component
+# @name: Component Inventory
+# @desc: Run the shared component inventory entrypoint
+# @cmd: comp
+# @keywords: dev inventory taxonomy commands
 comp() {
   local cmd="${1:-scan}"
   [[ $# -gt 0 ]] && shift
@@ -27,33 +32,67 @@ comp() {
   esac
 }
 
-# comp.scan: show component summary
+# @name: Component Summary
+# @desc: Show component summary
+# @cmd: comp.scan
+# @keywords: dev inventory summary taxonomy
 alias comp.scan='comp scan'
-# comp.legend: show unified command legend
+# @name: Component Legend
+# @desc: Show unified command legend
+# @cmd: comp.legend
+# @keywords: dev inventory legend taxonomy
 alias comp.legend='comp legend'
-# comp.records: emit component records
+# @name: Component Records
+# @desc: Emit component records
+# @cmd: comp.records
+# @keywords: dev inventory records taxonomy
 alias comp.records='comp records'
-# comp.validate: validate component metadata and taxonomy
+# @name: Component Validation
+# @desc: Validate component metadata and taxonomy
+# @cmd: comp.validate
+# @keywords: dev inventory validate taxonomy
 alias comp.validate='comp validate'
-# comp.dash: open dev dashboard
+# @name: Component Dashboard
+# @desc: Open dev dashboard
+# @cmd: comp.dash
+# @keywords: dev inventory dashboard taxonomy
 alias comp.dash='comp dash'
 
 ## dev
 
-# dd: dev dashboard
+# @name: Dev Dashboard
+# @desc: Open dev dashboard
+# @cmd: dd
+# @keywords: dev dashboard inventory
 alias dd='$HOME/dev/devdash'
-# ds: component summary
+# @name: Summary
+# @desc: Show component summary
+# @cmd: ds
+# @keywords: dev summary inventory
 alias ds='python3 "$HOME/dev/component-scan.sh" summary --color'
-# dl: component legend
+# @name: Legend
+# @desc: Show component legend
+# @cmd: dl
+# @keywords: dev legend inventory
 alias dl='python3 "$HOME/dev/component-scan.sh" legend --color'
-# dr: component records
+# @name: Records
+# @desc: Emit component records
+# @cmd: dr
+# @keywords: dev records inventory
 alias dr='python3 "$HOME/dev/component-scan.sh" records'
-# dv: component validation
+# @name: Validation
+# @desc: Validate component metadata
+# @cmd: dv
+# @keywords: dev validate inventory taxonomy
 alias dv='python3 "$HOME/dev/component-scan.sh" validate'
 
 ## util
 
-# l: unified command legend
+# @component
+# @name: Legend
+# @desc: Show unified command legend
+# @cmd: l
+# @keywords: dev legend inventory taxonomy
 l() {
   python3 "$HOME/dev/component-scan.sh" legend --color "$@"
 }

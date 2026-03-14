@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# @name: Audit Snapshot
 # @desc: Quick macOS audit with network/process focus + lightweight delta
-# @tags: audit macos network process
+# @cmd: aud
+# @keywords: audit macos network process
 # @run: user
-# @alias: aud
 # @owner: firstparty
 
 set -euo pipefail

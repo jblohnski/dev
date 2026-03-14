@@ -11,13 +11,13 @@ SCAN="${ROOT}/component-scan.sh"
 : "${TERM:=xterm-256color}"
 tp() { tput "$@" 2>/dev/null || true; }
 
-BOLD="$(tp bold)"
-DIM="$(tp dim)"
-RESET="$(tp sgr0)"
-HDR="$(tp setaf 6)"
-ACCENT="$(tp setaf 2)"
-MUTED="$(tp setaf 7)"
-WARN="$(tp setaf 3)"
+BOLD="$(printf '\033[1m')"
+DIM="$(printf '\033[2m')"
+RESET="$(printf '\033[0m')"
+HDR="$(printf '\033[38;5;110m')"
+ACCENT="$(printf '\033[38;5;109m')"
+MUTED="$(printf '\033[38;5;244m')"
+WARN="$(printf '\033[38;5;179m')"
 
 if [[ ! -f "$SCAN" ]]; then
   echo "error: component scanner not found: $SCAN" >&2
@@ -33,7 +33,7 @@ i=1
 current_component=""
 current_group=""
 
-while IFS=$'\t' read -r kind source path component group name run tags alias desc; do
+while IFS=$'\t' read -r kind source path component group name cmd run keywords desc; do
   [[ "$kind" == "cmd" ]] || continue
 
   if [[ "$component" != "$current_component" ]]; then
@@ -47,15 +47,17 @@ while IFS=$'\t' read -r kind source path component group name run tags alias des
     current_group="$group"
   fi
 
-  [[ "$alias" == "-" ]] && alias=""
-  display_name="${alias:-$name}"
-  printf "%s%2d%s  %-18s  %s%-5s%s  %s\n" \
+  [[ "$cmd" == "-" ]] && cmd=""
+  [[ "$name" == "-" ]] && name=""
+  display_name="${cmd:-$name}"
+  printf "%s%2d%s  %-18s  %s%-5s%s  %s%s\n" \
     "$BOLD" "$i" "$RESET" \
     "$display_name" \
     "${MUTED:-}" "$run" "$RESET" \
-    "$desc"
+    "$desc" \
+    ""
   printf "%s     %s[%s] %s%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$RESET"
-  printf "%s|%s|%s\n" "$i" "$ROOT/$path" "$run" >> "$TMP"
+  printf "%s|%s|%s|%s|%s\n" "$i" "$source" "$ROOT/$path" "$run" "$cmd" >> "$TMP"
   i=$((i + 1))
 done < <(python3 "$SCAN" "$ROOT" records)
 
@@ -75,13 +77,21 @@ if [[ -z "$entry" ]]; then
   exit 1
 fi
 
-cmd="$(printf "%s" "$entry" | cut -d'|' -f2)"
-runmode="$(printf "%s" "$entry" | cut -d'|' -f3)"
+source_kind="$(printf "%s" "$entry" | cut -d'|' -f2)"
+cmd_path="$(printf "%s" "$entry" | cut -d'|' -f3)"
+runmode="$(printf "%s" "$entry" | cut -d'|' -f4)"
+shell_cmd="$(printf "%s" "$entry" | cut -d'|' -f5)"
 
-printf "\n%s→ Running %s%s\n\n" "$BOLD" "$(basename "$cmd")" "$RESET"
+printf "\n%s→ Running %s%s\n\n" "$BOLD" "${shell_cmd:-$(basename "$cmd_path")}" "$RESET"
 
-if [[ "$runmode" == "sudo" ]]; then
-  sudo "$cmd"
+if [[ "$source_kind" == "shell" ]]; then
+  if [[ "$runmode" == "sudo" ]]; then
+    sudo zsh -lic "$shell_cmd"
+  else
+    zsh -lic "$shell_cmd"
+  fi
+elif [[ "$runmode" == "sudo" ]]; then
+  sudo "$cmd_path"
 else
-  "$cmd"
+  "$cmd_path"
 fi
