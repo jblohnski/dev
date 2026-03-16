@@ -7,6 +7,7 @@ from typing import Any, Mapping
 
 
 OPERATION_TYPES = {"command", "function", "script", "binary"}
+TOP_LEVELS = {"shell", "dev"}
 RUN_TYPES = {"user", "sudo", None}
 SOURCE_TYPES = {"script", "shell", "binary", None}
 
@@ -18,6 +19,8 @@ def is_valid(op: Mapping[str, Any]) -> bool:
     if not _non_empty_string(op.get("key")):
         return False
     if not _non_empty_string(op.get("path_key")):
+        return False
+    if op.get("top_level") not in TOP_LEVELS:
         return False
     if not _non_empty_string(op.get("component_id")):
         return False

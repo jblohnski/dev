@@ -53,6 +53,7 @@ Do not mix naming policy, UI policy, and crawl policy unless required for discov
 - `manifest` is the canonical machine output.
 - `key` is shorthand and may collide.
 - `path_key` is the stable unique identity.
+- `top_level` is the first taxonomy constraint and is either `shell` or `dev`.
 - `taxonomy_key` is the explicit logical lineage.
 - `index` holds aggregate walk counts and skip counts.
 - legend/index commands are projections of valid operations.
@@ -63,8 +64,11 @@ Do not mix naming policy, UI policy, and crawl policy unless required for discov
 - It is bound to path identity and logical taxonomy at the same time.
 - Path identity and logical taxonomy must remain separate.
 - Operation type is broad; taxonomy is conceptual.
+- `shell` is the top-level category for shell-loaded aliases, wrappers, and shell-native operations.
+- `dev` is the top-level category for the discovered `dev/` corpus.
 - if a discovered executable record does not produce a valid `op`, it is not a legit command/index entry.
 - a command is the alias or pointer view of a valid operation.
+- keywords are secondary facets used to re-sort and refilter operations.
 
 ## modularity rules
 

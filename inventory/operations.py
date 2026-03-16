@@ -5,6 +5,10 @@ from typing import Any
 from operation_contract import is_valid
 
 
+def top_level_for_record(record: dict[str, Any]) -> str:
+    return "shell" if record.get("source") == "shell" else "dev"
+
+
 def operation_type_for_record(record: dict[str, str]) -> str:
     source = record.get("source", "")
     if source == "shell":
@@ -22,6 +26,7 @@ def record_to_operation(record: dict[str, str]) -> dict[str, Any]:
     return {
         "key": record.get("key", ""),
         "path_key": record.get("path_key", ""),
+        "top_level": record.get("top_level", top_level_for_record(record)),
         "component_id": record.get("component_id", record.get("component", "")),
         "operation_type": operation_type_for_record(record),
         "name": record.get("name", "") or cmd,
@@ -35,6 +40,30 @@ def record_to_operation(record: dict[str, str]) -> dict[str, Any]:
         "declared_taxonomy": declared_taxonomy,
         "taxonomy_key": record.get("taxonomy_key", ""),
         "taxonomy_path": record.get("taxonomy_path", []),
+        "desc": record.get("desc", ""),
+    }
+
+
+def command_record_seed(record: dict[str, Any]) -> dict[str, Any]:
+    cmd = record.get("cmd", record.get("alias") or record.get("name") or "")
+    top_level = top_level_for_record(record)
+    taxonomy_path = [part for part in [top_level, record.get("component", ""), record.get("group", ""), cmd] if part]
+    return {
+        "key": cmd,
+        "path_key": f'{record.get("source", "cmd")}:{record.get("path", "")}#{cmd}',
+        "top_level": top_level,
+        "component_id": record.get("component", ""),
+        "name": record.get("name", ""),
+        "cmd": record.get("cmd", ""),
+        "path": record.get("path", ""),
+        "group": record.get("group"),
+        "run": record.get("run"),
+        "keywords": record.get("keywords", []),
+        "alias": record.get("alias") or None,
+        "source": record.get("source"),
+        "declared_taxonomy": record.get("declared_taxonomy"),
+        "taxonomy_key": "/".join(taxonomy_path),
+        "taxonomy_path": taxonomy_path,
         "desc": record.get("desc", ""),
     }
 

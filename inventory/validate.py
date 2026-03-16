@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from inventory.operations import valid_operations
+from inventory.operations import command_record_seed, valid_operations
 from inventory.shared import SECTION_RE, SHELL_SECTION_OWNER, VALID_KINDS, VALID_RUN, is_excluded, parse_md_meta, parse_sh_meta, rel_str
 
 
@@ -59,24 +59,7 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
 
     op_candidates = []
     for record in script_records + shell_records:
-        op_candidates.append(
-            {
-                "key": record.get("cmd", record.get("alias") or record.get("name") or ""),
-                "path_key": f'{record.get("source", "cmd")}:{record.get("path", "")}#{record.get("cmd", record.get("alias") or record.get("name") or "")}',
-                "component_id": record.get("component", ""),
-                "name": record.get("name", ""),
-                "cmd": record.get("cmd", ""),
-                "path": record.get("path", ""),
-                "group": record.get("group"),
-                "run": record.get("run"),
-                "keywords": [part for part in (record.get("keywords", "") or "").split() if part],
-                "alias": record.get("alias") or None,
-                "source": record.get("source"),
-                "taxonomy_key": "/".join(part for part in [record.get("component", ""), record.get("group", ""), record.get("cmd", "")] if part),
-                "taxonomy_path": [part for part in [record.get("component", ""), record.get("group", ""), record.get("cmd", "")] if part],
-                "desc": record.get("desc", ""),
-            }
-        )
+        op_candidates.append(command_record_seed({**record, "keywords": [part for part in (record.get("keywords", "") or "").split() if part]}))
 
     valid_path_keys = {op["path_key"] for op in valid_operations(op_candidates)}
     for candidate in op_candidates:

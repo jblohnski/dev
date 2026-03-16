@@ -11,7 +11,7 @@ from inventory.discovery import (
     collect_manifest_index,
     display_records,
 )
-from inventory.operations import operation_command_name, valid_operations
+from inventory.operations import command_record_seed, operation_command_name, valid_operations
 from inventory.shared import SCHEMA_VERSION, Style, matches_filters, order_key, split_keywords
 
 
@@ -77,22 +77,12 @@ def print_summary(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
     selected = [record for record in display_records(cmd_records) if matches_filters(record, filters)]
     op_records = valid_operations(
         [
-            {
-                "key": record.get("cmd", record.get("alias") or record.get("name") or ""),
-                "path_key": f'{record.get("source", "cmd")}:{record.get("path", "")}#{record.get("cmd", record.get("alias") or record.get("name") or "")}',
-                "component_id": record.get("component", ""),
-                "name": record.get("name", ""),
-                "cmd": record.get("cmd", ""),
-                "path": record.get("path", ""),
-                "group": record.get("group"),
-                "run": record.get("run"),
-                "keywords": split_keywords(record.get("keywords", "")),
-                "alias": record.get("alias") or None,
-                "source": record.get("source"),
-                "taxonomy_key": "/".join(part for part in [record.get("component", ""), record.get("group", ""), record.get("cmd", "")] if part),
-                "taxonomy_path": [part for part in [record.get("component", ""), record.get("group", ""), record.get("cmd", "")] if part],
-                "desc": record.get("desc", ""),
-            }
+            command_record_seed(
+                {
+                    **record,
+                    "keywords": split_keywords(record.get("keywords", "")),
+                }
+            )
             for record in selected
         ]
     )
@@ -135,22 +125,12 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
     selected = [record for record in display_records(cmd_records) if matches_filters(record, filters)]
     op_records = valid_operations(
         [
-            {
-                "key": record.get("cmd", record.get("alias") or record.get("name") or ""),
-                "path_key": f'{record.get("source", "cmd")}:{record.get("path", "")}#{record.get("cmd", record.get("alias") or record.get("name") or "")}',
-                "component_id": record.get("component", ""),
-                "name": record.get("name", ""),
-                "cmd": record.get("cmd", ""),
-                "path": record.get("path", ""),
-                "group": record.get("group"),
-                "run": record.get("run"),
-                "keywords": split_keywords(record.get("keywords", "")),
-                "alias": record.get("alias") or None,
-                "source": record.get("source"),
-                "taxonomy_key": "/".join(part for part in [record.get("component", ""), record.get("group", ""), record.get("cmd", "")] if part),
-                "taxonomy_path": [part for part in [record.get("component", ""), record.get("group", ""), record.get("cmd", "")] if part],
-                "desc": record.get("desc", ""),
-            }
+            command_record_seed(
+                {
+                    **record,
+                    "keywords": split_keywords(record.get("keywords", "")),
+                }
+            )
             for record in selected
         ]
     )
@@ -177,22 +157,7 @@ def print_index(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
     for record in display_records(cmd_records):
         if not matches_filters(record, filters):
             continue
-        op_seed = {
-            "key": record.get("cmd", record.get("alias") or record.get("name") or ""),
-            "path_key": f'{record.get("source", "cmd")}:{record.get("path", "")}#{record.get("cmd", record.get("alias") or record.get("name") or "")}',
-            "component_id": record.get("component", ""),
-            "name": record.get("name", ""),
-            "cmd": record.get("cmd", ""),
-            "path": record.get("path", ""),
-            "group": record.get("group"),
-            "run": record.get("run"),
-            "keywords": split_keywords(record.get("keywords", "")),
-            "alias": record.get("alias") or None,
-            "source": record.get("source"),
-            "taxonomy_key": "/".join(part for part in [record.get("component", ""), record.get("group", ""), record.get("cmd", "")] if part),
-            "taxonomy_path": [part for part in [record.get("component", ""), record.get("group", ""), record.get("cmd", "")] if part],
-            "desc": record.get("desc", ""),
-        }
+        op_seed = command_record_seed({**record, "keywords": split_keywords(record.get("keywords", ""))})
         ops = valid_operations([op_seed])
         if not ops:
             continue
@@ -203,6 +168,7 @@ def print_index(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
                 "name": op.get("name", ""),
                 "desc": op.get("desc", ""),
                 "keywords": op.get("keywords", []),
+                "top_level": op.get("top_level", ""),
                 "component": op.get("component_id", ""),
                 "group": op.get("group", ""),
                 "source": op.get("source", ""),

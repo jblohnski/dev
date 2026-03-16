@@ -15,6 +15,7 @@ FUNC_RE = re.compile(r"^([A-Za-z0-9_]+)\s*\(\)\s*\{")
 EXCLUDED_PARTS = {".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build", "target"}
 VALID_KINDS = {"component", "subcomponent", "support"}
 VALID_RUN = {"user", "sudo"}
+TOP_LEVEL_SCOPES = {"shell", "dev"}
 DEFAULT_ROOT = Path.home() / "dev"
 MODE_SET = {"summary", "records", "legend", "validate", "index", "catalog", "manifest"}
 SCHEMA_VERSION = "1.1.0"

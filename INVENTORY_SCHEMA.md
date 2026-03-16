@@ -45,6 +45,7 @@ Each item is one discovered node:
 - `record_type`: `dir` or `cmd`
 - `entity_type`: `component`, `subcomponent`, `support`, or `command`
 - `source`: `readme`, `script`, or `shell`
+- `top_level`: `shell` or `dev`
 - `component_id`: owning component id
 - `parent_component_id`: parent component id when applicable
 - `parent_key`: parent node identity using `path_key`
@@ -78,6 +79,13 @@ That is by design. A short key like `n.s` should stay short and semantically rea
 
 ## taxonomy declaration
 
+top-level taxonomy is constrained first:
+
+- `shell`: shell-loaded aliases, wrappers, and shell-native operations
+- `dev`: discovered operations rooted in the `dev/` corpus
+
+keywords are secondary facets for re-sorting operation lists. they are not the primary navigation root.
+
 Taxonomy does not need to match the script filename.
 
 Optional metadata:
@@ -93,6 +101,7 @@ Optional metadata:
 Rules:
 
 - If `@taxonomy` is declared on the record, it is used directly.
+- If explicit taxonomy omits `shell` or `dev`, the scanner prepends the appropriate top-level root.
 - If a command omits `@taxonomy`, the scanner derives taxonomy from the owning component plus group and command token.
 - A script is not required to encode taxonomy in its filename.
 - Prefer declaring shared lineage in a component `README.md` when you do not want to burden each script with it.
@@ -103,9 +112,10 @@ Examples:
 {
   "key": "w.w",
   "path_key": "cmd:wifiscan/wifiscan.sh#wifiscan",
+  "top_level": "dev",
   "declared_taxonomy": null,
   "taxonomy_source": "derived",
-  "taxonomy_key": "wifiscan/wifi/wifiscan"
+  "taxonomy_key": "dev/wifiscan/wifi/wifiscan"
 }
 ```
 
@@ -113,8 +123,9 @@ Examples:
 {
   "key": "n.s",
   "path_key": "cmd:ops/network/router.sh#router",
+  "top_level": "dev",
   "declared_taxonomy": "net/scan",
   "taxonomy_source": "explicit",
-  "taxonomy_key": "net/scan"
+  "taxonomy_key": "dev/net/scan"
 }
 ```

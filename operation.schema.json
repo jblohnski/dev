@@ -6,6 +6,7 @@
   "required": {
     "key": "string; short logical shorthand; human-facing; may collide",
     "path_key": "string; stable unique structural identity",
+    "top_level": "shell|dev; top-level taxonomy root",
     "component_id": "string; owning component identifier",
     "operation_type": "command|function|script|binary",
     "name": "string; human-facing label",

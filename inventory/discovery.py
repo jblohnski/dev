@@ -11,6 +11,7 @@ from inventory.shared import (
     SCHEMA_VERSION,
     SECTION_RE,
     SH_META_RE,
+    TOP_LEVEL_SCOPES,
     derive_group,
     is_excluded,
     meta_keywords,
@@ -29,6 +30,18 @@ from inventory.shared import (
     split_rel_parts,
     top_component,
 )
+
+
+def top_level_scope(record: dict[str, str]) -> str:
+    return "shell" if record.get("source") == "shell" else "dev"
+
+
+def normalize_taxonomy(parts: list[str], scope: str) -> list[str]:
+    if not parts:
+        return [scope]
+    if parts[0] in TOP_LEVEL_SCOPES:
+        return parts
+    return [scope] + parts
 
 
 def build_dir_records(root: Path) -> list[dict[str, str]]:
@@ -268,16 +281,17 @@ def display_records(cmd_records: list[dict[str, str]]) -> list[dict[str, str]]:
 
 
 def taxonomy_path(record: dict[str, str], owner_taxonomy: list[str] | None = None) -> list[str]:
+    scope = top_level_scope(record)
     explicit = parse_taxonomy_meta(record.get("taxonomy", ""))
     if explicit:
-        return explicit
+        return normalize_taxonomy(explicit, scope)
     if record["type"] == "dir":
         parts = split_rel_parts(record["path"])
-        return parts or [record["component"]]
+        return normalize_taxonomy(parts or [record["component"]], scope)
     cmd = record.get("cmd", record.get("alias") or record.get("name") or "")
     if owner_taxonomy:
-        return [part for part in owner_taxonomy + [record.get("group", ""), cmd] if part]
-    return [part for part in [record.get("component", ""), record.get("group", ""), cmd] if part]
+        return normalize_taxonomy([part for part in owner_taxonomy + [record.get("group", ""), cmd] if part], scope)
+    return normalize_taxonomy([part for part in [record.get("component", ""), record.get("group", ""), cmd] if part], scope)
 
 
 def parent_key_for_dir(record: dict[str, str], by_rel: dict[str, dict[str, str]]) -> str | None:
@@ -306,9 +320,11 @@ def parent_key_for_cmd(record: dict[str, str], explicit_paths: dict[str, str]) -
 def catalog_item_for_dir(record: dict[str, str], by_rel: dict[str, dict[str, str]]) -> dict[str, object]:
     taxon = taxonomy_path(record)
     declared_taxonomy = record.get("taxonomy", "").strip() or None
+    scope = top_level_scope(record)
     return {
         "key": short_taxonomy_key(taxon),
         "path_key": node_key(record),
+        "top_level": scope,
         "path": record["path"],
         "docs_path": docs_path_for_rel(record["rel"], by_rel),
         "record_type": "dir",
@@ -340,9 +356,11 @@ def catalog_item_for_cmd(
     owner_taxonomy = taxonomy_path(owner_record) if owner_record else None
     taxon = taxonomy_path(record, owner_taxonomy=owner_taxonomy)
     declared_taxonomy = record.get("taxonomy", "").strip() or None
+    scope = top_level_scope(record)
     return {
         "key": short_taxonomy_key(taxon),
         "path_key": node_key(record),
+        "top_level": scope,
         "path": record["path"],
         "docs_path": docs_path_for_rel(owner_rel, by_rel),
         "record_type": "cmd",

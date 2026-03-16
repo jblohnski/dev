@@ -38,6 +38,7 @@ canonical json catalog fields:
 
 - `key`: short taxonomic handle such as `n.s`
 - `path_key`: canonical unique structural key
+- `top_level`: first taxonomy root, `shell` or `dev`
 - `declared_taxonomy`: raw metadata taxonomy when present
 - `taxonomy_source`: `explicit` or `derived`
 - `taxonomy_key`: verbose semantic lineage key
@@ -55,6 +56,7 @@ interpretation rules:
 - `component` is the stable owner used for merged output.
 - `group` is the human-facing subgroup used by `l` and `devdash`.
 - `path` is always preserved in machine output and richer dashboards, even when terse legends omit it.
+- `keywords` are secondary facets for re-sorting, not the primary taxonomy root.
 
 ## readme metadata
 
