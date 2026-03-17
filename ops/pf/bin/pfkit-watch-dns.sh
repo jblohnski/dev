@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# @cmd: pfkit-watch-dns
 # @desc: Stream DNS packets from selected interface
 # @tags: ops pf dns monitor
 # @run: sudo

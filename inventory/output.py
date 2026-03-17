@@ -4,6 +4,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
+from inventory.commands import command_object, command_path, valid_commands
 from inventory.discovery import (
     build_dir_lookup,
     catalog_item_for_cmd,
@@ -13,8 +14,7 @@ from inventory.discovery import (
     display_records,
     is_legend_eligible,
 )
-from inventory.operations import command_record_seed, operation_command_name, valid_operations
-from inventory.shared import SCHEMA_VERSION, Style, matches_filters, order_key, split_keywords
+from inventory.shared import SCHEMA_VERSION, Style, matches_filters, order_key
 
 
 def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str, str]]) -> None:
@@ -64,7 +64,7 @@ def render_command_group(commands: list[dict[str, str]], show_paths: bool, style
         print(f"    {cmd_text}{padding}{style.wrap(record['desc'], style.desc)}")
         if show_paths:
             name = record.get("name", "").strip()
-            label = f"@ {record['path']}"
+            label = f"@ {command_path(record)}"
             if name and name.lower() != cmd.lower():
                 label = f"{label} [{name}]"
             print(f"      {style.wrap(label, style.desc)}")
@@ -80,22 +80,10 @@ def print_summary(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
     subcomponents = [record for record in dir_records if record["kind"] == "subcomponent"]
 
     selected = [record for record in display_records(cmd_records) if matches_filters(record, filters)]
-    op_records = valid_operations(
-        [
-            command_record_seed(
-                {
-                    **record,
-                    "keywords": split_keywords(record.get("keywords", "")),
-                }
-            )
-            for record in selected
-        ]
-    )
-    valid_paths = {op["path_key"] for op in op_records}
+    valid_paths = {cmd["path"] for cmd in valid_commands(selected)}
     cmds_by_component: dict[str, list[dict[str, str]]] = {}
     for record in selected:
-        path_key = f'{record.get("source", "cmd")}:{record.get("path", "")}#{record.get("cmd", record.get("alias") or record.get("name") or "")}'
-        if path_key not in valid_paths:
+        if command_path(record) not in valid_paths:
             continue
         if matches_filters(record, filters):
             cmds_by_component.setdefault(record["component"], []).append(record)
@@ -128,21 +116,9 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
     print()
     grouped_by_component: dict[str, list[dict[str, str]]] = {}
     selected = [record for record in display_records(cmd_records) if is_legend_eligible(record) and matches_filters(record, filters)]
-    op_records = valid_operations(
-        [
-            command_record_seed(
-                {
-                    **record,
-                    "keywords": split_keywords(record.get("keywords", "")),
-                }
-            )
-            for record in selected
-        ]
-    )
-    valid_paths = {op["path_key"] for op in op_records}
+    valid_paths = {cmd["path"] for cmd in valid_commands(selected)}
     for record in selected:
-        path_key = f'{record.get("source", "cmd")}:{record.get("path", "")}#{record.get("cmd", record.get("alias") or record.get("name") or "")}'
-        if path_key not in valid_paths:
+        if command_path(record) not in valid_paths:
             continue
         grouped_by_component.setdefault(record["component"], []).append(record)
 
@@ -158,29 +134,7 @@ def print_index(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
     for record in display_records(cmd_records):
         if not matches_filters(record, filters):
             continue
-        op_seed = command_record_seed({**record, "keywords": split_keywords(record.get("keywords", ""))})
-        ops = valid_operations([op_seed])
-        if not ops:
-            continue
-        op = ops[0]
-        records.append(
-            {
-                "alias": operation_command_name(op),
-                "entry": op.get("entry", ""),
-                "cmd": record.get("cmd", ""),
-                "name": op.get("name", ""),
-                "desc": op.get("desc", ""),
-                "keywords": op.get("keywords", []),
-                "top_level": op.get("top_level", ""),
-                "component": op.get("component_id", ""),
-                "group": op.get("group", ""),
-                "source": op.get("source", ""),
-                "path": op.get("path", ""),
-                "run": op.get("run", "user"),
-                "path_key": op.get("path_key", ""),
-                "taxonomy_key": op.get("taxonomy_key", ""),
-            }
-        )
+        records.extend(valid_commands([record]))
     print(json.dumps({"commands": records}, indent=2))
 
 

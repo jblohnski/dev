@@ -65,6 +65,9 @@ Keep path identity and logical taxonomy separate.
 - `legend` is a terse human projection
 - `index` is the shared command-reference list used by richer consumers such as `devdash`
 - display views may choose one canonical alias while still preserving `path`, `alias`, `name`, and `desc` in machine-readable outputs
+- in the command contract, `path` is the unique declaration path and `source_path` carries the backing file path
+
+The command-facing contract itself is defined separately in `command.schema.json`.
 
 ## example
 

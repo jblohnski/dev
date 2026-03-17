@@ -72,10 +72,11 @@ The minimum shared command-reference fields are:
 
 Interpretation:
 
-- `path`: structural source path
+- `path`: unique declaration path, typically `source-path#alias`
 - `alias`: required displayed invocation token used by human-facing views
 - `name`: fuller human label
 - `desc`: terse summary
+- `source_path`: backing file path retained in the command contract
 
 `@tags` remains a legacy alias for `@keywords`.
 
@@ -121,6 +122,7 @@ Canonical shell sections:
 - `summary` and `legend` are terse human projections
 - `index` is the shared machine-readable command list
 - `manifest` and `catalog` emit the richer JSON inventory payload
-- `validate` enforces metadata shape and operation legitimacy
+- `validate` enforces metadata shape and command legitimacy
 
-Valid machine outputs should be grounded in the operation contract defined by `operation.schema.json` and `operation_contract.py`.
+Command-facing outputs should be grounded in the command contract defined by `command.schema.json` and `command_contract.py`.
+The broader operation contract can remain available for richer manifest/catalog use, but it is no longer the canonical legend/index model.

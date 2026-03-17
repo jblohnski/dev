@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# @cmd: pfkit-watch-blocks
 # @desc: Stream blocked packets from pflog0
 # @tags: ops pf firewall monitor
 # @run: sudo

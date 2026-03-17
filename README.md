@@ -81,6 +81,8 @@ The shared command-reference model keeps:
 
 That is the minimum human-facing contract used to build `legend` and `devdash`.
 
+`path` is the unique declaration path for a command, typically `source-path#alias`.
+
 For human views, `alias` is the command key.
 If something does not resolve to an alias, it should not appear in the legend command list.
 
@@ -96,6 +98,7 @@ Deeper structure can still exist in the tree and machine outputs, but it should 
 - [COMPONENT_PROTOCOL.md](COMPONENT_PROTOCOL.md): primary discovery and command-reference contract
 - [DISCOVERY_RULES.md](DISCOVERY_RULES.md): terse walk/extraction rules
 - [INVENTORY_SCHEMA.md](INVENTORY_SCHEMA.md): manifest payload shape
+- `command.schema.json`: canonical command object contract
 
 ## Shell Source
 

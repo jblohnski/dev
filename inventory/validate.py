@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from inventory.operations import command_record_seed, valid_operations
+from inventory.commands import command_object, valid_commands
 from inventory.shared import SECTION_RE, SHELL_SECTION_OWNER, VALID_KINDS, VALID_RUN, is_excluded, parse_md_meta, parse_sh_meta, rel_str
 
 
@@ -65,7 +65,7 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
     if not shell_records:
         warnings.append("bootstrap/shell: no shell command records discovered")
 
-    op_candidates = []
+    command_candidates = []
     for record in script_records + shell_records:
         alias = (record.get("alias") or "").strip()
         name = (record.get("name") or "").strip()
@@ -76,12 +76,13 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
             errors.append(f"{record['path']}: discovered command record missing name")
         if not desc:
             errors.append(f"{record['path']}: discovered command record missing desc")
-        op_candidates.append(command_record_seed({**record, "keywords": [part for part in (record.get("keywords", "") or "").split() if part]}))
+        command_candidates.append(record)
 
-    valid_path_keys = {op["path_key"] for op in valid_operations(op_candidates)}
-    for candidate in op_candidates:
-        if candidate["path_key"] not in valid_path_keys:
-            errors.append(f"{candidate['path']}: discovered command record did not produce a valid operation object")
+    valid_paths = {cmd["path"] for cmd in valid_commands(command_candidates)}
+    for candidate in command_candidates:
+        candidate_path = command_object(candidate)["path"]
+        if candidate_path not in valid_paths:
+            errors.append(f"{candidate['path']}: discovered command record did not produce a valid command object")
 
     for message in errors:
         print(f"ERROR {message}")

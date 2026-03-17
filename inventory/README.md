@@ -21,6 +21,7 @@ modules are split by responsibility:
 
 - `shared.py`: constants and common parsing helpers
 - `discovery.py`: tree walk and record extraction
+- `commands.py`: canonical command-object normalization
 - `output.py`: summary, records, legend, index, and manifest rendering
 - `validate.py`: metadata validation rules
 - `cli.py`: command entrypoint orchestration

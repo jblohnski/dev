@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# @cmd: pfkit-uninstall
 # @desc: Remove pfkit anchor and restore pf config
 # @tags: ops pf firewall uninstall
 # @run: sudo

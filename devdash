@@ -32,7 +32,7 @@ TMP="$(mktemp -t devdash.XXXXXX)"
 i=1
 current_component=""
 
-while IFS=$'\t' read -r source path component group alias name run desc; do
+while IFS=$'\t' read -r source path source_path component group alias name run desc; do
   [[ -n "$source" ]] || continue
 
   if [[ "$component" != "$current_component" ]]; then
@@ -54,7 +54,7 @@ while IFS=$'\t' read -r source path component group alias name run desc; do
   else
     printf "%s     %s[%s] %s%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$RESET"
   fi
-  printf "%s|%s|%s|%s|%s\n" "$i" "$source" "$ROOT/$path" "$run" "$display_name" >> "$TMP"
+  printf "%s|%s|%s|%s|%s\n" "$i" "$source" "$ROOT/$source_path" "$run" "$display_name" >> "$TMP"
   i=$((i + 1))
 done < <(
   python3 "$SCAN" "$ROOT" index | python3 -c '
@@ -67,6 +67,7 @@ for cmd in payload.get("commands", []):
     row = [
         cmd.get("source", ""),
         cmd.get("path", ""),
+        cmd.get("source_path", ""),
         cmd.get("component", ""),
         cmd.get("group", ""),
         cmd.get("alias", ""),
