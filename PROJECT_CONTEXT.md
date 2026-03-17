@@ -14,9 +14,9 @@ Directory structure:
 
 dev/
   audit/
-  auditor/
-  netshot/
-  tools/
+  apps/
+  bootstrap/
+  ops/
 
 Modules must be independent unless explicitly stated.
 

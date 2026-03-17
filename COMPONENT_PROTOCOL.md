@@ -1,179 +1,126 @@
 # component protocol
 
-This repo treats `~/dev` as a recursive component tree.
+This repo treats `~/dev` as a recursive component tree with one shared command-reference stream.
 
-related documents:
+Related documents:
 
-- `DISCOVERY_RULES.md`: terse tree walk and extraction rules
-- `INVENTORY_SCHEMA.md`: manifest object shape
+- `DISCOVERY_RULES.md`: terse walk/extraction rules
+- `INVENTORY_SCHEMA.md`: manifest payload shape
 
-## intent
+## core intent
 
-- A directory becomes an explicit component when its `README.md` declares component metadata.
-- Runnable scripts become discoverable commands when they declare command metadata.
-- Shell legend commands and `devdash` should consume one shared inventory stream instead of re-implementing discovery.
+- `README.md` metadata establishes directory identity.
+- script and shell metadata establish discoverable commands.
+- `legend`, `summary`, `index`, and `devdash` should all derive from the same normalized command references.
 
-## canonical taxonomy
+There are two distinct inventories:
 
-Inventory should adhere to one canonical hierarchy:
+- components: discovered containers rooted in the tree
+- commands: the invokable subset discovered from script and shell declarations
 
-1. `component`
-2. `group`
-3. `command`
+Not every component is a command.
 
-canonical record fields:
+## layout rules
 
-- `type`: `dir` | `cmd`
-- `source`: `readme` | `script` | `shell`
-- `path`: repo-relative path to the source file or directory
-- `component`: owning component id
-- `group`: display subgroup inside the owning component
-- `name`: human-facing command label when `type=cmd`
-- `cmd`: command token shown in legends and used by shell-backed records
-- `run`: `user` | `sudo` when `type=cmd`
-- `keywords`: taxonomy keywords
-- `desc`: one-line summary
+- `bootstrap/`: tracked environment bootstrap state
+- `audit/`: evidence collection and reporting workflows
+- `ops/`: live system actions and checks
+- `apps/`: standalone file-backed utilities
+- `inventory/`: discovery, validation, and rendering modules
 
-canonical json catalog fields:
+`dev/` itself is workspace root metadata, not the place to accumulate standalone tools.
 
-- `key`: short taxonomic handle such as `n.s`
-- `path_key`: canonical unique structural key
-- `top_level`: first taxonomy root, `shell` or `dev`
-- `declared_taxonomy`: raw metadata taxonomy when present
-- `taxonomy_source`: `explicit` or `derived`
-- `taxonomy_key`: verbose semantic lineage key
-- `taxonomy_path`: lineage segments as an ordered array
-- `docs_path`: nearest README path
+## directory rules
 
-Canonical operation object:
-
-- see `operation.schema.json`
-- validate with `operation_contract.py:is_valid(op)`
-- `operation` is the broad executable parent for commands, functions, scripts, and binaries
-
-interpretation rules:
-
-- `component` is the stable owner used for merged output.
-- `group` is the human-facing subgroup used by `l` and `devdash`.
-- `path` is always preserved in machine output and richer dashboards, even when terse legends omit it.
-- `keywords` are secondary facets for re-sorting, not the primary taxonomy root.
-
-## readme metadata
-
-Declare component identity near the top of `README.md` with HTML comments:
+Declare directory identity near the top of `README.md`:
 
 ```md
-<!-- @component: audit -->
-<!-- @kind: component -->
-<!-- @desc: Quick macOS audit and Zeek analysis pipeline -->
-<!-- @keywords: audit macos zeek -->
+<!-- @component: stable-component-id -->
+<!-- @kind: component|subcomponent|support -->
+<!-- @desc: one-line summary -->
+<!-- @keywords: space-delimited keywords -->
+<!-- @taxonomy: optional semantic lineage -->
 ```
 
-fields:
+Interpretation:
 
-- `@component`: stable component id
-- `@kind`: `component` | `subcomponent` | `support`
-- `@desc`: one-line summary used in rollups
-- `@keywords`: space-separated taxonomy keywords
-- `@taxonomy`: optional explicit semantic lineage such as `net/scan`
+- `component`: first-class owner in summary/legend ordering
+- `subcomponent`: nested first-class unit under a component
+- `support`: documented directory that should not own the primary command surface
 
-rules:
+Commands attach to the nearest explicit ancestor whose kind is `component` or `subcomponent`.
 
-- `component`: top-level or independently meaningful unit
-- `subcomponent`: nested unit with distinct responsibility
-- `support`: content directory that should be visible but not treated as a primary control surface
-- Every tracked directory with a `README.md` should eventually declare explicit metadata.
-- `@taxonomy` is optional and may be used to decouple semantic lineage from directory names.
+## command rules
 
-If a `README.md` exists without metadata, discovery may still show the directory as implicit support, but it is not a first-class component.
-
-## script metadata
-
-runnable scripts should declare:
+Discoverable commands need this metadata:
 
 ```bash
 # @name: human label
-# @desc: one-line description
-# @cmd: command token shown in legends
-# @keywords: space-separated taxonomy keywords
-# @taxonomy: optional semantic lineage such as net/scan
+# @desc: one-line summary
+# @cmd: preferred invocation token
+# @keywords: space-delimited keywords
+# @taxonomy: optional semantic lineage
 # @run: user|sudo
 ```
 
-optional:
+The minimum shared command-reference fields are:
 
-```bash
-# @alias: shortname
-# @owner: firstparty
-```
+- `path`
+- `alias`
+- `name`
+- `desc`
 
-rules:
+Interpretation:
 
-- `@name`, `@desc`, and `@cmd` form the canonical command triplet.
-- `@desc` is required for dashboard inclusion.
-- `@run` controls invocation mode in dashboards.
-- `@keywords` is expected and drives taxonomy grouping.
-- `@taxonomy` is optional and overrides derived taxonomy when present.
-- `@alias` is display metadata only; it does not create shell aliases automatically.
-- `@tags` is accepted as a legacy alias for `@keywords`.
-- Executable scripts in tracked components are expected to declare all core metadata fields.
+- `path`: structural source path
+- `alias`: required displayed invocation token used by human-facing views
+- `name`: fuller human label
+- `desc`: terse summary
 
-## shell metadata
+`@tags` remains a legacy alias for `@keywords`.
 
-shell command wrappers remain valid inventory, but they should be thin wrappers around file-backed functionality whenever possible.
+For human-facing command views, `alias` is the canonical entry key.
+If a discovered record does not resolve to an alias, it is not a legit legend command.
 
-rules:
+## grouping rules
 
-- Shell legend commands are discovered from `bootstrap/shell/*.sh`.
-- `## section` headers define shell groups.
-- `# @component` on its own resets shell metadata to the current section owner.
-- Shell commands should declare `@name`, `@desc`, `@cmd`, and `@keywords` before the alias or function they describe.
-- Legacy `# name: description` lines are still parsed while older wrappers are migrated.
-- Canonical shell sections are:
-  - `bootstrap`
-  - `audit`
-  - `dev`
-  - `python`
-  - `nav`
-  - `git`
-  - `network`
-  - `dns`
-  - `util`
+- file-backed scripts use structure first when they live in a real subdirectory under their owner
+- file-backed scripts fall back to keyword-derived grouping when they live directly at the owner root
+- shell wrappers group by shell section plus declared subgroup keywords
+- keywords are secondary facets, not the primary navigation tree
 
-## discovery contract
+This keeps `apps/netshot`, `apps/sitechk`, and `apps/wifiscan` grouped structurally while still allowing root-level audit scripts to fall into `zeek` or `macos`.
 
-The shared scanner walks `~/dev` recursively and emits records for:
+Human-facing views should remain one level deep in perspective:
 
-- explicit components and subcomponents from `README.md`
-- implicit support directories that have a `README.md` but no metadata
-- runnable scripts with script metadata
-- shell aliases/functions discovered from `bootstrap/shell/*.sh`
+- component list first
+- command list under the component
+- deeper nested directories roll up to the owning component for legend/dashboard purposes
 
-Each script record is attached to the nearest explicit ancestor component; if none exists, it falls back to the top-level directory name.
+## shell wrapper rules
 
-## output shapes
+- discover from `bootstrap/shell/*.sh`
+- `## section` establishes shell scope
+- bare `# @component` resets metadata to the current section owner
+- wrappers should stay thin and point at file-backed functionality when practical
 
-human summary:
+Canonical shell sections:
 
-- terse tree-style stdout for quick review
-- components first, groups second, commands third
+- `bootstrap`
+- `audit`
+- `dev`
+- `python`
+- `nav`
+- `git`
+- `network`
+- `dns`
+- `util`
 
-machine records:
+## output rules
 
-- tab-separated records for dashboards and generators
-- one record type per line: `dir` or `cmd`
+- `summary` and `legend` are terse human projections
+- `index` is the shared machine-readable command list
+- `manifest` and `catalog` emit the richer JSON inventory payload
+- `validate` enforces metadata shape and operation legitimacy
 
-machine catalog:
-
-- `./component-scan.sh manifest`
-- `./component-scan.sh catalog`
-- emits the canonical JSON info object described by the plain JSON contract in `inventory.schema.json`
-- `key` is shorthand; `path_key` is the authoritative unique identifier
-- legend and index command views should be derived from valid operation objects
-
-validation:
-
-- `./component-scan.sh validate`
-- flags missing metadata, invalid kinds, invalid run modes, duplicate component ids, and non-canonical shell sections
-
-This is the source of truth for `devdash`, `l`, and related inventory views.
+Valid machine outputs should be grounded in the operation contract defined by `operation.schema.json` and `operation_contract.py`.

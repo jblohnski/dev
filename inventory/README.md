@@ -5,7 +5,17 @@
 
 # inventory
 
-support package for `component-scan.sh`.
+Support package for `component-scan.sh`.
+
+This package owns:
+
+- tree walking
+- component normalization
+- command discovery
+- legend/summary/index rendering
+- validation
+
+It does not own shell initialization or shell publishing. That belongs to `bootstrap/`.
 
 modules are split by responsibility:
 

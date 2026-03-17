@@ -31,37 +31,52 @@ printf "%sInventory-first component view of %s%s\n\n" "${DIM:-}" "$ROOT" "$RESET
 TMP="$(mktemp -t devdash.XXXXXX)"
 i=1
 current_component=""
-current_group=""
 
-while IFS=$'\t' read -r kind source path component group name cmd run keywords desc; do
-  [[ "$kind" == "cmd" ]] || continue
-  # Skip shell-only legend entries to keep devdash focused on file-backed commands
-  [[ "$source" == "shell" ]] && continue
+while IFS=$'\t' read -r source path component group alias name run desc; do
+  [[ -n "$source" ]] || continue
 
   if [[ "$component" != "$current_component" ]]; then
     printf "\n%s%s%s\n" "$BOLD$HDR" "$component" "$RESET"
     current_component="$component"
-    current_group=""
   fi
 
-  if [[ "$group" != "$current_group" ]]; then
-    printf "%s  %s%s%s\n" "${DIM:-}" "${ACCENT:-}" "$group" "$RESET"
-    current_group="$group"
-  fi
-
-  [[ "$cmd" == "-" ]] && cmd=""
+  [[ "$alias" == "-" ]] && alias=""
   [[ "$name" == "-" ]] && name=""
-  display_name="${cmd:-$name}"
+  display_name="${alias:-$name}"
   printf "%s%2d%s  %-18s  %s%-5s%s  %s%s\n" \
     "$BOLD" "$i" "$RESET" \
     "$display_name" \
     "${MUTED:-}" "$run" "$RESET" \
     "$desc" \
     ""
-  printf "%s     %s[%s] %s%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$RESET"
-  printf "%s|%s|%s|%s|%s\n" "$i" "$source" "$ROOT/$path" "$run" "$cmd" >> "$TMP"
+  if [[ -n "$name" && "${name,,}" != "${display_name,,}" ]]; then
+    printf "%s     %s[%s] %s (%s)%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$name" "$RESET"
+  else
+    printf "%s     %s[%s] %s%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$RESET"
+  fi
+  printf "%s|%s|%s|%s|%s\n" "$i" "$source" "$ROOT/$path" "$run" "$display_name" >> "$TMP"
   i=$((i + 1))
-done < <(python3 "$SCAN" "$ROOT" records)
+done < <(
+  python3 "$SCAN" "$ROOT" index | python3 -c '
+import json, sys
+
+payload = json.load(sys.stdin)
+for cmd in payload.get("commands", []):
+    if cmd.get("source") == "shell":
+        continue
+    row = [
+        cmd.get("source", ""),
+        cmd.get("path", ""),
+        cmd.get("component", ""),
+        cmd.get("group", ""),
+        cmd.get("alias", ""),
+        cmd.get("name", ""),
+        cmd.get("run", "user"),
+        cmd.get("desc", ""),
+    ]
+    print("\t".join(row))
+'
+)
 
 printf "\n%sSelect number to run (Enter = quit)%s\n" "${DIM:-}" "$RESET"
 read -r choice

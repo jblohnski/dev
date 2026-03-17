@@ -55,9 +55,9 @@ source_if_exists() {
 source_if_exists /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source_if_exists /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-# Pin prompt behavior so Terminal.app gets color expansion and persistent RPROMPT.
+# Pin prompt behavior so Terminal.app gets color expansion and stable inline prompt rendering.
 setopt PROMPT_PERCENT PROMPT_CR PROMPT_SP
 unsetopt PROMPT_SUBST TRANSIENT_RPROMPT
 
-PROMPT='%F{109}%n@%m%f %F{110}%~%f %F{244}>%f '
-RPROMPT='%F{109}🦍%f'
+PROMPT='%F{109}%n@%m%f %F{110}%~%f %F{109}🦍%f %F{244}>%f '
+RPROMPT=''

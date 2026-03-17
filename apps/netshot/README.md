@@ -1,7 +1,7 @@
 <!-- @component: netshot -->
 <!-- @kind: support -->
 <!-- @desc: Packet capture and Zeek snapshot helper -->
-<!-- @keywords: audit network zeek capture -->
+<!-- @keywords: netshot audit network zeek capture -->
 
 # netshot
 

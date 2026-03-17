@@ -9,7 +9,9 @@ from inventory.discovery import (
     catalog_item_for_cmd,
     catalog_item_for_dir,
     collect_manifest_index,
+    display_command_name,
     display_records,
+    is_legend_eligible,
 )
 from inventory.operations import command_record_seed, operation_command_name, valid_operations
 from inventory.shared import SCHEMA_VERSION, Style, matches_filters, order_key, split_keywords
@@ -33,7 +35,7 @@ def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
                 ]
             )
         )
-    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], x["alias"] or x["name"])):
+    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], display_command_name(x))):
         cmd = record.get("cmd", record["alias"] or record["name"])
         print(
             "\t".join(
@@ -54,15 +56,18 @@ def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
 
 
 def render_command_group(commands: list[dict[str, str]], show_paths: bool, style: Style) -> None:
+    cmd_width = max((len(display_command_name(record)) for record in commands), default=0)
     for record in commands:
-        cmd = record.get("cmd", record["alias"] or record["name"])
-        desc = record["desc"]
+        cmd = display_command_name(record)
         cmd_text = style.wrap(cmd, style.cmd)
-        name_text = style.wrap(record.get("name", cmd), style.name)
-        print(f"    {cmd_text}  {name_text}  {style.wrap(desc, style.desc)}")
+        padding = " " * (max(cmd_width - len(cmd), 0) + 2)
+        print(f"    {cmd_text}{padding}{style.wrap(record['desc'], style.desc)}")
         if show_paths:
-            print(f"      {style.wrap('@ ' + record['path'], style.desc)}")
-
+            name = record.get("name", "").strip()
+            label = f"@ {record['path']}"
+            if name and name.lower() != cmd.lower():
+                label = f"{label} [{name}]"
+            print(f"      {style.wrap(label, style.desc)}")
 
 def print_summary(dir_records: list[dict[str, str]], cmd_records: list[dict[str, str]], show_paths: bool, color: bool, filters: list[str]) -> None:
     style = Style(color)
@@ -122,7 +127,7 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
     print(style.wrap("commands", style.hdr))
     print()
     grouped_by_component: dict[str, list[dict[str, str]]] = {}
-    selected = [record for record in display_records(cmd_records) if matches_filters(record, filters)]
+    selected = [record for record in display_records(cmd_records) if is_legend_eligible(record) and matches_filters(record, filters)]
     op_records = valid_operations(
         [
             command_record_seed(
@@ -143,12 +148,8 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
 
     for component in sorted(grouped_by_component, key=order_key):
         print(style.wrap(component, style.bold, style.hdr))
-        grouped: dict[str, list[dict[str, str]]] = {}
-        for record in grouped_by_component[component]:
-            grouped.setdefault(record["group"], []).append(record)
-        for group in sorted(grouped):
-            print(f"  {style.wrap(group, style.accent)}")
-            render_command_group(grouped[group], show_paths, style)
+        commands = sorted(grouped_by_component[component], key=display_command_name)
+        render_command_group(commands, show_paths, style)
         print()
 
 
@@ -164,7 +165,9 @@ def print_index(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
         op = ops[0]
         records.append(
             {
-                "cmd_name": operation_command_name(op),
+                "alias": operation_command_name(op),
+                "entry": op.get("entry", ""),
+                "cmd": record.get("cmd", ""),
                 "name": op.get("name", ""),
                 "desc": op.get("desc", ""),
                 "keywords": op.get("keywords", []),

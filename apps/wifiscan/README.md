@@ -1,7 +1,7 @@
 <!-- @component: wifiscan -->
-<!-- @kind: component -->
+<!-- @kind: support -->
 <!-- @desc: Native Wi-Fi scanner backed by CoreWLAN for modern macOS -->
-<!-- @keywords: wifi network scan macos native -->
+<!-- @keywords: wifiscan wifi network scan macos native -->
 
 # wifiscan
 

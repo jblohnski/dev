@@ -71,7 +71,7 @@ alias dd='$HOME/dev/devdash'
 # @keywords: dev summary inventory
 alias ds='python3 "$HOME/dev/component-scan.sh" summary --color'
 # @name: Legend
-# @desc: Show component legend
+# @desc: Show unified command legend
 # @cmd: dl
 # @keywords: dev legend inventory
 alias dl='python3 "$HOME/dev/component-scan.sh" legend --color'
@@ -81,7 +81,7 @@ alias dl='python3 "$HOME/dev/component-scan.sh" legend --color'
 # @keywords: dev records inventory
 alias dr='python3 "$HOME/dev/component-scan.sh" records'
 # @name: Validation
-# @desc: Validate component metadata
+# @desc: Validate component metadata and taxonomy
 # @cmd: dv
 # @keywords: dev validate inventory taxonomy
 alias dv='python3 "$HOME/dev/component-scan.sh" validate'

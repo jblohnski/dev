@@ -30,7 +30,7 @@ SHELL_SECTION_OWNER = {
     "dns": "dev",
     "util": "dev",
 }
-COMPONENT_ORDER = ["bootstrap", "audit", "ops", "dev", "projects", "proposals", "zlogs", "arkenfox"]
+COMPONENT_ORDER = ["bootstrap", "audit", "ops", "apps", "dev", "projects", "proposals", "zlogs", "arkenfox"]
 RESERVED_GROUP_KEYWORDS = {
     "automation",
     "command",
@@ -60,7 +60,7 @@ class Style:
         self.hdr = "\033[38;5;110m" if enabled else ""
         self.cmd = "\033[1;97m" if enabled else ""
         self.name = "\033[38;5;114m" if enabled else ""
-        self.desc = "\033[2;38;5;245m" if enabled else ""
+        self.desc = "\033[2;38;5;248m" if enabled else ""
         self.accent = "\033[38;5;109m" if enabled else ""
 
     def wrap(self, text: str, *codes: str) -> str:

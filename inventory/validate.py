@@ -19,6 +19,12 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
             errors.append(f"{record['path']}: invalid @kind '{record['kind']}'")
         if not meta:
             warnings.append(f"{record['path']}: implicit support README without explicit component metadata")
+        else:
+            for key in ("component", "kind", "desc"):
+                if key not in meta:
+                    warnings.append(f"{record['path']}/README.md: missing directory metadata @{key}")
+            if "keywords" not in meta and "tags" not in meta:
+                warnings.append(f"{record['path']}/README.md: missing directory metadata @keywords")
         comp = record["component"]
         if comp in component_ids and component_ids[comp] != record["path"]:
             errors.append(f"duplicate component id '{comp}' in {record['path']} and {component_ids[comp]}")
@@ -40,6 +46,8 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
                 warnings.append(f"{rel}: missing script metadata @{key}")
         if "keywords" not in meta and "tags" not in meta:
             warnings.append(f"{rel}: missing script metadata @keywords")
+        if "cmd" not in meta and "alias" not in meta:
+            warnings.append(f"{rel}: missing script metadata @cmd")
         if "run" in meta and meta["run"] not in VALID_RUN:
             errors.append(f"{rel}: invalid @run '{meta['run']}'")
 
@@ -59,6 +67,15 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
 
     op_candidates = []
     for record in script_records + shell_records:
+        alias = (record.get("alias") or "").strip()
+        name = (record.get("name") or "").strip()
+        desc = (record.get("desc") or "").strip()
+        if not alias:
+            errors.append(f"{record['path']}: discovered command record missing alias")
+        if not name:
+            errors.append(f"{record['path']}: discovered command record missing name")
+        if not desc:
+            errors.append(f"{record['path']}: discovered command record missing desc")
         op_candidates.append(command_record_seed({**record, "keywords": [part for part in (record.get("keywords", "") or "").split() if part]}))
 
     valid_path_keys = {op["path_key"] for op in valid_operations(op_candidates)}

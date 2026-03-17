@@ -1,30 +1,16 @@
 # inventory schema
 
-canonical machine catalog for `~/dev` discovery.
+Canonical machine catalog for `~/dev` discovery.
 
-primary emitter:
+Primary emitter:
 
 ```bash
 python3 ./component-scan.sh manifest
 ```
 
-schema file:
+Schema file:
 
 - `inventory.schema.json`
-
-## design
-
-The catalog separates three identities that were previously blurred together:
-
-- `key`: short taxonomic handle such as `n.s`
-- `path_key`: canonical unique structural key derived from path and command token
-- `taxonomy_key`: verbose semantic lineage such as `ops/network/router`
-
-That split is intentional:
-
-- `key` is for quick human reference and shorthand grouping.
-- `path_key` is the collision-proof identity for storage, joins, and updates.
-- `taxonomy_key` is the explicit semantic lineage for dashboards and reasoning.
 
 ## payload
 
@@ -35,10 +21,6 @@ Top-level object:
 - `root`
 - `index`
 - `items`
-
-`inventory.schema.json` is intentionally plain JSON, not a JSON Schema-spec document.
-
-It is a lightweight contract file that names the object shape without bringing in validator-specific syntax.
 
 Each item is one discovered node:
 
@@ -51,81 +33,53 @@ Each item is one discovered node:
 - `parent_key`: parent node identity using `path_key`
 - `group`: command group, otherwise `null`
 - `name`: human label
-- `cmd`: command token for command records, otherwise `null`
+- `cmd`: preferred command token for command records
 - `run`: `user` or `sudo` for command records, otherwise `null`
 - `desc`: one-line summary
 - `keywords`: normalized keyword array
-- `alias`: alias when present, otherwise `null`
+- `alias`: alternate or display invocation token when present
 - `path`: repo-relative source path
 - `docs_path`: nearest README path
 - `declared_taxonomy`: raw taxonomy declared in metadata when present
 - `taxonomy_source`: `explicit` or `derived`
-- `taxonomy_path`: ordered semantic lineage segments
+- `taxonomy_key`: resolved logical lineage
+- `taxonomy_path`: ordered taxonomy segments
 
-the `index` object holds aggregate walk data:
+The `index` object holds aggregate walk data:
 
-- `eligible_dirs`: repo-relative directories included in the walk
-- `skipped_dirs`: pruned directories
-- `counts`: aggregate emitted and discovered totals
-- `skipped`: aggregate skip reasons
+- `eligible_dirs`
+- `skipped_dirs`
+- `counts`
+- `skipped`
 
-legend and command index outputs are downstream views over valid operation objects, not independent discovery products.
+## identity rules
 
-## key rules
+- `key` is shorthand and may collide
+- `path_key` is the authoritative structural identity
+- `taxonomy_key` is the resolved logical lineage
 
-`key` is not guaranteed unique.
+Keep path identity and logical taxonomy separate.
 
-That is by design. A short key like `n.s` should stay short and semantically readable. Use `path_key` whenever you need a stable unique identity.
+## downstream views
 
-## taxonomy declaration
+- `legend` is a terse human projection
+- `index` is the shared command-reference list used by richer consumers such as `devdash`
+- display views may choose one canonical alias while still preserving `path`, `alias`, `name`, and `desc` in machine-readable outputs
 
-top-level taxonomy is constrained first:
-
-- `shell`: shell-loaded aliases, wrappers, and shell-native operations
-- `dev`: discovered operations rooted in the `dev/` corpus
-
-keywords are secondary facets for re-sorting operation lists. they are not the primary navigation root.
-
-Taxonomy does not need to match the script filename.
-
-Optional metadata:
-
-```md
-<!-- @taxonomy: net/scan -->
-```
-
-```bash
-# @taxonomy: net/scan
-```
-
-Rules:
-
-- If `@taxonomy` is declared on the record, it is used directly.
-- If explicit taxonomy omits `shell` or `dev`, the scanner prepends the appropriate top-level root.
-- If a command omits `@taxonomy`, the scanner derives taxonomy from the owning component plus group and command token.
-- A script is not required to encode taxonomy in its filename.
-- Prefer declaring shared lineage in a component `README.md` when you do not want to burden each script with it.
-
-Examples:
+## example
 
 ```json
 {
-  "key": "w.w",
-  "path_key": "cmd:wifiscan/wifiscan.sh#wifiscan",
+  "key": "d.a.n",
+  "path_key": "cmd:apps/netshot/netshot.sh#netshot",
   "top_level": "dev",
-  "declared_taxonomy": null,
+  "component_id": "apps",
+  "group": "netshot",
+  "name": "Netshot",
+  "cmd": "netshot",
+  "alias": null,
+  "desc": "Capture a short packet trace, run Zeek, and summarize the result",
   "taxonomy_source": "derived",
-  "taxonomy_key": "dev/wifiscan/wifi/wifiscan"
-}
-```
-
-```json
-{
-  "key": "n.s",
-  "path_key": "cmd:ops/network/router.sh#router",
-  "top_level": "dev",
-  "declared_taxonomy": "net/scan",
-  "taxonomy_source": "explicit",
-  "taxonomy_key": "dev/net/scan"
+  "taxonomy_key": "dev/apps/netshot/netshot"
 }
 ```

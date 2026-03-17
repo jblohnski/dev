@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # @name: Netshot
 # @desc: Capture a short packet trace, run Zeek, and summarize the result
-# @cmd: netshot.sh
+# @cmd: netshot
 # @keywords: audit network zeek capture
 # @run: sudo
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # @name: Site Check
 # @desc: Verify DNS, TLS, and HTTP identity signals for a site
-# @cmd: sitechk.sh
+# @cmd: sitechk
 # @keywords: audit web tls dns http
 # @run: user
 # check_site_identity.sh

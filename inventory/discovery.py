@@ -32,6 +32,36 @@ from inventory.shared import (
 )
 
 
+def display_command_name(record: dict[str, str]) -> str:
+    alias = (record.get("alias") or "").strip()
+    if alias:
+        return alias
+    cmd = (record.get("cmd") or "").strip()
+    if cmd:
+        return cmd
+    return (record.get("name") or "").strip()
+
+
+def is_shorthand_alias(record: dict[str, str]) -> bool:
+    desc = " ".join((record.get("desc") or "").strip().lower().split())
+    return desc.startswith("shorthand for ")
+
+
+def is_legend_eligible(record: dict[str, str]) -> bool:
+    if is_shorthand_alias(record):
+        return False
+    if record.get("component") == "dev" and record.get("group") in {
+        "dashboard",
+        "legend",
+        "records",
+        "summary",
+        "taxonomy",
+        "validate",
+    }:
+        return False
+    return True
+
+
 def top_level_scope(record: dict[str, str]) -> str:
     return "shell" if record.get("source") == "shell" else "dev"
 
@@ -141,6 +171,12 @@ def script_group(dir_rel: str, owner: str, by_rel: dict[str, dict[str, str]], ex
     return nearest_rel
 
 
+def script_display_group(owner: str, keywords: str, fallback: str) -> str:
+    if fallback and fallback not in {".", "scripts", "shell"}:
+        return fallback
+    return derive_group(owner, keywords, fallback)
+
+
 def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[dict[str, str]]:
     records: list[dict[str, str]] = []
     by_rel, explicit_paths = build_dir_lookup(dir_records)
@@ -164,13 +200,13 @@ def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[
                 "rel": rel,
                 "component": owner,
                 "owner": owner,
-                "group": derive_group(owner, meta_keywords(meta, owner), script_group(dir_rel, owner, by_rel, explicit_paths)),
+                "group": script_display_group(owner, meta_keywords(meta, owner), script_group(dir_rel, owner, by_rel, explicit_paths)),
                 "name": meta.get("name", meta.get("alias", script.stem)),
                 "cmd": meta.get("cmd", meta.get("alias", script.name)),
                 "run": meta.get("run", "user"),
                 "keywords": meta_keywords(meta, owner),
                 "tags": meta_keywords(meta, owner),
-                "alias": meta.get("alias", ""),
+                "alias": meta.get("cmd") or meta.get("alias") or script.stem,
                 "desc": desc,
                 "docs": doc_for_rel(dir_rel, by_rel, root),
                 "taxonomy": meta.get("taxonomy", ""),
@@ -267,7 +303,9 @@ def build_shell_records(root: Path, by_rel: dict[str, dict[str, str]]) -> list[d
 def display_records(cmd_records: list[dict[str, str]]) -> list[dict[str, str]]:
     selected: list[dict[str, str]] = []
     seen: dict[tuple[str, str, str, str], int] = {}
-    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], x["alias"] or x["name"])):
+    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], display_command_name(x))):
+        if is_shorthand_alias(record):
+            continue
         key = (record["component"], record["group"], record["desc"], record["run"])
         current = seen.get(key)
         if current is None:

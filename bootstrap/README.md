@@ -43,5 +43,6 @@ Shell bootstrap logic lives in `bootstrap/shell/` and is split by concern:
 ## Notes
 
 - The shell layer is interactive-only; non-interactive shells stop at the loader.
-- The canonical machine inventory source remains `../component-scan.sh`.
+- `bootstrap/` is about initialization, publishing, and shell/runtime setup.
+- Command discovery and legend generation are not defined here; they are delegated to `../component-scan.sh` and the `inventory/` package.
 - The shell no longer auto-prints the legend on startup by default. Set `DEV_SHELL_SHOW_LEGEND=1` if you want that behavior back for a session.
