@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Burst-sample process table for short-lived processes
+# @tags: audit collector process watch
+# @run: user
+
 set -euo pipefail
 
 OUTDIR="${1:-./current}"

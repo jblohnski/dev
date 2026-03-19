@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Collect trust chain and SIP-related anomaly signals
+# @tags: audit collector trust sip
+# @run: user
+
 set -euo pipefail
 
 OUTDIR="${1:-./current}"

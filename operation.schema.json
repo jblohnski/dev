@@ -1,0 +1,35 @@
+{
+  "name": "dev_operation_contract",
+  "version": "1.0.0",
+  "object": "operation",
+  "definition": "executable leaf abstraction discovered under dev/. broad enough to represent a command, function, script, or binary while keeping logical taxonomy separate from path identity.",
+  "required": {
+    "key": "string; short logical shorthand; human-facing; may collide",
+    "path_key": "string; stable unique structural identity",
+    "top_level": "shell|dev; top-level taxonomy root",
+    "component_id": "string; owning component identifier",
+    "operation_type": "command|function|script|binary",
+    "name": "string; human-facing label",
+    "entry": "string; invocation token, function symbol, script name, or binary name",
+    "path": "string; repo-relative source path",
+    "taxonomy_key": "string; resolved logical lineage",
+    "taxonomy_path": ["string; ordered logical lineage segment"],
+    "desc": "string; concise summary"
+  },
+  "optional": {
+    "group": "string|null; local subgroup inside the component",
+    "run": "user|sudo|null; execution mode when applicable",
+    "keywords": ["string; normalized classification hint"],
+    "alias": "string|null; alternate invocation token",
+    "source": "script|shell|binary|null; physical discovery source",
+    "declared_taxonomy": "string|null; raw taxonomy declared in metadata"
+  },
+  "rules": [
+    "key is shorthand and may collide",
+    "path_key is authoritative unique identity",
+    "taxonomy is logical meaning, not storage location",
+    "script filename does not need to match taxonomy",
+    "operation_type is the broad executable class, not the taxonomy",
+    "a command view is an alias or pointer to a valid operation object"
+  ]
+}

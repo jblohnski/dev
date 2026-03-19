@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Apply arkenfox profile and Firefox hardening overrides
+# @tags: ops browser firefox hardening
+# @run: user
+
 # firefox.sh
 #
 # Purpose:

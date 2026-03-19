@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Verify signatures for core system binaries
+# @tags: audit collector signing integrity
+# @run: user
+
 set -euo pipefail
 
 OUTDIR="${1:-./current}"

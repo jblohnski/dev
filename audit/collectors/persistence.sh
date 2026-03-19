@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Collect persistence surfaces and login items
+# @tags: audit collector persistence launch
+# @run: user
+
 set -euo pipefail
 
 OUT="$1/persistence.txt"

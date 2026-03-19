@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Run deep network audit baseline/compare flow
+# @tags: audit collector network deep
+# @run: sudo
+
 set -euo pipefail
 
 # Network-focused audit (burst sampling + process attribution + timing distribution)

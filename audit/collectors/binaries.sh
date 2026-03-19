@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Collect executable inventory and suspicious unsigned binaries
+# @tags: audit collector binaries signing
+# @run: user
+
 set -euo pipefail
 
 OUTDIR="${1:-./current}"

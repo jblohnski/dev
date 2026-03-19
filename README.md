@@ -1,64 +1,113 @@
+<!-- @component: dev -->
+<!-- @kind: component -->
+<!-- @desc: Personal machine automation and diagnostics workspace -->
+<!-- @keywords: workspace automation diagnostics -->
+
 # dev
 
 Personal machine automation and diagnostics repo for `~/dev`.
 
-## Taxonomy (phase 1)
+## Layout
 
-Top-level groups are intentionally separated by lifecycle:
+- `bootstrap/`: tracked shell and machine bootstrap files
+- `audit/`: evidence collection, Zeek workflows, and reports
+- `ops/`: live system actions and operational checks
+- `apps/`: standalone file-backed utilities grouped under one parent
+- `inventory/`: discovery, validation, and rendering modules
 
-1. `bootstrap/`:
-   Files used to initialize or publish local environment/profile state.
-   Example: shell profile, terminal profiles, git/editor defaults.
-2. `ops/`:
-   Operational scripts that interrogate, harden, or manipulate live system state.
-   Example: router checks, macOS hardening, Firefox hardening.
-3. `audit/`:
-   Analysis pipeline that captures snapshots, compares baseline vs current, and reports findings.
-4. `pfkit/`:
-   PF-specific firewall toolkit (kept separate due to privileged/network policy scope).
-5. `arkenfox/`:
-   Upstream/vendor material and related support scripts.
-6. `projects/`:
-   Independent project sandboxes, excluded from this repo workflow.
+Rule of thumb:
 
-## Shell Profile Source of Truth
+- put live-action tooling in `ops/`
+- put collection and comparison flows in `audit/`
+- put self-contained utilities in `apps/`
+- keep shell wrappers thin in `bootstrap/shell/`
 
-Canonical tracked shell profile path:
+## Inventory
+
+`component-scan.sh` is the shared source for:
+
+- `summary`
+- `legend`
+- `records`
+- `index`
+- `manifest`
+- `catalog`
+- `validate`
+
+Human views and the dashboard should not invent their own discovery logic.
+They should consume the same command-reference stream.
+
+Separation of concerns:
+
+- `bootstrap/` initializes and publishes shell state
+- `inventory/` walks `dev/` and resolves components and commands
+
+Two things are discovered:
+
+- components: directories with declared identity
+- commands: invokable records with alias, name, desc, and path
+
+Not every component is a command.
+
+## Metadata
+
+Directory `README.md` files declare component metadata:
+
+```md
+<!-- @component: stable-component-id -->
+<!-- @kind: component|subcomponent|support -->
+<!-- @desc: one-line summary -->
+<!-- @keywords: space-delimited keywords -->
+<!-- @taxonomy: optional semantic lineage -->
+```
+
+Executable scripts and shell wrappers declare command metadata:
+
+```bash
+# @name: human label
+# @desc: one-line summary
+# @cmd: preferred invocation token shown in views
+# @keywords: space-delimited keywords
+# @taxonomy: optional semantic lineage
+# @run: user|sudo
+```
+
+The shared command-reference model keeps:
+
+- `path`
+- `alias`
+- `name`
+- `desc`
+
+That is the minimum human-facing contract used to build `legend` and `devdash`.
+
+`path` is the unique declaration path for a command, typically `source-path#alias`.
+
+For human views, `alias` is the command key.
+If something does not resolve to an alias, it should not appear in the legend command list.
+
+Human-facing views should stay one level deep:
+
+- component
+- command
+
+Deeper structure can still exist in the tree and machine outputs, but it should roll up in `legend` and `devdash`.
+
+## Docs
+
+- [COMPONENT_PROTOCOL.md](COMPONENT_PROTOCOL.md): primary discovery and command-reference contract
+- [DISCOVERY_RULES.md](DISCOVERY_RULES.md): terse walk/extraction rules
+- [INVENTORY_SCHEMA.md](INVENTORY_SCHEMA.md): manifest payload shape
+- `command.schema.json`: canonical command object contract
+
+## Shell Source
+
+Tracked shell profile source of truth:
 
 - `bootstrap/.zshrc`
 
-Publish workflow:
+Publish it with:
 
 ```bash
 pz
 ```
-
-`pz` copies `~/dev/bootstrap/.zshrc` to `~/.zshrc` and reloads it in the current shell.
-
-## Ops vs Audit
-
-- `ops/`: direct actions and runtime interrogation.
-- `audit/`: evidence collection + normalization + reporting.
-
-Rule: keep scripts that *act* in `ops/`; keep scripts that *measure/compare* in `audit/`.
-
-## Zeek Integration
-
-See [DEV_AUDIT_ZEEK_INTEGRATION.md](DEV_AUDIT_ZEEK_INTEGRATION.md) for the integrated Zeek datamining workflow, anchor-based investigation model (`uid` or `src/dst/port/timestamp`), and artifact structure.
-
-## Metadata Convention (for legend/dashboard)
-
-Runnable scripts should include:
-
-```bash
-# @desc: one-line description
-# @tags: space-separated taxonomy tags
-# @run: user|sudo
-```
-
-## Near-Term Cleanup Queue
-
-1. Remove tracked archive artifacts from git history going forward.
-2. Normalize metadata headers across all executable scripts.
-3. Consolidate Firefox hardening into one maintained script.
-4. Keep README updated when adding features or new top-level groups.

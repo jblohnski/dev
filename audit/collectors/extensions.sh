@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Collect kernel/system extension listings
+# @tags: audit collector extensions
+# @run: user
+
 set -euo pipefail
 
 OUT="$1/extensions.txt"

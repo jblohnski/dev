@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# @name: Zeek Report
+# @desc: Run Zeek correlation report generation
+# @cmd: za
+# @keywords: audit zeek report
+# @run: user
+
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -45,7 +51,7 @@ elif [[ $# -gt 2 ]]; then
 fi
 
 if [[ ! -d "$LOG_DIR" || ! -f "$LOG_DIR/conn.log" ]]; then
-  for fallback in "$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$HOME/zlogs"; do
+  for fallback in "$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$ROOT_DIR" "$HOME/zlogs"; do
     if [[ -d "$fallback" && -f "$fallback/conn.log" ]]; then
       LOG_DIR="$fallback"
       break

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Capture default route, DNS, and interfaces
+# @tags: audit collector network path dns
+# @run: user
+
 set -euo pipefail
 
 OUTDIR="${1:-./current}"

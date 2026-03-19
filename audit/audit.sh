@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
+# @name: Audit Snapshot
 # @desc: Quick macOS audit with network/process focus + lightweight delta
-# @tags: audit macos network process
+# @cmd: aud
+# @keywords: audit macos network process
 # @run: user
-# @alias: aud
 # @owner: firstparty
 
 set -euo pipefail
@@ -128,7 +129,7 @@ resolve_zeek_log_dir() {
   if [[ -n "${ZEEK_LOG_DIR:-}" ]]; then
     candidates+=("$ZEEK_LOG_DIR")
   fi
-  candidates+=("$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$HOME/zlogs")
+  candidates+=("$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$ROOT_DIR" "$HOME/zlogs")
 
   local d
   for d in "${candidates[@]}"; do

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# @desc: Capture live socket and route snapshot
+# @tags: audit collector network live
+# @run: user
+
 set -euo pipefail
 
 OUTDIR="${1:-./current}"

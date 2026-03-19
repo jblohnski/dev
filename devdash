@@ -1,83 +1,115 @@
 #!/usr/bin/env bash
+# @desc: Show the dev component and command inventory dashboard
+# @tags: dev dashboard inventory
+# @run: user
 
-ROOT="$HOME/dev"
+set -euo pipefail
 
-# --- robust terminal styling (never hard-fail) ---
+ROOT="${HOME}/dev"
+SCAN="${ROOT}/component-scan.sh"
+
 : "${TERM:=xterm-256color}"
-
 tp() { tput "$@" 2>/dev/null || true; }
 
-BOLD="$(tp bold)"
-DIM="$(tp dim)"          # may be empty if unsupported
-RESET="$(tp sgr0)"
+BOLD="$(printf '\033[1m')"
+DIM="$(printf '\033[2m')"
+RESET="$(printf '\033[0m')"
+HDR="$(printf '\033[38;5;110m')"
+ACCENT="$(printf '\033[38;5;109m')"
+MUTED="$(printf '\033[38;5;244m')"
+WARN="$(printf '\033[38;5;179m')"
 
-SEC="$(tp setaf 1)"      # red
-DIAG="$(tp setaf 6)"     # cyan
-UTIL="$(tp setaf 2)"     # green
-OTHER="$(tp setaf 7)"    # gray
-
-color_for_tag() {
-  case "$1" in
-    sec*)  printf "%s" "$SEC" ;;
-    diag*) printf "%s" "$DIAG" ;;
-    util*) printf "%s" "$UTIL" ;;
-    *)     printf "%s" "$OTHER" ;;
-  esac
-}
+if [[ ! -f "$SCAN" ]]; then
+  echo "error: component scanner not found: $SCAN" >&2
+  exit 1
+fi
 
 clear
 printf "%sDEV DASHBOARD%s\n" "$BOLD" "$RESET"
-printf "%s────────────────────────────────────────────%s\n\n" "${DIM:-}" "$RESET"
+printf "%sInventory-first component view of %s%s\n\n" "${DIM:-}" "$ROOT" "$RESET"
 
-i=1
 TMP="$(mktemp -t devdash.XXXXXX)"
+i=1
+current_component=""
 
-# Discover runnable scripts
-while IFS= read -r file; do
-  [ ! -x "$file" ] && continue
+while IFS=$'\t' read -r source path source_path component group alias name run desc; do
+  [[ -n "$source" ]] || continue
 
-  name="$(basename "$file")"
+  if [[ "$component" != "$current_component" ]]; then
+    printf "\n%s%s%s\n" "$BOLD$HDR" "$component" "$RESET"
+    current_component="$component"
+  fi
 
-  desc="$(grep -m1 '^# @desc:' "$file" | sed 's/# @desc:[ ]*//')"
-  tags="$(grep -m1 '^# @tags:' "$file" | sed 's/# @tags:[ ]*//')"
-  run="$(grep -m1 '^# @run:'  "$file" | sed 's/# @run:[ ]*//')"
-
-  [ -z "$desc" ] && desc="(no description)"
-  [ -z "$tags" ] && tags="misc"
-  [ -z "$run"  ] && run="user"
-
-  tagcolor="$(color_for_tag "$tags")"
-
-  printf "%s%2d%s  %-18s  %s%-14s%s  %s\n" \
+  [[ "$alias" == "-" ]] && alias=""
+  [[ "$name" == "-" ]] && name=""
+  display_name="${alias:-$name}"
+  printf "%s%2d%s  %-18s  %s%-5s%s  %s%s\n" \
     "$BOLD" "$i" "$RESET" \
-    "$name" \
-    "$tagcolor" "$tags" "$RESET" \
-    "$desc"
+    "$display_name" \
+    "${MUTED:-}" "$run" "$RESET" \
+    "$desc" \
+    ""
+  if [[ -n "$name" && "${name,,}" != "${display_name,,}" ]]; then
+    printf "%s     %s[%s] %s (%s)%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$name" "$RESET"
+  else
+    printf "%s     %s[%s] %s%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$RESET"
+  fi
+  printf "%s|%s|%s|%s|%s\n" "$i" "$source" "$ROOT/$source_path" "$run" "$display_name" >> "$TMP"
+  i=$((i + 1))
+done < <(
+  python3 "$SCAN" "$ROOT" index | python3 -c '
+import json, sys
 
-  printf "%s|%s|%s\n" "$i" "$file" "$run" >> "$TMP"
-  i=$((i+1))
-done < <(find "$ROOT" -type f \( -name "*.sh" -o -name "*.zsh" \))
+payload = json.load(sys.stdin)
+for cmd in payload.get("commands", []):
+    if cmd.get("source") == "shell":
+        continue
+    row = [
+        cmd.get("source", ""),
+        cmd.get("path", ""),
+        cmd.get("source_path", ""),
+        cmd.get("component", ""),
+        cmd.get("group", ""),
+        cmd.get("alias", ""),
+        cmd.get("name", ""),
+        cmd.get("run", "user"),
+        cmd.get("desc", ""),
+    ]
+    print("\t".join(row))
+'
+)
 
 printf "\n%sSelect number to run (Enter = quit)%s\n" "${DIM:-}" "$RESET"
 read -r choice
 
-[ -z "$choice" ] && rm -f "$TMP" && exit 0
+if [[ -z "${choice:-}" ]]; then
+  rm -f "$TMP"
+  exit 0
+fi
 
 entry="$(grep -E "^${choice}\|" "$TMP" || true)"
 rm -f "$TMP"
 
-if [ -z "$entry" ]; then
-  printf "%sInvalid selection.%s\n" "$SEC" "$RESET"
+if [[ -z "$entry" ]]; then
+  printf "%sInvalid selection.%s\n" "${WARN:-}" "$RESET"
   exit 1
 fi
 
-cmd="$(printf "%s" "$entry" | cut -d'|' -f2)"
-runmode="$(printf "%s" "$entry" | cut -d'|' -f3)"
+source_kind="$(printf "%s" "$entry" | cut -d'|' -f2)"
+cmd_path="$(printf "%s" "$entry" | cut -d'|' -f3)"
+runmode="$(printf "%s" "$entry" | cut -d'|' -f4)"
+shell_cmd="$(printf "%s" "$entry" | cut -d'|' -f5)"
 
-printf "\n%s→ Running %s%s\n\n" "$BOLD" "$(basename "$cmd")" "$RESET"
+printf "\n%s→ Running %s%s\n\n" "$BOLD" "${shell_cmd:-$(basename "$cmd_path")}" "$RESET"
 
-if [ "$runmode" = "sudo" ]; then
-  sudo "$cmd"
+if [[ "$source_kind" == "shell" ]]; then
+  if [[ "$runmode" == "sudo" ]]; then
+    sudo zsh -lic "$shell_cmd"
+  else
+    zsh -lic "$shell_cmd"
+  fi
+elif [[ "$runmode" == "sudo" ]]; then
+  sudo "$cmd_path"
 else
-  "$cmd"
+  "$cmd_path"
 fi
