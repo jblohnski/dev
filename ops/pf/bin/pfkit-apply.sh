@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit-apply name=pfkit-apply group=net run=sudo desc="Render and load pfkit anchor rules"
+# dev-cmd: alias=pfkit-apply name=pfkit-apply group=sys run=sudo desc="Render and load pfkit anchor rules"
 
 set -euo pipefail
 

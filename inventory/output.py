@@ -75,17 +75,12 @@ def render_command_group(commands: list[dict[str, str]], show_paths: bool, style
 
 def render_group_legend(commands: list[dict[str, str]], show_paths: bool, style: Style) -> None:
     aliases = [display_command_name(record) for record in commands]
-    components = [record["component"] for record in commands]
     alias_width = max((len(alias) for alias in aliases), default=0)
-    component_width = max((len(component) for component in components), default=0)
     for record in commands:
         alias = display_command_name(record)
-        component = record["component"]
         alias_text = style.wrap(alias, style.cmd)
-        component_text = style.wrap(f"[{component}]", style.name)
         alias_padding = " " * (max(alias_width - len(alias), 0) + 2)
-        component_padding = " " * (max(component_width - len(component), 0) + 2)
-        print(f"    {alias_text}{alias_padding}{component_text}{component_padding}{style.wrap(record['desc'], style.desc)}")
+        print(f"    {alias_text}{alias_padding}{style.wrap(record['desc'], style.desc)}")
         if show_paths:
             name = record.get("name", "").strip()
             label = f"@ {command_path(record)}"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit-watch-blocks name=pfkit-watch-blocks group=net run=sudo desc="Stream blocked packets from pflog0"
+# dev-cmd: alias=pfkit-watch-blocks name=pfkit-watch-blocks group=sys run=sudo desc="Stream blocked packets from pflog0"
 
 set -euo pipefail
 

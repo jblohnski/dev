@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit-install name=pfkit-install group=net run=sudo desc="Install pfkit anchor and pf.conf wiring"
+# dev-cmd: alias=pfkit-install name=pfkit-install group=sys run=sudo desc="Install pfkit anchor and pf.conf wiring"
 
 set -euo pipefail
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit-uninstall name=pfkit-uninstall group=net run=sudo desc="Remove pfkit anchor and restore pf config"
+# dev-cmd: alias=pfkit-uninstall name=pfkit-uninstall group=sys run=sudo desc="Remove pfkit anchor and restore pf config"
 
 set -euo pipefail
 
