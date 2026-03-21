@@ -1,5 +1,7 @@
 ## dev
 
+export DEV_ROOT="${DEV_ROOT:-$HOME/dev}"
+
 # dev-cmd: alias=comp name="Component Inventory" group=sys run=user legend=hide desc="Run the shared component inventory entrypoint"
 comp() {
   local cmd="${1:-scan}"
@@ -7,19 +9,19 @@ comp() {
 
   case "$cmd" in
     scan)
-      python3 "$HOME/dev/component-scan.sh" summary --color "$@"
+      python3 "$DEV_ROOT/component-scan.sh" summary --color "$@"
       ;;
     legend)
-      python3 "$HOME/dev/component-scan.sh" legend --color "$@"
+      python3 "$DEV_ROOT/component-scan.sh" legend --color "$@"
       ;;
     records)
-      python3 "$HOME/dev/component-scan.sh" records "$@"
+      python3 "$DEV_ROOT/component-scan.sh" records "$@"
       ;;
     validate)
-      python3 "$HOME/dev/component-scan.sh" validate "$@"
+      python3 "$DEV_ROOT/component-scan.sh" validate "$@"
       ;;
     dash)
-      "$HOME/dev/devdash" "$@"
+      "$DEV_ROOT/devdash" "$@"
       ;;
     *)
       echo "comp commands: scan legend records validate dash"
@@ -42,19 +44,35 @@ alias comp.dash='comp dash'
 ## dev
 
 # dev-cmd: alias=dd name="Dev Dashboard" group=sys run=user legend=hide desc="Open dev dashboard"
-alias dd='$HOME/dev/devdash'
+alias dd='$DEV_ROOT/devdash'
 # dev-cmd: alias=ds name=Summary group=sys run=user legend=hide desc="Show component summary"
-alias ds='python3 "$HOME/dev/component-scan.sh" summary --color'
+alias ds='python3 "$DEV_ROOT/component-scan.sh" summary --color'
 # dev-cmd: alias=dl name=Legend group=sys run=user legend=hide desc="Show unified command legend"
-alias dl='python3 "$HOME/dev/component-scan.sh" legend --color'
+alias dl='python3 "$DEV_ROOT/component-scan.sh" legend --color'
 # dev-cmd: alias=dr name=Records group=sys run=user legend=hide desc="Emit component records"
-alias dr='python3 "$HOME/dev/component-scan.sh" records'
+alias dr='python3 "$DEV_ROOT/component-scan.sh" records'
 # dev-cmd: alias=dv name=Validation group=sys run=user legend=hide desc="Validate component metadata and taxonomy"
-alias dv='python3 "$HOME/dev/component-scan.sh" validate'
+alias dv='python3 "$DEV_ROOT/component-scan.sh" validate'
 
 ## util
 
 # dev-cmd: alias=l name=Legend group=sys run=user legend=hide desc="Show unified command legend"
 l() {
-  python3 "$HOME/dev/component-scan.sh" legend --color "$@"
+  python3 "$DEV_ROOT/component-scan.sh" legend --color "$@"
+}
+
+dev_publish_discovered_commands() {
+  local alias_name rel_path runmode alias_value
+  while IFS=$'\t' read -r alias_name rel_path runmode; do
+    [[ -n "$alias_name" && -n "$rel_path" ]] || continue
+    if (( ${+aliases[$alias_name]} || ${+functions[$alias_name]} )); then
+      continue
+    fi
+    if [[ "$runmode" == "sudo" ]]; then
+      alias_value="sudo \"\$DEV_ROOT/$rel_path\""
+    else
+      alias_value="\"\$DEV_ROOT/$rel_path\""
+    fi
+    alias -- "$alias_name=$alias_value"
+  done < <(python3 "$DEV_ROOT/component-scan.sh" shell)
 }

@@ -166,6 +166,21 @@ def print_index(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
     print(json.dumps({"commands": records}, indent=2))
 
 
+def print_shell(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
+    seen_aliases: set[str] = set()
+    selected = sorted(cmd_records, key=lambda x: (group_key(x["group"]), order_key(x["component"]), display_command_name(x)))
+    for record in selected:
+        if record.get("source") != "script":
+            continue
+        if not is_legend_eligible(record) or not matches_filters(record, filters):
+            continue
+        alias = display_command_name(record)
+        if not alias or alias in seen_aliases:
+            continue
+        seen_aliases.add(alias)
+        print(f"{alias}\t{record['path']}\t{record.get('run', 'user')}")
+
+
 def print_manifest(
     root: Path,
     dir_records: list[dict[str, str]],

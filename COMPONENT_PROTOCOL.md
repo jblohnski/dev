@@ -89,6 +89,8 @@ Human-facing views should remain one level deep in perspective:
 - discover from `bootstrap/shell/*.sh`
 - `## section` establishes shell scope
 - wrappers should stay thin and point at file-backed functionality when practical
+- interactive shell init should publish discovered script commands directly from inventory data
+- when a shell wrapper and a file-backed script represent the same command surface, prefer the script-backed alias in human-facing outputs
 
 Canonical shell sections:
 

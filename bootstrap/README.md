@@ -31,7 +31,7 @@ Shell bootstrap logic lives in `bootstrap/shell/` and is split by concern:
 
 - `dev.sh`: top-level loader sourced by `bootstrap/.zshrc`
 - `base.sh`: colors, prompt, shell environment, shared helpers
-- `inventory.sh`: legend, records, and dashboard wrappers
+- `inventory.sh`: legend, records, dashboard wrappers, and discovered script alias publication
 - `bootstrap.sh`: bootstrap install/sync commands
 - `audit.sh`: audit and Zeek shell wrappers
 - `system.sh`: nav, git, network, dns, and general shell helpers
@@ -42,4 +42,5 @@ Shell bootstrap logic lives in `bootstrap/shell/` and is split by concern:
 - The shell layer is interactive-only; non-interactive shells stop at the loader.
 - `bootstrap/` is about initialization, publishing, and shell/runtime setup.
 - Command discovery and legend generation are not defined here; they are delegated to `../component-scan.sh` and the `inventory/` package.
+- Script-backed component commands are published into the interactive shell from inventory scan output during init.
 - The shell no longer auto-prints the legend on startup by default. Set `DEV_SHELL_SHOW_LEGEND=1` if you want that behavior back for a session.

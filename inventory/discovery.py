@@ -306,9 +306,6 @@ def display_records(cmd_records: list[dict[str, str]]) -> list[dict[str, str]]:
             seen[key] = len(selected)
             selected.append(record)
             continue
-        incumbent = selected[current]
-        if incumbent["source"] != "shell" and record["source"] == "shell":
-            selected[current] = record
     return selected
 
 

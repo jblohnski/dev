@@ -100,6 +100,11 @@ Tracked shell profile source of truth:
 
 - `bootstrap/.zshrc`
 
+Interactive shell init now does two things:
+
+- loads the handwritten basic shell helpers from `bootstrap/shell/*.sh`
+- publishes discovered script commands from the inventory scan as direct aliases to their backing script paths
+
 Publish it with:
 
 ```bash

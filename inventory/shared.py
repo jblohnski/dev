@@ -22,7 +22,7 @@ VALID_GROUPS = {"sys", "audit", "net"}
 GROUP_ORDER = ["sys", "audit", "net"]
 TOP_LEVEL_SCOPES = {"shell", "dev"}
 DEFAULT_ROOT = Path.home() / "dev"
-MODE_SET = {"summary", "records", "legend", "validate", "index", "catalog", "manifest"}
+MODE_SET = {"summary", "records", "legend", "validate", "index", "catalog", "manifest", "shell"}
 SCHEMA_VERSION = "1.1.0"
 SHELL_SECTION_OWNER = {
     "bootstrap": "bootstrap",
