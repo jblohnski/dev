@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-# @desc: Scan the dev tree and emit canonical component inventory and validation output
-# @tags: dev component inventory metadata
-# @run: user
+# dev-cmd: alias=component-scan name="Component Scan" group=sys run=user legend=hide desc="Scan the dev tree and emit canonical component inventory and validation output"
 
 from __future__ import annotations
 

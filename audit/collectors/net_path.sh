@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Capture default route, DNS, and interfaces
-# @tags: audit collector network path dns
-# @run: user
+# dev-cmd: alias=net_path name="Net Path" group=audit run=user legend=hide desc="Capture default route, DNS, and interfaces"
 
 set -euo pipefail
 

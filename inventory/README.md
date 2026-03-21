@@ -1,7 +1,4 @@
-<!-- @component: inventory -->
-<!-- @kind: support -->
-<!-- @desc: Inventory and manifest extraction modules for the dev tree -->
-<!-- @keywords: inventory manifest discovery support -->
+<!-- dev-component: id=inventory kind=support group=sys desc="Inventory and manifest extraction modules for the dev tree" -->
 
 # inventory
 

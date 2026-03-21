@@ -1,10 +1,6 @@
 ## dev
 
-# @component
-# @name: Component Inventory
-# @desc: Run the shared component inventory entrypoint
-# @cmd: comp
-# @keywords: dev inventory taxonomy commands
+# dev-cmd: alias=comp name="Component Inventory" group=sys run=user legend=hide desc="Run the shared component inventory entrypoint"
 comp() {
   local cmd="${1:-scan}"
   [[ $# -gt 0 ]] && shift
@@ -32,67 +28,33 @@ comp() {
   esac
 }
 
-# @name: Component Summary
-# @desc: Show component summary
-# @cmd: comp.scan
-# @keywords: dev inventory summary taxonomy
+# dev-cmd: alias=comp.scan name="Component Summary" group=sys run=user legend=hide desc="Show component summary"
 alias comp.scan='comp scan'
-# @name: Component Legend
-# @desc: Show unified command legend
-# @cmd: comp.legend
-# @keywords: dev inventory legend taxonomy
+# dev-cmd: alias=comp.legend name="Component Legend" group=sys run=user legend=hide desc="Show unified command legend"
 alias comp.legend='comp legend'
-# @name: Component Records
-# @desc: Emit component records
-# @cmd: comp.records
-# @keywords: dev inventory records taxonomy
+# dev-cmd: alias=comp.records name="Component Records" group=sys run=user legend=hide desc="Emit component records"
 alias comp.records='comp records'
-# @name: Component Validation
-# @desc: Validate component metadata and taxonomy
-# @cmd: comp.validate
-# @keywords: dev inventory validate taxonomy
+# dev-cmd: alias=comp.validate name="Component Validation" group=sys run=user legend=hide desc="Validate component metadata and taxonomy"
 alias comp.validate='comp validate'
-# @name: Component Dashboard
-# @desc: Open dev dashboard
-# @cmd: comp.dash
-# @keywords: dev inventory dashboard taxonomy
+# dev-cmd: alias=comp.dash name="Component Dashboard" group=sys run=user legend=hide desc="Open dev dashboard"
 alias comp.dash='comp dash'
 
 ## dev
 
-# @name: Dev Dashboard
-# @desc: Open dev dashboard
-# @cmd: dd
-# @keywords: dev dashboard inventory
+# dev-cmd: alias=dd name="Dev Dashboard" group=sys run=user legend=hide desc="Open dev dashboard"
 alias dd='$HOME/dev/devdash'
-# @name: Summary
-# @desc: Show component summary
-# @cmd: ds
-# @keywords: dev summary inventory
+# dev-cmd: alias=ds name=Summary group=sys run=user legend=hide desc="Show component summary"
 alias ds='python3 "$HOME/dev/component-scan.sh" summary --color'
-# @name: Legend
-# @desc: Show unified command legend
-# @cmd: dl
-# @keywords: dev legend inventory
+# dev-cmd: alias=dl name=Legend group=sys run=user legend=hide desc="Show unified command legend"
 alias dl='python3 "$HOME/dev/component-scan.sh" legend --color'
-# @name: Records
-# @desc: Emit component records
-# @cmd: dr
-# @keywords: dev records inventory
+# dev-cmd: alias=dr name=Records group=sys run=user legend=hide desc="Emit component records"
 alias dr='python3 "$HOME/dev/component-scan.sh" records'
-# @name: Validation
-# @desc: Validate component metadata and taxonomy
-# @cmd: dv
-# @keywords: dev validate inventory taxonomy
+# dev-cmd: alias=dv name=Validation group=sys run=user legend=hide desc="Validate component metadata and taxonomy"
 alias dv='python3 "$HOME/dev/component-scan.sh" validate'
 
 ## util
 
-# @component
-# @name: Legend
-# @desc: Show unified command legend
-# @cmd: l
-# @keywords: dev legend inventory taxonomy
+# dev-cmd: alias=l name=Legend group=sys run=user legend=hide desc="Show unified command legend"
 l() {
   python3 "$HOME/dev/component-scan.sh" legend --color "$@"
 }

@@ -1,7 +1,4 @@
-<!-- @component: ops-diagnostics -->
-<!-- @kind: support -->
-<!-- @desc: Operational diagnostics helpers and log summarizers -->
-<!-- @tags: ops diagnostics support -->
+<!-- dev-component: id=ops-diagnostics kind=support group=audit desc="Operational diagnostics helpers and log summarizers" -->
 
 # diagnostics
 

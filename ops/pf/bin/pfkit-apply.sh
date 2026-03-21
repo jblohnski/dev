@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# @cmd: pfkit-apply
-# @desc: Render and load pfkit anchor rules
-# @tags: ops pf firewall apply
-# @run: sudo
+# dev-cmd: alias=pfkit-apply name=pfkit-apply group=net run=sudo desc="Render and load pfkit anchor rules"
 
 set -euo pipefail
 

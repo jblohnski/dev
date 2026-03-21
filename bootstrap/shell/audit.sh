@@ -3,17 +3,10 @@
 export AUDIT_DIR="$HOME/dev/audit"
 export ZEEK_LOG_DIR="${ZEEK_LOG_DIR:-$HOME/zlogs}"
 
-# @component
-# @name: Audit
-# @desc: Run the main audit entrypoint
-# @cmd: a
-# @keywords: audit macos snapshot
+# dev-cmd: alias=a name=Audit group=audit run=user desc="Run the main audit entrypoint"
 alias a='builtin cd "$AUDIT_DIR" && ./audit.sh'
 
-# @name: Zeek Workflow
-# @desc: Run Zeek capture and report workflow subcommands
-# @cmd: az
-# @keywords: audit zeek workflow
+# dev-cmd: alias=az name="Zeek Workflow" group=audit run=user desc="Run Zeek capture and report workflow subcommands"
 az() {
   local cmd="${1:-run}"
   [[ $# -gt 0 ]] && shift
@@ -63,56 +56,29 @@ az() {
   esac
 }
 
-# @name: Zeek Run
-# @desc: Run Zeek report generation
-# @cmd: az.run
-# @keywords: audit zeek report
+# dev-cmd: alias=az.run name="Zeek Run" group=audit run=user desc="Run Zeek report generation"
 alias az.run='az run'
-# @name: Zeek Start
-# @desc: Start background Zeek capture
-# @cmd: az.start
-# @keywords: audit zeek capture
+# dev-cmd: alias=az.start name="Zeek Start" group=audit run=user desc="Start background Zeek capture"
 alias az.start='az start'
-# @name: Zeek Stop
-# @desc: Stop background Zeek capture
-# @cmd: az.stop
-# @keywords: audit zeek capture
+# dev-cmd: alias=az.stop name="Zeek Stop" group=audit run=user desc="Stop background Zeek capture"
 alias az.stop='az stop'
-# @name: Zeek Status
-# @desc: Show background Zeek capture status
-# @cmd: az.stat
-# @keywords: audit zeek status
+# dev-cmd: alias=az.stat name="Zeek Status" group=audit run=user desc="Show background Zeek capture status"
 alias az.stat='az stat'
-# @name: Zeek Merge
-# @desc: Merge stray local Zeek logs into $ZEEK_LOG_DIR
-# @cmd: az.merge
-# @keywords: audit zeek sync
+# dev-cmd: alias=az.merge name="Zeek Merge" group=audit run=user desc="Merge stray local Zeek logs into $ZEEK_LOG_DIR"
 alias az.merge='az merge'
-# @name: Zeek UID
-# @desc: Run Zeek report by uid
-# @cmd: az.uid
-# @keywords: audit zeek uid
+# dev-cmd: alias=az.uid name="Zeek UID" group=audit run=user desc="Run Zeek report by uid"
 alias az.uid='az uid'
-# @name: Zeek Tuple
-# @desc: Run Zeek report by tuple
-# @cmd: az.tuple
-# @keywords: audit zeek tuple
+# dev-cmd: alias=az.tuple name="Zeek Tuple" group=audit run=user desc="Run Zeek report by tuple"
 alias az.tuple='az tuple'
 
-# @name: Audit Report
-# @desc: Print latest Zeek markdown report path
-# @cmd: arpt
-# @keywords: audit zeek report
+# dev-cmd: alias=arpt name="Audit Report" group=audit run=user desc="Print latest Zeek markdown report path"
 arpt() {
   local f
   f="$(command ls -1t "$AUDIT_DIR"/report/zeek/zeek-*.md 2>/dev/null | head -n 1 || true)"
   [[ -n "$f" ]] && print "$f" || print "no zeek markdown report found"
 }
 
-# @name: Audit Zip
-# @desc: Zip up audit project code only
-# @cmd: azip
-# @keywords: audit archive sources
+# dev-cmd: alias=azip name="Audit Zip" group=audit run=user desc="Zip up audit project code only"
 azip() {
   zip -r audit.zip audit \
     -x "audit/.git/*" \

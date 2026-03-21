@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import re
+import shlex
 import sys
 from pathlib import Path
 
 
 MD_META_RE = re.compile(r"^<!-- @\s*([a-z]+):\s*(.*?)\s*-->$")
+MD_COMPONENT_RE = re.compile(r"^<!--\s*dev-component:\s*(.*?)\s*-->$")
 SH_META_RE = re.compile(r"^#\s*@([a-z]+)(?::\s*(.*?)\s*|\s+(.+?)\s*)?$")
+SH_COMMAND_RE = re.compile(r"^#\s*dev-cmd:\s*(.*?)\s*$")
 SECTION_RE = re.compile(r"^##\s+(.+?)\s*$")
 LEGEND_RE = re.compile(r"^#\s*([A-Za-z0-9_.-]+):\s+(.+?)\s*$")
 ALIAS_RE = re.compile(r"^alias\s+([A-Za-z0-9_.-]+)=")
@@ -15,6 +18,7 @@ FUNC_RE = re.compile(r"^([A-Za-z0-9_]+)\s*\(\)\s*\{")
 EXCLUDED_PARTS = {".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build", "target"}
 VALID_KINDS = {"component", "subcomponent", "support"}
 VALID_RUN = {"user", "sudo"}
+VALID_GROUPS = {"sys", "audit", "net"}
 TOP_LEVEL_SCOPES = {"shell", "dev"}
 DEFAULT_ROOT = Path.home() / "dev"
 MODE_SET = {"summary", "records", "legend", "validate", "index", "catalog", "manifest"}
@@ -118,6 +122,10 @@ def rel_str(path: Path, root: Path) -> str:
 def parse_md_meta(readme: Path) -> dict[str, str]:
     meta: dict[str, str] = {}
     for line in readme.read_text(errors="ignore").splitlines():
+        component_match = MD_COMPONENT_RE.match(line.strip())
+        if component_match:
+            meta.update(parse_inline_fields(component_match.group(1), aliases={"id": "component"}))
+            continue
         match = MD_META_RE.match(line.strip())
         if match:
             meta[match.group(1)] = match.group(2)
@@ -156,6 +164,10 @@ def parse_md_doc(readme: Path) -> str:
 def parse_sh_meta(script: Path) -> dict[str, str]:
     meta: dict[str, str] = {}
     for line in script.read_text(errors="ignore").splitlines():
+        command_match = SH_COMMAND_RE.match(line.rstrip())
+        if command_match:
+            meta.update(parse_inline_fields(command_match.group(1)))
+            continue
         match = SH_META_RE.match(line.rstrip())
         if match:
             value = match.group(2) if match.group(2) is not None else match.group(3)
@@ -167,6 +179,18 @@ def parse_sh_meta(script: Path) -> dict[str, str]:
 
 def meta_keywords(meta: dict[str, str], fallback: str = "") -> str:
     return meta.get("keywords") or meta.get("tags") or fallback
+
+
+def parse_inline_fields(raw: str, aliases: dict[str, str] | None = None) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    alias_map = aliases or {}
+    for token in shlex.split(raw):
+        if "=" not in token:
+            continue
+        key, value = token.split("=", 1)
+        key = alias_map.get(key, key)
+        fields[key] = value
+    return fields
 
 
 def split_keywords(raw: str) -> list[str]:

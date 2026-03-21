@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Summarize macOS unified logs for hangs/beachballs (system + Firefox)
-# @tags: diag logs macos
-# @run: user
-# @alias: logsum
-# @owner: firstparty
+# dev-cmd: alias=logsum name=logsum group=audit run=user desc="Summarize macOS unified logs for hangs/beachballs (system + Firefox)"
 
 set -euo pipefail
 

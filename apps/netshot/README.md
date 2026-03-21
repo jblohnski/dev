@@ -1,7 +1,4 @@
-<!-- @component: netshot -->
-<!-- @kind: support -->
-<!-- @desc: Packet capture and Zeek snapshot helper -->
-<!-- @keywords: netshot audit network zeek capture -->
+<!-- dev-component: id=netshot kind=support group=audit desc="Packet capture and Zeek snapshot helper" -->
 
 # netshot
 

@@ -1,7 +1,4 @@
-<!-- @component: apps -->
-<!-- @kind: component -->
-<!-- @desc: Standalone file-backed utilities grouped under one parent -->
-<!-- @keywords: apps tools utilities -->
+<!-- dev-component: id=apps kind=component group=net desc="Standalone file-backed utilities grouped under one parent" -->
 
 # apps
 

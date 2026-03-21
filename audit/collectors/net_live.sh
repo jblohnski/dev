@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Capture live socket and route snapshot
-# @tags: audit collector network live
-# @run: user
+# dev-cmd: alias=net_live name="Net Live" group=audit run=user legend=hide desc="Capture live socket and route snapshot"
 
 set -euo pipefail
 

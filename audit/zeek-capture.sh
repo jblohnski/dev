@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-# @name: Zeek Capture
-# @desc: Start, stop, and inspect background Zeek capture writing logs to the configured log dir
-# @cmd: zc
-# @keywords: audit zeek capture
-# @run: user
+# dev-cmd: alias=zc name="Zeek Capture" group=audit run=user desc="Start, stop, and inspect background Zeek capture writing logs to the configured log dir"
 
 set -euo pipefail
 

@@ -1,7 +1,4 @@
-<!-- @component: audit-collectors -->
-<!-- @kind: subcomponent -->
-<!-- @desc: Collector scripts used by the audit component -->
-<!-- @tags: audit collectors -->
+<!-- dev-component: id=audit-collectors kind=subcomponent group=audit desc="Collector scripts used by the audit component" -->
 
 # collectors
 

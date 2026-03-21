@@ -1,7 +1,4 @@
-<!-- @component: ops-system -->
-<!-- @kind: support -->
-<!-- @desc: System hardening operations and checks -->
-<!-- @tags: ops system support -->
+<!-- dev-component: id=ops-system kind=support group=sys desc="System hardening operations and checks" -->
 
 # system
 

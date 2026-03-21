@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Capture sorted process list snapshot
-# @tags: audit collector process snapshot
-# @run: user
+# dev-cmd: alias=processes name=Processes group=audit run=user legend=hide desc="Capture sorted process list snapshot"
 
 set -euo pipefail
 

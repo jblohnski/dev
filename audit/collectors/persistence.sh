@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Collect persistence surfaces and login items
-# @tags: audit collector persistence launch
-# @run: user
+# dev-cmd: alias=persistence name=Persistence group=audit run=user legend=hide desc="Collect persistence surfaces and login items"
 
 set -euo pipefail
 

@@ -1,7 +1,4 @@
-<!-- @component: audit-analysis -->
-<!-- @kind: subcomponent -->
-<!-- @desc: Analysis engines used by the audit component -->
-<!-- @tags: audit analysis -->
+<!-- dev-component: id=audit-analysis kind=subcomponent group=audit desc="Analysis engines used by the audit component" -->
 
 # analysis
 

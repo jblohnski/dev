@@ -1,7 +1,4 @@
-<!-- @component: ops-browser -->
-<!-- @kind: support -->
-<!-- @desc: Browser hardening operations and policy scripts -->
-<!-- @tags: ops browser support -->
+<!-- dev-component: id=ops-browser kind=support group=sys desc="Browser hardening operations and policy scripts" -->
 
 # browser
 

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Apply arkenfox profile and Firefox hardening overrides
-# @tags: ops browser firefox hardening
-# @run: user
+# dev-cmd: alias=firefox-harden name="Firefox Harden" group=sys run=user legend=hide desc="Apply arkenfox profile and Firefox hardening overrides"
 
 # firefox.sh
 #

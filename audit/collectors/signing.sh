@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Verify signatures for core system binaries
-# @tags: audit collector signing integrity
-# @run: user
+# dev-cmd: alias=signing name=Signing group=audit run=user legend=hide desc="Verify signatures for core system binaries"
 
 set -euo pipefail
 

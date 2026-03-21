@@ -1,7 +1,4 @@
-<!-- @component: ops-pf -->
-<!-- @kind: support -->
-<!-- @desc: PF firewall toolkit (macOS) with DNS hardening anchors and helpers -->
-<!-- @keywords: ops pf firewall dns macos support -->
+<!-- dev-component: id=ops-pf kind=support group=net desc="PF firewall toolkit (macOS) with DNS hardening anchors and helpers" -->
 
 # pfkit (macOS)
 

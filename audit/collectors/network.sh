@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Capture active network connections via lsof
-# @tags: audit collector network lsof
-# @run: user
+# dev-cmd: alias=network name=Network group=audit run=user legend=hide desc="Capture active network connections via lsof"
 
 set -euo pipefail
 

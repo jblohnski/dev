@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Collect trust chain and SIP-related anomaly signals
-# @tags: audit collector trust sip
-# @run: user
+# dev-cmd: alias=trust name=Trust group=audit run=user legend=hide desc="Collect trust chain and SIP-related anomaly signals"
 
 set -euo pipefail
 

@@ -1,7 +1,4 @@
-<!-- @component: sitechk -->
-<!-- @kind: support -->
-<!-- @desc: Site identity checks across DNS, TLS, and HTTP -->
-<!-- @keywords: sitechk audit web tls dns http -->
+<!-- dev-component: id=sitechk kind=support group=net desc="Site identity checks across DNS, TLS, and HTTP" -->
 
 # sitechk
 

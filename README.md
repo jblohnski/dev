@@ -1,7 +1,4 @@
-<!-- @component: dev -->
-<!-- @kind: component -->
-<!-- @desc: Personal machine automation and diagnostics workspace -->
-<!-- @keywords: workspace automation diagnostics -->
+<!-- dev-component: id=dev kind=component group=sys desc="Personal machine automation and diagnostics workspace" -->
 
 # dev
 
@@ -45,7 +42,7 @@ Separation of concerns:
 Two things are discovered:
 
 - components: directories with declared identity
-- commands: invokable records with alias, name, desc, and path
+- commands: invokable records with alias, name, desc, and simple group
 
 Not every component is a command.
 
@@ -54,34 +51,29 @@ Not every component is a command.
 Directory `README.md` files declare component metadata:
 
 ```md
-<!-- @component: stable-component-id -->
-<!-- @kind: component|subcomponent|support -->
-<!-- @desc: one-line summary -->
-<!-- @keywords: space-delimited keywords -->
-<!-- @taxonomy: optional semantic lineage -->
+<!-- dev-component: id=stable-component-id kind=component|subcomponent|support group=sys|audit|net desc="one-line summary" -->
 ```
 
 Executable scripts and shell wrappers declare command metadata:
 
 ```bash
-# @name: human label
-# @desc: one-line summary
-# @cmd: preferred invocation token shown in views
-# @keywords: space-delimited keywords
-# @taxonomy: optional semantic lineage
-# @run: user|sudo
+# dev-cmd: alias=token name="Human Label" group=sys|audit|net run=user|sudo legend=hide desc="one-line summary"
 ```
 
 The shared command-reference model keeps:
 
-- `path`
 - `alias`
 - `name`
 - `desc`
+- `group`
 
 That is the minimum human-facing contract used to build `legend` and `devdash`.
 
-`path` is the unique declaration path for a command, typically `source-path#alias`.
+Known groups are intentionally small:
+
+- `sys`
+- `audit`
+- `net`
 
 For human views, `alias` is the command key.
 If something does not resolve to an alias, it should not appear in the legend command list.

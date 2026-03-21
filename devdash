@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Show the dev component and command inventory dashboard
-# @tags: dev dashboard inventory
-# @run: user
+# dev-cmd: alias=devdash name=Devdash group=sys run=user legend=hide desc="Show the dev component and command inventory dashboard"
 
 set -euo pipefail
 

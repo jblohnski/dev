@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Run deep network audit baseline/compare flow
-# @tags: audit collector network deep
-# @run: sudo
+# dev-cmd: alias=network_deep name="Network Deep" group=audit run=sudo legend=hide desc="Run deep network audit baseline and compare flow"
 
 set -euo pipefail
 

@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Harden macOS security defaults (remote access, firewall, privacy)
-# @tags: sec system macos
-# @run: sudo
-# @alias: harden
-# @owner: firstparty
+# dev-cmd: alias=harden name=harden group=sys run=sudo desc="Harden macOS security defaults (remote access, firewall, privacy)"
 
 set -euo pipefail
 

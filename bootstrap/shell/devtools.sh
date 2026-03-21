@@ -1,10 +1,6 @@
 ## dev
 
-# @component
-# @name: Dev Zip
-# @desc: Zip up only sources for a given directory
-# @cmd: devzip
-# @keywords: dev archive sources
+# dev-cmd: alias=devzip name="Dev Zip" group=sys run=user desc="Zip up only sources for a given directory"
 devzip() {
   local root="${1:-$HOME/dev}"
   local out="${2:-devsrc.zip}"
@@ -29,22 +25,13 @@ devzip() {
   echo "created $out from $root"
 }
 
-# @name: Dev Zip Alias
-# @desc: Shorthand for devzip
-# @cmd: dz
-# @keywords: dev archive alias
+# dev-cmd: alias=dz name="Dev Zip Alias" group=sys run=user desc="Shorthand for devzip"
 alias dz='devzip'
 
-# @name: Edit
-# @desc: Open in Sublime
-# @cmd: ed
-# @keywords: dev editor shell
+# dev-cmd: alias=ed name=Edit group=sys run=user legend=hide desc="Open in Sublime"
 alias ed='subl'
 
-# @name: Gorilla
-# @desc: Run the local gorilla entrypoint when installed
-# @cmd: gorilla
-# @keywords: dev ai cli
+# dev-cmd: alias=gorilla name=Gorilla group=sys run=user desc="Run the local gorilla entrypoint when installed"
 gorilla() {
   local bin=""
   bin="$(whence -p gorilla 2>/dev/null || true)"

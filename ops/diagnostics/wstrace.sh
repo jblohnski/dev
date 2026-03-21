@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Trace WindowServer-related faults/errors for UI stutter and beachballs
-# @tags: diag logs ui macos
-# @run: user
-# @alias: wstrace
-# @owner: firstparty
+# dev-cmd: alias=wstrace name=wstrace group=audit run=user desc="Trace WindowServer-related faults/errors for UI stutter and beachballs"
 
 set -euo pipefail
 

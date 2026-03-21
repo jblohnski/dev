@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Burst-sample process table for short-lived processes
-# @tags: audit collector process watch
-# @run: user
+# dev-cmd: alias=proc_watch name="Proc Watch" group=audit run=user legend=hide desc="Burst-sample process table for short-lived processes"
 
 set -euo pipefail
 

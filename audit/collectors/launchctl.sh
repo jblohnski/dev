@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Dump launchctl system and GUI trees
-# @tags: audit collector launchctl persistence
-# @run: user
+# dev-cmd: alias=launchctl name=Launchctl group=audit run=user legend=hide desc="Dump launchctl system and GUI trees"
 
 set -euo pipefail
 

@@ -16,15 +16,16 @@ Primary source of truth:
 ## directories
 
 - `README.md` metadata defines explicit identity
+- use one `dev-component` comment line with `id`, `kind`, `group`, and `desc`
 - `component` and `subcomponent` directories may own commands
 - `support` directories stay documented but do not own the primary command surface
 
 ## scripts
 
 - consider executable `.sh` and `.zsh` files
-- skip script command records when `@desc` is missing
-- use structure-first grouping when the script lives in a real child directory under its owner
-- otherwise fall back to keyword-derived grouping
+- use one `dev-cmd` comment line with `alias`, `name`, `group`, and `desc`
+- `run` and `legend` are optional runtime-only flags
+- allowed groups are `sys`, `audit`, and `net`
 
 ## shell wrappers
 

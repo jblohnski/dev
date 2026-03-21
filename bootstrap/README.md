@@ -1,7 +1,4 @@
-<!-- @component: bootstrap -->
-<!-- @kind: component -->
-<!-- @desc: Install and sync tracked bootstrap files into live system locations -->
-<!-- @keywords: bootstrap install sync shell git editor -->
+<!-- dev-component: id=bootstrap kind=component group=sys desc="Install and sync tracked bootstrap files into live system locations" -->
 
 # bootstrap
 

@@ -1,7 +1,4 @@
-<!-- @component: ops-network -->
-<!-- @kind: support -->
-<!-- @desc: Network operations and interrogation helpers -->
-<!-- @tags: ops network support -->
+<!-- dev-component: id=ops-network kind=support group=net desc="Network operations and interrogation helpers" -->
 
 # network
 

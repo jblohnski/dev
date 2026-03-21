@@ -1,8 +1,5 @@
 #!/bin/zsh
-# @cmd: macsm-anlyz
-# @desc: Analyze macsm watch run artifacts and summarize diffs
-# @tags: audit macsm analysis
-# @run: user
+# dev-cmd: alias=macsm-anlyz name=macsm-anlyz group=audit run=user desc="Analyze macsm watch run artifacts and summarize diffs"
 
 # macsm_analyze.sh
 # Analyze a macsm.sh run directory and summarize:
@@ -227,4 +224,3 @@ print "Wrote:"
 print "  $AN_DIR/index.txt"
 print "  $AN_DIR/summary.txt"
 [[ -f "$TOP" ]] && print "  $AN_DIR/top_writers.txt" || true
-

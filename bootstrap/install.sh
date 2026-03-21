@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
-# @name: Bootstrap Install
-# @desc: Sync tracked bootstrap files into their live system counterparts
-# @cmd: bootstrap.install
-# @keywords: bootstrap install sync shell git editor
-# @run: user
+# dev-cmd: alias=bootstrap.install name="Bootstrap Install" group=sys run=user desc="Sync tracked bootstrap files into their live system counterparts"
 
 set -euo pipefail
 

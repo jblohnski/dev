@@ -1,9 +1,5 @@
 #!/usr/bin/env zsh
-# @name: Wi-Fi BSSID tree
-# @desc: Group scanned Wi-Fi SSIDs by BSSID with backend diagnostics
-# @cmd: wifi_bssid_tree
-# @keywords: wifi network scan macos bssid
-# @run: user
+# dev-cmd: alias=wifi_bssid_tree name="Wi-Fi BSSID Tree" group=net run=user desc="Group scanned Wi-Fi SSIDs by BSSID with backend diagnostics"
 #
 # dev:network:wifi
 # BSSID → SSID association tree

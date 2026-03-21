@@ -1,7 +1,4 @@
-<!-- @component: audit -->
-<!-- @kind: component -->
-<!-- @desc: Quick macOS audit and Zeek analysis pipeline -->
-<!-- @tags: audit macos zeek -->
+<!-- dev-component: id=audit kind=component group=audit desc="Quick macOS audit and Zeek analysis pipeline" -->
 
 # audit — quick macOS snapshot
 

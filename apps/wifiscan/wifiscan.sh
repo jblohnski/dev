@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-# @name: Native Wi-Fi scan
-# @desc: Scan nearby Wi-Fi networks via CoreWLAN with macOS permission diagnostics
-# @cmd: wifiscan
-# @keywords: wifi network scan macos native
-# @run: user
-# @alias: wifiscan
+# dev-cmd: alias=wifiscan name="Native Wi-Fi Scan" group=net run=user desc="Scan nearby Wi-Fi networks via CoreWLAN with macOS permission diagnostics"
 
 set -euo pipefail
 

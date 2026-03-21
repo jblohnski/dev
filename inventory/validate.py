@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 from inventory.commands import command_object, valid_commands
-from inventory.shared import SECTION_RE, SHELL_SECTION_OWNER, VALID_KINDS, VALID_RUN, is_excluded, parse_md_meta, parse_sh_meta, rel_str
+from inventory.shared import SECTION_RE, SHELL_SECTION_OWNER, VALID_GROUPS, VALID_KINDS, VALID_RUN, is_excluded, parse_md_meta, parse_sh_meta, rel_str
 
 
 def validate(root: Path, dir_records: list[dict[str, str]], script_records: list[dict[str, str]], shell_records: list[dict[str, str]]) -> int:
@@ -20,11 +20,11 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
         if not meta:
             warnings.append(f"{record['path']}: implicit support README without explicit component metadata")
         else:
-            for key in ("component", "kind", "desc"):
+            for key in ("component", "kind", "group", "desc"):
                 if key not in meta:
                     warnings.append(f"{record['path']}/README.md: missing directory metadata @{key}")
-            if "keywords" not in meta and "tags" not in meta:
-                warnings.append(f"{record['path']}/README.md: missing directory metadata @keywords")
+            if "group" in meta and meta["group"] not in VALID_GROUPS:
+                errors.append(f"{record['path']}/README.md: invalid group '{meta['group']}'")
         comp = record["component"]
         if comp in component_ids and component_ids[comp] != record["path"]:
             errors.append(f"duplicate component id '{comp}' in {record['path']} and {component_ids[comp]}")
@@ -41,15 +41,13 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
             continue
         if rel.startswith("bootstrap/shell/"):
             continue
-        for key in ("desc", "run"):
+        for key in ("alias", "name", "group", "desc"):
             if key not in meta:
                 warnings.append(f"{rel}: missing script metadata @{key}")
-        if "keywords" not in meta and "tags" not in meta:
-            warnings.append(f"{rel}: missing script metadata @keywords")
-        if "cmd" not in meta and "alias" not in meta:
-            warnings.append(f"{rel}: missing script metadata @cmd")
         if "run" in meta and meta["run"] not in VALID_RUN:
             errors.append(f"{rel}: invalid @run '{meta['run']}'")
+        if "group" in meta and meta["group"] not in VALID_GROUPS:
+            errors.append(f"{rel}: invalid group '{meta['group']}'")
 
     shell_dir = root / "bootstrap" / "shell"
     if shell_dir.is_dir():
@@ -69,11 +67,16 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
     for record in script_records + shell_records:
         alias = (record.get("alias") or "").strip()
         name = (record.get("name") or "").strip()
+        group = (record.get("group") or "").strip()
         desc = (record.get("desc") or "").strip()
         if not alias:
             errors.append(f"{record['path']}: discovered command record missing alias")
         if not name:
             errors.append(f"{record['path']}: discovered command record missing name")
+        if not group:
+            errors.append(f"{record['path']}: discovered command record missing group")
+        elif group not in VALID_GROUPS:
+            errors.append(f"{record['path']}: discovered command record has invalid group '{group}'")
         if not desc:
             errors.append(f"{record['path']}: discovered command record missing desc")
         command_candidates.append(record)

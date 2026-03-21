@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Collect executable inventory and suspicious unsigned binaries
-# @tags: audit collector binaries signing
-# @run: user
+# dev-cmd: alias=binaries name=Binaries group=audit run=user legend=hide desc="Collect executable inventory and suspicious unsigned binaries"
 
 set -euo pipefail
 

@@ -35,11 +35,7 @@ Not every component is a command.
 Declare directory identity near the top of `README.md`:
 
 ```md
-<!-- @component: stable-component-id -->
-<!-- @kind: component|subcomponent|support -->
-<!-- @desc: one-line summary -->
-<!-- @keywords: space-delimited keywords -->
-<!-- @taxonomy: optional semantic lineage -->
+<!-- dev-component: id=stable-component-id kind=component|subcomponent|support group=sys|audit|net desc="one-line summary" -->
 ```
 
 Interpretation:
@@ -55,42 +51,31 @@ Commands attach to the nearest explicit ancestor whose kind is `component` or `s
 Discoverable commands need this metadata:
 
 ```bash
-# @name: human label
-# @desc: one-line summary
-# @cmd: preferred invocation token
-# @keywords: space-delimited keywords
-# @taxonomy: optional semantic lineage
-# @run: user|sudo
+# dev-cmd: alias=token name="Human Label" group=sys|audit|net run=user|sudo legend=hide desc="one-line summary"
 ```
 
 The minimum shared command-reference fields are:
 
-- `path`
 - `alias`
 - `name`
 - `desc`
+- `group`
 
 Interpretation:
 
-- `path`: unique declaration path, typically `source-path#alias`
-- `alias`: required displayed invocation token used by human-facing views
+- `alias`: required invocation token used by human-facing views
 - `name`: fuller human label
 - `desc`: terse summary
-- `source_path`: backing file path retained in the command contract
-
-`@tags` remains a legacy alias for `@keywords`.
+- `group`: one of `sys`, `audit`, or `net`
 
 For human-facing command views, `alias` is the canonical entry key.
 If a discovered record does not resolve to an alias, it is not a legit legend command.
 
 ## grouping rules
 
-- file-backed scripts use structure first when they live in a real subdirectory under their owner
-- file-backed scripts fall back to keyword-derived grouping when they live directly at the owner root
-- shell wrappers group by shell section plus declared subgroup keywords
-- keywords are secondary facets, not the primary navigation tree
-
-This keeps `apps/netshot`, `apps/sitechk`, and `apps/wifiscan` grouped structurally while still allowing root-level audit scripts to fall into `zeek` or `macos`.
+- grouping is explicit in metadata, not inferred from keywords
+- allowed groups are fixed: `sys`, `audit`, `net`
+- component and command metadata should declare one of those groups directly
 
 Human-facing views should remain one level deep in perspective:
 
@@ -102,7 +87,6 @@ Human-facing views should remain one level deep in perspective:
 
 - discover from `bootstrap/shell/*.sh`
 - `## section` establishes shell scope
-- bare `# @component` resets metadata to the current section owner
 - wrappers should stay thin and point at file-backed functionality when practical
 
 Canonical shell sections:

@@ -1,7 +1,4 @@
-<!-- @component: ops -->
-<!-- @kind: component -->
-<!-- @desc: Operational scripts that act on live system state -->
-<!-- @tags: ops runtime system -->
+<!-- dev-component: id=ops kind=component group=sys desc="Operational scripts that act on live system state" -->
 
 # ops
 

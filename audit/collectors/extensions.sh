@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Collect kernel/system extension listings
-# @tags: audit collector extensions
-# @run: user
+# dev-cmd: alias=extensions name=Extensions group=audit run=user legend=hide desc="Collect kernel/system extension listings"
 
 set -euo pipefail
 

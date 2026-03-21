@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Summarize Zeek log datasets with lnav queries
-# @tags: zeek dashboard logs
-# @run: user
+# dev-cmd: alias=zdash name=Zdash group=audit run=user legend=hide desc="Summarize Zeek log datasets with lnav queries"
 
 set -euo pipefail
 

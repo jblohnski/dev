@@ -9,6 +9,7 @@ from inventory.shared import (
     FUNC_RE,
     LEGEND_RE,
     SCHEMA_VERSION,
+    SH_COMMAND_RE,
     SECTION_RE,
     SH_META_RE,
     TOP_LEVEL_SCOPES,
@@ -19,6 +20,7 @@ from inventory.shared import (
     order_key,
     parse_md_desc,
     parse_md_doc,
+    parse_inline_fields,
     parse_md_meta,
     parse_sh_meta,
     parse_taxonomy_meta,
@@ -47,8 +49,15 @@ def is_shorthand_alias(record: dict[str, str]) -> bool:
     return desc.startswith("shorthand for ")
 
 
+def is_hidden_from_legend(record: dict[str, str]) -> bool:
+    flag = (record.get("legend") or "").strip().lower()
+    return flag in {"0", "false", "hide", "hidden", "no", "off"}
+
+
 def is_legend_eligible(record: dict[str, str]) -> bool:
     if is_shorthand_alias(record):
+        return False
+    if is_hidden_from_legend(record):
         return False
     if record.get("component") == "dev" and record.get("group") in {
         "dashboard",
@@ -96,7 +105,7 @@ def build_dir_records(root: Path) -> list[dict[str, str]]:
                 "kind": kind,
                 "component": component,
                 "owner": component,
-                "group": parent or "root",
+                "group": meta.get("group", parent or "sys"),
                 "parent": parent,
                 "keywords": keywords,
                 "tags": keywords,
@@ -115,6 +124,15 @@ def build_dir_lookup(dir_records: list[dict[str, str]]) -> tuple[dict[str, dict[
         if record["kind"] in {"component", "subcomponent"}
     }
     return by_rel, explicit_paths
+
+
+def component_group(component: str, by_rel: dict[str, dict[str, str]]) -> str:
+    for record in by_rel.values():
+        if record.get("component") == component and record.get("kind") in {"component", "subcomponent", "support"}:
+            group = (record.get("group") or "").strip()
+            if group:
+                return group
+    return component
 
 
 def nearest_explicit_component(dir_rel: str, by_rel: dict[str, dict[str, str]]) -> str:
@@ -192,6 +210,7 @@ def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[
         rel = rel_str(script, root)
         dir_rel = rel_str(script.parent, root)
         owner = nearest_explicit_component(dir_rel, by_rel)
+        owner_group = component_group(owner, by_rel)
         records.append(
             {
                 "type": "cmd",
@@ -200,7 +219,9 @@ def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[
                 "rel": rel,
                 "component": owner,
                 "owner": owner,
-                "group": script_display_group(owner, meta_keywords(meta, owner), script_group(dir_rel, owner, by_rel, explicit_paths)),
+                "group": meta.get("group")
+                or owner_group
+                or script_display_group(owner, meta_keywords(meta, owner), script_group(dir_rel, owner, by_rel, explicit_paths)),
                 "name": meta.get("name", meta.get("alias", script.stem)),
                 "cmd": meta.get("cmd", meta.get("alias", script.name)),
                 "run": meta.get("run", "user"),
@@ -209,6 +230,7 @@ def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[
                 "alias": meta.get("cmd") or meta.get("alias") or script.stem,
                 "desc": desc,
                 "docs": doc_for_rel(dir_rel, by_rel, root),
+                "legend": meta.get("legend", ""),
                 "taxonomy": meta.get("taxonomy", ""),
             }
         )
@@ -228,6 +250,10 @@ def parse_shell_commands(shell_file: Path, root: Path, by_rel: dict[str, dict[st
             section = section_match.group(1).strip().lower()
             component = shell_owner(section)
             pending = {}
+            continue
+        command_match = SH_COMMAND_RE.match(line)
+        if command_match:
+            pending = parse_inline_fields(command_match.group(1))
             continue
         meta_match = SH_META_RE.match(line)
         if meta_match:
@@ -261,6 +287,7 @@ def parse_shell_commands(shell_file: Path, root: Path, by_rel: dict[str, dict[st
             expected_cmd = pending.get("cmd", matched_name)
             if matched_name == expected_cmd and pending.get("desc"):
                 owner = pending.get("component") or component
+                owner_group = component_group(owner, by_rel)
                 keywords = meta_keywords(pending, f"shell {owner} {shell_group(section)}")
                 records.append(
                     {
@@ -270,7 +297,7 @@ def parse_shell_commands(shell_file: Path, root: Path, by_rel: dict[str, dict[st
                         "rel": rel,
                         "component": owner,
                         "owner": owner,
-                        "group": derive_group(owner, keywords, shell_group(section)),
+                        "group": pending.get("group") or owner_group or derive_group(owner, keywords, shell_group(section)),
                         "name": pending.get("name", matched_name),
                         "cmd": expected_cmd,
                         "run": pending.get("run", "user"),
@@ -279,6 +306,7 @@ def parse_shell_commands(shell_file: Path, root: Path, by_rel: dict[str, dict[st
                         "alias": expected_cmd,
                         "desc": pending["desc"],
                         "docs": doc_for_rel(rel_str(shell_file.parent, root), by_rel, root),
+                        "legend": pending.get("legend", ""),
                         "taxonomy": pending.get("taxonomy", ""),
                     }
                 )

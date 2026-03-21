@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# @desc: Collect non-Apple launch agents and daemons
-# @tags: audit collector launch persistence
-# @run: user
+# dev-cmd: alias=launch_nonapple name="Launch Nonapple" group=audit run=user legend=hide desc="Collect non-Apple launch agents and daemons"
 
 set -euo pipefail
 
