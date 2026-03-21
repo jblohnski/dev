@@ -74,15 +74,15 @@ The command-facing contract itself is defined separately in `command.schema.json
 ```json
 {
   "key": "d.a.n",
-  "path_key": "cmd:apps/netshot/netshot.sh#netshot",
+  "path_key": "cmd:audit/netshot/netshot.sh#netshot",
   "top_level": "dev",
-  "component_id": "apps",
-  "group": "netshot",
+  "component_id": "netshot",
+  "group": "audit",
   "name": "Netshot",
   "cmd": "netshot",
   "alias": null,
   "desc": "Capture a short packet trace, run Zeek, and summarize the result",
   "taxonomy_source": "derived",
-  "taxonomy_key": "dev/apps/netshot/netshot"
+  "taxonomy_key": "dev/audit/netshot/audit/netshot"
 }
 ```

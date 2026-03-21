@@ -83,6 +83,10 @@ Artifacts are written under `audit/report/`:
 - `zeek/zeek-<id>.md`
 - `zeek/zeek-<id>.graph.dot` (and PNG if Graphviz `dot` exists)
 
+Related tooling:
+
+- `netshot/`: short packet capture and Zeek snapshot helper
+
 ## JSON output
 
 Default path:

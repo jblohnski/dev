@@ -1,4 +1,4 @@
-<!-- dev-component: id=netshot kind=support group=audit desc="Packet capture and Zeek snapshot helper" -->
+<!-- dev-component: id=netshot kind=subcomponent group=audit desc="Packet capture and Zeek snapshot helper" -->
 
 # netshot
 

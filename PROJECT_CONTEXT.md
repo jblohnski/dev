@@ -14,7 +14,6 @@ Directory structure:
 
 dev/
   audit/
-  apps/
   bootstrap/
   ops/
 

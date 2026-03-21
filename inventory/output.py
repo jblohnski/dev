@@ -35,7 +35,10 @@ def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
                 ]
             )
         )
-    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], display_command_name(x))):
+    for record in sorted(
+        cmd_records,
+        key=lambda x: (order_key(x.get("sort_component", x["component"])), x["group"], x["source"], display_command_name(x)),
+    ):
         cmd = record.get("cmd", record["alias"] or record["name"])
         print(
             "\t".join(
@@ -55,19 +58,19 @@ def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
         )
 
 
-def render_command_group(commands: list[dict[str, str]], show_paths: bool, style: Style) -> None:
+def render_command_group(commands: list[dict[str, str]], show_paths: bool, style: Style, indent: str = "    ") -> None:
     cmd_width = max((len(display_command_name(record)) for record in commands), default=0)
     for record in commands:
         cmd = display_command_name(record)
         cmd_text = style.wrap(cmd, style.cmd)
         padding = " " * (max(cmd_width - len(cmd), 0) + 2)
-        print(f"    {cmd_text}{padding}{style.wrap(record['desc'], style.desc)}")
+        print(f"{indent}{cmd_text}{padding}{style.wrap(record['desc'], style.desc)}")
         if show_paths:
             name = record.get("name", "").strip()
             label = f"@ {command_path(record)}"
             if name and name.lower() != cmd.lower():
                 label = f"{label} [{name}]"
-            print(f"      {style.wrap(label, style.desc)}")
+            print(f"{indent}  {style.wrap(label, style.desc)}")
 
 
 def render_group_legend(commands: list[dict[str, str]], show_paths: bool, style: Style) -> None:
@@ -102,6 +105,9 @@ def print_summary(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
     components = [record for record in dir_records if record["kind"] == "component"]
     components_by_id = {record["component"]: record for record in components}
     subcomponents = [record for record in dir_records if record["kind"] == "subcomponent"]
+    subcomponents_by_parent: dict[str, list[dict[str, str]]] = {}
+    for record in subcomponents:
+        subcomponents_by_parent.setdefault(record["parent"], []).append(record)
 
     selected = [record for record in display_records(cmd_records) if is_legend_eligible(record) and matches_filters(record, filters)]
     valid_aliases = {cmd["alias"] for cmd in valid_commands(selected)}
@@ -117,23 +123,37 @@ def print_summary(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
         cmds_by_component: dict[str, list[dict[str, str]]] = {}
         for record in grouped[group]:
             cmds_by_component.setdefault(record["component"], []).append(record)
-        for component_id in sorted(cmds_by_component, key=order_key):
-            component = components_by_id.get(component_id)
-            if component is None:
-                continue
+        visible_components = []
+        for component in sorted(components, key=lambda record: order_key(record["component"])):
+            component_id = component["component"]
+            has_direct_commands = component_id in cmds_by_component
+            has_subcomponent_commands = any(
+                sub["component"] in cmds_by_component for sub in subcomponents_by_parent.get(component_id, [])
+            )
+            if has_direct_commands or has_subcomponent_commands:
+                visible_components.append(component_id)
+        for component_id in visible_components:
+            component = components_by_id[component_id]
             print(
                 f'  {style.wrap(component["component"], style.name)} '
                 f'{style.wrap("[" + component["kind"] + "]", style.desc)} '
                 f'{style.wrap(component["desc"], style.desc)}'
             )
-            for sub in sorted(subcomponents, key=lambda x: x["component"]):
-                if sub["parent"] == component["component"]:
-                    print(
-                        f'    + {style.wrap(sub["component"], style.name)} '
-                        f'{style.wrap("[" + sub["kind"] + "]", style.desc)} '
-                        f'{style.wrap(sub["desc"], style.desc)}'
+            for sub in sorted(subcomponents_by_parent.get(component["component"], []), key=lambda x: x["component"]):
+                print(
+                    f'    + {style.wrap(sub["component"], style.name)} '
+                    f'{style.wrap("[" + sub["kind"] + "]", style.desc)} '
+                    f'{style.wrap(sub["desc"], style.desc)}'
+                )
+                if sub["component"] in cmds_by_component:
+                    render_command_group(
+                        sorted(cmds_by_component[sub["component"]], key=display_command_name),
+                        show_paths,
+                        style,
+                        indent="      ",
                     )
-            render_command_group(sorted(cmds_by_component[component_id], key=display_command_name), show_paths, style)
+            if component_id in cmds_by_component:
+                render_command_group(sorted(cmds_by_component[component_id], key=display_command_name), show_paths, style)
         print()
 
 
@@ -152,7 +172,10 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
     grouped = group_commands(filtered_records)
     for group in sorted(grouped, key=group_key):
         print(style.wrap(group, style.bold, style.hdr))
-        commands = sorted(grouped[group], key=lambda record: (order_key(record["component"]), display_command_name(record)))
+        commands = sorted(
+            grouped[group],
+            key=lambda record: (order_key(record.get("sort_component", record["component"])), display_command_name(record)),
+        )
         render_group_legend(commands, show_paths, style)
         print()
 
@@ -168,7 +191,10 @@ def print_index(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
 
 def print_shell(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
     seen_aliases: set[str] = set()
-    selected = sorted(cmd_records, key=lambda x: (group_key(x["group"]), order_key(x["component"]), display_command_name(x)))
+    selected = sorted(
+        cmd_records,
+        key=lambda x: (group_key(x["group"]), order_key(x.get("sort_component", x["component"])), display_command_name(x)),
+    )
     for record in selected:
         if record.get("source") != "script":
             continue

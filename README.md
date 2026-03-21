@@ -9,14 +9,13 @@ Personal machine automation and diagnostics repo for `~/dev`.
 - `bootstrap/`: tracked shell and machine bootstrap files
 - `audit/`: evidence collection, Zeek workflows, and reports
 - `ops/`: live system actions and operational checks
-- `apps/`: standalone file-backed utilities grouped under one parent
 - `inventory/`: discovery, validation, and rendering modules
 
 Rule of thumb:
 
 - put live-action tooling in `ops/`
 - put collection and comparison flows in `audit/`
-- put self-contained utilities in `apps/`
+- put self-contained utilities under the owning component tree
 - keep shell wrappers thin in `bootstrap/shell/`
 
 ## Inventory

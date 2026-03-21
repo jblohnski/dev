@@ -35,7 +35,7 @@ SHELL_SECTION_OWNER = {
     "dns": "dev",
     "util": "dev",
 }
-COMPONENT_ORDER = ["bootstrap", "audit", "ops", "apps", "dev", "projects", "proposals", "zlogs", "arkenfox"]
+COMPONENT_ORDER = ["bootstrap", "audit", "ops", "dev", "projects", "proposals", "zlogs", "arkenfox"]
 RESERVED_GROUP_KEYWORDS = {
     "automation",
     "command",

@@ -25,10 +25,10 @@ Not every component is a command.
 - `bootstrap/`: tracked environment bootstrap state
 - `audit/`: evidence collection and reporting workflows
 - `ops/`: live system actions and checks
-- `apps/`: standalone file-backed utilities
 - `inventory/`: discovery, validation, and rendering modules
 
 `dev/` itself is workspace root metadata, not the place to accumulate standalone tools.
+Standalone file-backed utilities should live under the component tree that owns them, such as `audit/` or `ops/`.
 
 ## directory rules
 

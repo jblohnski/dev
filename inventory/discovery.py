@@ -83,7 +83,12 @@ def build_dir_records(root: Path) -> list[dict[str, str]]:
         component = meta.get("component", directory.name if rel != "." else "dev")
         desc = meta.get("desc", parse_md_desc(readme))
         keywords = meta_keywords(meta, component)
-        parent = "" if rel == "." else top_component(rel)
+        if rel == ".":
+            parent = ""
+        elif "/" in rel:
+            parent = top_component(rel)
+        else:
+            parent = ""
         records.append(
             {
                 "type": "dir",
@@ -165,7 +170,7 @@ def docs_path_for_rel(dir_rel: str, by_rel: dict[str, dict[str, str]]) -> str:
 
 def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[dict[str, str]]:
     records: list[dict[str, str]] = []
-    by_rel, _explicit_paths = build_dir_lookup(dir_records)
+    by_rel, explicit_paths = build_dir_lookup(dir_records)
     for script in sorted(root.rglob("*")):
         if not script.is_file() or script.suffix not in {".sh", ".zsh"}:
             continue
@@ -179,6 +184,9 @@ def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[
         dir_rel = rel_str(script.parent, root)
         owner = nearest_explicit_component(dir_rel, by_rel)
         owner_group = component_group(owner, by_rel)
+        owner_rel = explicit_paths.get(owner, "")
+        owner_record = by_rel.get(owner_rel, {})
+        sort_component = owner_record.get("parent") if owner_record.get("kind") == "subcomponent" else owner
         records.append(
             {
                 "type": "cmd",
@@ -197,6 +205,7 @@ def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[
                 "desc": desc,
                 "docs": doc_for_rel(dir_rel, by_rel, root),
                 "legend": meta.get("legend", ""),
+                "sort_component": sort_component or owner,
                 "taxonomy": meta.get("taxonomy", ""),
             }
         )
@@ -273,6 +282,7 @@ def parse_shell_commands(shell_file: Path, root: Path, by_rel: dict[str, dict[st
                         "desc": pending["desc"],
                         "docs": doc_for_rel(rel_str(shell_file.parent, root), by_rel, root),
                         "legend": pending.get("legend", ""),
+                        "sort_component": owner,
                         "taxonomy": pending.get("taxonomy", ""),
                     }
                 )
@@ -297,7 +307,10 @@ def build_shell_records(root: Path, by_rel: dict[str, dict[str, str]]) -> list[d
 def display_records(cmd_records: list[dict[str, str]]) -> list[dict[str, str]]:
     selected: list[dict[str, str]] = []
     seen: dict[tuple[str, str, str, str], int] = {}
-    for record in sorted(cmd_records, key=lambda x: (order_key(x["component"]), x["group"], x["source"], display_command_name(x))):
+    for record in sorted(
+        cmd_records,
+        key=lambda x: (order_key(x.get("sort_component", x["component"])), x["group"], x["source"], display_command_name(x)),
+    ):
         if is_shorthand_alias(record):
             continue
         key = (record["component"], record["group"], record["desc"], record["run"])
