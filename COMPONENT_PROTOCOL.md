@@ -79,9 +79,10 @@ If a discovered record does not resolve to an alias, it is not a legit legend co
 
 Human-facing views should remain one level deep in perspective:
 
-- component list first
-- command list under the component
-- deeper nested directories roll up to the owning component for legend/dashboard purposes
+- group list first
+- component list under a group when structural context is needed
+- command list under the group or component
+- deeper nested directories roll up to the owning component for human-facing views
 
 ## shell wrapper rules
 

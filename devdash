@@ -24,89 +24,103 @@ fi
 
 clear
 printf "%sDEV DASHBOARD%s\n" "$BOLD" "$RESET"
-printf "%sInventory-first component view of %s%s\n\n" "${DIM:-}" "$ROOT" "$RESET"
+printf "%sInventory-first command view of %s%s\n\n" "${DIM:-}" "$ROOT" "$RESET"
 
 TMP="$(mktemp -t devdash.XXXXXX)"
-i=1
-current_component=""
+INDEX_TMP="$(mktemp -t devdash.index.XXXXXX)"
+RECORDS_TMP="$(mktemp -t devdash.records.XXXXXX)"
+MERGED_TMP="$(mktemp -t devdash.merge.XXXXXX)"
+cleanup() {
+  rm -f "$TMP" "$INDEX_TMP" "$RECORDS_TMP" "$MERGED_TMP"
+}
+trap cleanup EXIT
 
-while IFS=$'\t' read -r source path source_path component group alias name run desc; do
-  [[ -n "$source" ]] || continue
+python3 "$SCAN" "$ROOT" index > "$INDEX_TMP"
+python3 "$SCAN" "$ROOT" records > "$RECORDS_TMP"
+python3 - "$INDEX_TMP" "$RECORDS_TMP" > "$MERGED_TMP" <<'PY'
+import json
+import sys
 
-  if [[ "$component" != "$current_component" ]]; then
-    printf "\n%s%s%s\n" "$BOLD$HDR" "$component" "$RESET"
-    current_component="$component"
-  fi
+index_path, records_path = sys.argv[1:3]
 
-  [[ "$alias" == "-" ]] && alias=""
-  [[ "$name" == "-" ]] && name=""
-  display_name="${alias:-$name}"
-  printf "%s%2d%s  %-18s  %s%-5s%s  %s%s\n" \
-    "$BOLD" "$i" "$RESET" \
-    "$display_name" \
-    "${MUTED:-}" "$run" "$RESET" \
-    "$desc" \
-    ""
-  if [[ -n "$name" && "${name,,}" != "${display_name,,}" ]]; then
-    printf "%s     %s[%s] %s (%s)%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$name" "$RESET"
-  else
-    printf "%s     %s[%s] %s%s\n" "${DIM:-}" "${MUTED:-}" "$source" "$path" "$RESET"
-  fi
-  printf "%s|%s|%s|%s|%s\n" "$i" "$source" "$ROOT/$source_path" "$run" "$display_name" >> "$TMP"
-  i=$((i + 1))
-done < <(
-  python3 "$SCAN" "$ROOT" index | python3 -c '
-import json, sys
+with open(index_path, encoding="utf-8") as handle:
+    commands = json.load(handle).get("commands", [])
 
-payload = json.load(sys.stdin)
-for cmd in payload.get("commands", []):
-    if cmd.get("source") == "shell":
-        continue
+runtime: dict[str, tuple[str, str]] = {}
+with open(records_path, encoding="utf-8") as handle:
+    for raw in handle:
+        row = raw.rstrip("\n").split("\t")
+        if len(row) != 10 or row[0] != "cmd":
+            continue
+        _, source, path, _component, _group, _name, alias, run, _keywords, _desc = row
+        if source != "script":
+            continue
+        runtime.setdefault(alias, (path, run or "user"))
+
+group_order = {"sys": 0, "audit": 1, "net": 2}
+selected = [cmd for cmd in commands if cmd.get("alias", "") in runtime]
+selected.sort(key=lambda cmd: (group_order.get(cmd.get("group", ""), 99), cmd.get("alias", "")))
+
+for cmd in selected:
+    path, run = runtime[cmd["alias"]]
     row = [
-        cmd.get("source", ""),
-        cmd.get("path", ""),
-        cmd.get("source_path", ""),
-        cmd.get("component", ""),
         cmd.get("group", ""),
         cmd.get("alias", ""),
         cmd.get("name", ""),
-        cmd.get("run", "user"),
         cmd.get("desc", ""),
+        run,
+        path,
     ]
     print("\t".join(row))
-'
-)
+PY
+
+i=1
+current_group=""
+
+while IFS=$'\t' read -r group alias name desc run cmd_path; do
+  [[ -n "$alias" ]] || continue
+
+  if [[ "$group" != "$current_group" ]]; then
+    group_label="$(printf "%s" "$group" | tr '[:lower:]' '[:upper:]')"
+    printf "\n%s%s%s\n" "$BOLD$HDR" "$group_label" "$RESET"
+    current_group="$group"
+  fi
+
+  printf "%s%2d%s  %-18s  %s%s\n" \
+    "$BOLD" "$i" "$RESET" \
+    "$alias" \
+    "$desc" \
+    ""
+  name_fold="$(printf "%s" "$name" | tr '[:upper:]' '[:lower:]')"
+  alias_fold="$(printf "%s" "$alias" | tr '[:upper:]' '[:lower:]')"
+  if [[ -n "$name" && "$name_fold" != "$alias_fold" ]]; then
+    printf "%s     %s%s%s\n" "${DIM:-}" "${MUTED:-}" "$name" "$RESET"
+  fi
+  printf "%s|%s|%s|%s\n" "$i" "$ROOT/$cmd_path" "$run" "$alias" >> "$TMP"
+  i=$((i + 1))
+done < "$MERGED_TMP"
 
 printf "\n%sSelect number to run (Enter = quit)%s\n" "${DIM:-}" "$RESET"
 read -r choice
 
 if [[ -z "${choice:-}" ]]; then
-  rm -f "$TMP"
   exit 0
 fi
 
 entry="$(grep -E "^${choice}\|" "$TMP" || true)"
-rm -f "$TMP"
 
 if [[ -z "$entry" ]]; then
   printf "%sInvalid selection.%s\n" "${WARN:-}" "$RESET"
   exit 1
 fi
 
-source_kind="$(printf "%s" "$entry" | cut -d'|' -f2)"
-cmd_path="$(printf "%s" "$entry" | cut -d'|' -f3)"
-runmode="$(printf "%s" "$entry" | cut -d'|' -f4)"
-shell_cmd="$(printf "%s" "$entry" | cut -d'|' -f5)"
+cmd_path="$(printf "%s" "$entry" | cut -d'|' -f2)"
+runmode="$(printf "%s" "$entry" | cut -d'|' -f3)"
+shell_cmd="$(printf "%s" "$entry" | cut -d'|' -f4)"
 
 printf "\n%s→ Running %s%s\n\n" "$BOLD" "${shell_cmd:-$(basename "$cmd_path")}" "$RESET"
 
-if [[ "$source_kind" == "shell" ]]; then
-  if [[ "$runmode" == "sudo" ]]; then
-    sudo zsh -lic "$shell_cmd"
-  else
-    zsh -lic "$shell_cmd"
-  fi
-elif [[ "$runmode" == "sudo" ]]; then
+if [[ "$runmode" == "sudo" ]]; then
   sudo "$cmd_path"
 else
   "$cmd_path"

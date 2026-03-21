@@ -3,7 +3,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from inventory.commands import command_object, valid_commands
+from command_contract import is_valid
+from inventory.commands import command_object
 from inventory.shared import SECTION_RE, SHELL_SECTION_OWNER, VALID_GROUPS, VALID_KINDS, VALID_RUN, is_excluded, parse_md_meta, parse_sh_meta, rel_str
 
 
@@ -64,6 +65,7 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
         warnings.append("bootstrap/shell: no shell command records discovered")
 
     command_candidates = []
+    alias_paths: dict[str, str] = {}
     for record in script_records + shell_records:
         alias = (record.get("alias") or "").strip()
         name = (record.get("name") or "").strip()
@@ -79,12 +81,15 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
             errors.append(f"{record['path']}: discovered command record has invalid group '{group}'")
         if not desc:
             errors.append(f"{record['path']}: discovered command record missing desc")
+        existing_path = alias_paths.get(alias)
+        if alias and existing_path and existing_path != record["path"]:
+            errors.append(f"duplicate command alias '{alias}' in {record['path']} and {existing_path}")
+        elif alias:
+            alias_paths[alias] = record["path"]
         command_candidates.append(record)
 
-    valid_paths = {cmd["path"] for cmd in valid_commands(command_candidates)}
     for candidate in command_candidates:
-        candidate_path = command_object(candidate)["path"]
-        if candidate_path not in valid_paths:
+        if not is_valid(command_object(candidate)):
             errors.append(f"{candidate['path']}: discovered command record did not produce a valid command object")
 
     for message in errors:

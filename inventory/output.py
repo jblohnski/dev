@@ -14,7 +14,7 @@ from inventory.discovery import (
     display_records,
     is_legend_eligible,
 )
-from inventory.shared import SCHEMA_VERSION, Style, matches_filters, order_key
+from inventory.shared import SCHEMA_VERSION, Style, group_key, matches_filters, order_key
 
 
 def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str, str]]) -> None:
@@ -69,44 +69,71 @@ def render_command_group(commands: list[dict[str, str]], show_paths: bool, style
                 label = f"{label} [{name}]"
             print(f"      {style.wrap(label, style.desc)}")
 
+
+def render_group_legend(commands: list[dict[str, str]], show_paths: bool, style: Style) -> None:
+    aliases = [display_command_name(record) for record in commands]
+    components = [record["component"] for record in commands]
+    alias_width = max((len(alias) for alias in aliases), default=0)
+    component_width = max((len(component) for component in components), default=0)
+    for record in commands:
+        alias = display_command_name(record)
+        component = record["component"]
+        alias_text = style.wrap(alias, style.cmd)
+        component_text = style.wrap(f"[{component}]", style.name)
+        alias_padding = " " * (max(alias_width - len(alias), 0) + 2)
+        component_padding = " " * (max(component_width - len(component), 0) + 2)
+        print(f"    {alias_text}{alias_padding}{component_text}{component_padding}{style.wrap(record['desc'], style.desc)}")
+        if show_paths:
+            name = record.get("name", "").strip()
+            label = f"@ {command_path(record)}"
+            if name and name.lower() != alias.lower():
+                label = f"{label} [{name}]"
+            print(f"      {style.wrap(label, style.desc)}")
+
+
+def group_commands(records: list[dict[str, str]]) -> dict[str, list[dict[str, str]]]:
+    grouped: dict[str, list[dict[str, str]]] = {}
+    for record in records:
+        grouped.setdefault(record["group"], []).append(record)
+    return grouped
+
 def print_summary(dir_records: list[dict[str, str]], cmd_records: list[dict[str, str]], show_paths: bool, color: bool, filters: list[str]) -> None:
     style = Style(color)
-    components = [record for record in dir_records if record["kind"] == "component" and record["rel"] != "."]
-    if any(record["rel"] == "." for record in dir_records):
-        root_record = next(record for record in dir_records if record["rel"] == ".")
-        components = [root_record] + sorted(components, key=lambda x: order_key(x["component"]))
-    else:
-        components = sorted(components, key=lambda x: order_key(x["component"]))
+    components = [record for record in dir_records if record["kind"] == "component"]
+    components_by_id = {record["component"]: record for record in components}
     subcomponents = [record for record in dir_records if record["kind"] == "subcomponent"]
 
-    selected = [record for record in display_records(cmd_records) if matches_filters(record, filters)]
-    valid_paths = {cmd["path"] for cmd in valid_commands(selected)}
-    cmds_by_component: dict[str, list[dict[str, str]]] = {}
+    selected = [record for record in display_records(cmd_records) if is_legend_eligible(record) and matches_filters(record, filters)]
+    valid_aliases = {cmd["alias"] for cmd in valid_commands(selected)}
+    filtered_records: list[dict[str, str]] = []
     for record in selected:
-        if command_path(record) not in valid_paths:
+        if display_command_name(record) not in valid_aliases:
             continue
-        if matches_filters(record, filters):
-            cmds_by_component.setdefault(record["component"], []).append(record)
+        filtered_records.append(record)
 
-    for component in components:
-        print(
-            f'{style.wrap(component["component"], style.bold, style.hdr)} '
-            f'{style.wrap("[" + component["kind"] + "]", style.desc)} '
-            f'{style.wrap(component["desc"], style.desc)}'
-        )
-        for sub in sorted(subcomponents, key=lambda x: x["component"]):
-            if sub["parent"] == component["component"]:
-                print(
-                    f'  + {style.wrap(sub["component"], style.name)} '
-                    f'{style.wrap("[" + sub["kind"] + "]", style.desc)} '
-                    f'{style.wrap(sub["desc"], style.desc)}'
-                )
-        grouped: dict[str, list[dict[str, str]]] = {}
-        for record in cmds_by_component.get(component["component"], []):
-            grouped.setdefault(record["group"], []).append(record)
-        for group in sorted(grouped):
-            print(f"  > {style.wrap(group, style.accent)}")
-            render_command_group(grouped[group], show_paths, style)
+    grouped = group_commands(filtered_records)
+    for group in sorted(grouped, key=group_key):
+        print(style.wrap(group, style.bold, style.hdr))
+        cmds_by_component: dict[str, list[dict[str, str]]] = {}
+        for record in grouped[group]:
+            cmds_by_component.setdefault(record["component"], []).append(record)
+        for component_id in sorted(cmds_by_component, key=order_key):
+            component = components_by_id.get(component_id)
+            if component is None:
+                continue
+            print(
+                f'  {style.wrap(component["component"], style.name)} '
+                f'{style.wrap("[" + component["kind"] + "]", style.desc)} '
+                f'{style.wrap(component["desc"], style.desc)}'
+            )
+            for sub in sorted(subcomponents, key=lambda x: x["component"]):
+                if sub["parent"] == component["component"]:
+                    print(
+                        f'    + {style.wrap(sub["component"], style.name)} '
+                        f'{style.wrap("[" + sub["kind"] + "]", style.desc)} '
+                        f'{style.wrap(sub["desc"], style.desc)}'
+                    )
+            render_command_group(sorted(cmds_by_component[component_id], key=display_command_name), show_paths, style)
         print()
 
 
@@ -114,18 +141,19 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
     style = Style(color)
     print(style.wrap("commands", style.hdr))
     print()
-    grouped_by_component: dict[str, list[dict[str, str]]] = {}
     selected = [record for record in display_records(cmd_records) if is_legend_eligible(record) and matches_filters(record, filters)]
-    valid_paths = {cmd["path"] for cmd in valid_commands(selected)}
+    valid_aliases = {cmd["alias"] for cmd in valid_commands(selected)}
+    filtered_records: list[dict[str, str]] = []
     for record in selected:
-        if command_path(record) not in valid_paths:
+        if display_command_name(record) not in valid_aliases:
             continue
-        grouped_by_component.setdefault(record["component"], []).append(record)
+        filtered_records.append(record)
 
-    for component in sorted(grouped_by_component, key=order_key):
-        print(style.wrap(component, style.bold, style.hdr))
-        commands = sorted(grouped_by_component[component], key=display_command_name)
-        render_command_group(commands, show_paths, style)
+    grouped = group_commands(filtered_records)
+    for group in sorted(grouped, key=group_key):
+        print(style.wrap(group, style.bold, style.hdr))
+        commands = sorted(grouped[group], key=lambda record: (order_key(record["component"]), display_command_name(record)))
+        render_group_legend(commands, show_paths, style)
         print()
 
 

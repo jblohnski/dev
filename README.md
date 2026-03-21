@@ -80,10 +80,12 @@ If something does not resolve to an alias, it should not appear in the legend co
 
 Human-facing views should stay one level deep:
 
-- component
-- command
+- group
+- component or command
 
-Deeper structure can still exist in the tree and machine outputs, but it should roll up in `legend` and `devdash`.
+`legend` is group-first and terse.
+`summary` is group-first with components nested under each group.
+Deeper structure can still exist in the tree and machine outputs, but it should roll up in `legend`, `summary`, and `devdash`.
 
 ## Docs
 

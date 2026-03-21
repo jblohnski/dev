@@ -19,6 +19,7 @@ EXCLUDED_PARTS = {".git", "node_modules", "__pycache__", ".venv", "venv", "dist"
 VALID_KINDS = {"component", "subcomponent", "support"}
 VALID_RUN = {"user", "sudo"}
 VALID_GROUPS = {"sys", "audit", "net"}
+GROUP_ORDER = ["sys", "audit", "net"]
 TOP_LEVEL_SCOPES = {"shell", "dev"}
 DEFAULT_ROOT = Path.home() / "dev"
 MODE_SET = {"summary", "records", "legend", "validate", "index", "catalog", "manifest"}
@@ -197,20 +198,8 @@ def split_keywords(raw: str) -> list[str]:
     return [KEYWORD_ALIASES.get(part.strip().lower(), part.strip().lower()) for part in raw.split() if part.strip()]
 
 
-def derive_group(component: str, keywords: str, fallback: str) -> str:
-    component_parts = {part for part in re.split(r"[-_/]", component.lower()) if part}
-    for keyword in split_keywords(keywords):
-        if keyword not in RESERVED_GROUP_KEYWORDS and keyword not in component_parts:
-            return keyword
-    return fallback
-
-
 def shell_owner(section: str) -> str:
     return SHELL_SECTION_OWNER.get(section, "dev")
-
-
-def shell_group(section: str) -> str:
-    return "shell" if section in {"bootstrap", "audit", "dev"} else section
 
 
 def top_component(rel: str) -> str:
@@ -224,6 +213,13 @@ def order_key(component: str) -> tuple[int, str]:
         return (COMPONENT_ORDER.index(component), component)
     except ValueError:
         return (999, component)
+
+
+def group_key(group: str) -> tuple[int, str]:
+    try:
+        return (GROUP_ORDER.index(group), group)
+    except ValueError:
+        return (999, group)
 
 
 def matches_filters(record: dict[str, str], filters: list[str]) -> bool:

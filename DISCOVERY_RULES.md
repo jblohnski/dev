@@ -35,7 +35,7 @@ Primary source of truth:
 
 ## outputs
 
-- `summary` and `legend` are human views
+- `summary` and `legend` are group-first human views
 - `index` is the shared command-reference list
 - `manifest` and `catalog` are machine inventory payloads
 - only valid command objects should survive into command-facing downstream views

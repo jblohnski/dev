@@ -8,12 +8,10 @@ from inventory.shared import (
     ALIAS_RE,
     FUNC_RE,
     LEGEND_RE,
-    SCHEMA_VERSION,
     SH_COMMAND_RE,
     SECTION_RE,
     SH_META_RE,
     TOP_LEVEL_SCOPES,
-    derive_group,
     is_excluded,
     meta_keywords,
     node_key,
@@ -25,7 +23,6 @@ from inventory.shared import (
     parse_sh_meta,
     parse_taxonomy_meta,
     rel_str,
-    shell_group,
     shell_owner,
     short_taxonomy_key,
     split_keywords,
@@ -58,15 +55,6 @@ def is_legend_eligible(record: dict[str, str]) -> bool:
     if is_shorthand_alias(record):
         return False
     if is_hidden_from_legend(record):
-        return False
-    if record.get("component") == "dev" and record.get("group") in {
-        "dashboard",
-        "legend",
-        "records",
-        "summary",
-        "taxonomy",
-        "validate",
-    }:
         return False
     return True
 
@@ -175,29 +163,9 @@ def docs_path_for_rel(dir_rel: str, by_rel: dict[str, dict[str, str]]) -> str:
     return ""
 
 
-def script_group(dir_rel: str, owner: str, by_rel: dict[str, dict[str, str]], explicit_paths: dict[str, str]) -> str:
-    nearest_rel = nearest_readme_rel(dir_rel, by_rel)
-    owner_rel = explicit_paths.get(owner, owner)
-    if nearest_rel == owner_rel:
-        rel_from_owner = dir_rel[len(owner_rel):].lstrip("/") if owner_rel != "." else dir_rel
-        return rel_from_owner or "scripts"
-    if nearest_rel == ".":
-        return "scripts"
-    if owner_rel != "." and nearest_rel.startswith(owner_rel + "/"):
-        trimmed = nearest_rel[len(owner_rel) + 1 :]
-        return trimmed or "scripts"
-    return nearest_rel
-
-
-def script_display_group(owner: str, keywords: str, fallback: str) -> str:
-    if fallback and fallback not in {".", "scripts", "shell"}:
-        return fallback
-    return derive_group(owner, keywords, fallback)
-
-
 def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[dict[str, str]]:
     records: list[dict[str, str]] = []
-    by_rel, explicit_paths = build_dir_lookup(dir_records)
+    by_rel, _explicit_paths = build_dir_lookup(dir_records)
     for script in sorted(root.rglob("*")):
         if not script.is_file() or script.suffix not in {".sh", ".zsh"}:
             continue
@@ -219,9 +187,7 @@ def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[
                 "rel": rel,
                 "component": owner,
                 "owner": owner,
-                "group": meta.get("group")
-                or owner_group
-                or script_display_group(owner, meta_keywords(meta, owner), script_group(dir_rel, owner, by_rel, explicit_paths)),
+                "group": meta.get("group") or owner_group,
                 "name": meta.get("name", meta.get("alias", script.stem)),
                 "cmd": meta.get("cmd", meta.get("alias", script.name)),
                 "run": meta.get("run", "user"),
@@ -288,7 +254,7 @@ def parse_shell_commands(shell_file: Path, root: Path, by_rel: dict[str, dict[st
             if matched_name == expected_cmd and pending.get("desc"):
                 owner = pending.get("component") or component
                 owner_group = component_group(owner, by_rel)
-                keywords = meta_keywords(pending, f"shell {owner} {shell_group(section)}")
+                keywords = meta_keywords(pending, f"shell {owner}")
                 records.append(
                     {
                         "type": "cmd",
@@ -297,7 +263,7 @@ def parse_shell_commands(shell_file: Path, root: Path, by_rel: dict[str, dict[st
                         "rel": rel,
                         "component": owner,
                         "owner": owner,
-                        "group": pending.get("group") or owner_group or derive_group(owner, keywords, shell_group(section)),
+                        "group": pending.get("group") or owner_group,
                         "name": pending.get("name", matched_name),
                         "cmd": expected_cmd,
                         "run": pending.get("run", "user"),

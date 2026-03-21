@@ -1,27 +1,17 @@
 {
   "name": "dev_command_contract",
-  "version": "1.0.0",
   "object": "command",
-  "definition": "canonical invokable command discovered under dev/. commands are the alias-driven subset used by legend, index, and dashboard views.",
+  "definition": "canonical public command object used by legend, index, and dashboard display.",
   "required": {
-    "path": "string; unique repo-relative declaration path, typically source-path#alias",
-    "source_path": "string; repo-relative source file path",
-    "component": "string; owning component identifier",
     "alias": "string; canonical invocation token shown in human-facing views",
     "name": "string; human-facing label",
-    "desc": "string; concise summary"
-  },
-  "optional": {
-    "group": "string|null; local subgroup retained for non-legend views",
-    "run": "user|sudo|null; execution mode when applicable",
-    "source": "script|shell|null; discovery source",
-    "keywords": ["string; normalized classification hint"]
+    "desc": "string; concise summary",
+    "group": "sys|audit|net; fixed simple command category"
   },
   "rules": [
     "commands are the invokable subset of discovered records",
     "alias is required for human-facing command views",
-    "path is the authoritative unique command identifier",
-    "source_path points at the backing file when one exists",
-    "not every component is a command"
+    "public command objects only expose alias, name, desc, and group",
+    "group must be one of sys, audit, or net"
   ]
 }
