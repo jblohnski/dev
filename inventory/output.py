@@ -4,7 +4,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from inventory.commands import command_object, command_path, valid_commands
+from inventory.commands import command_path, valid_commands
 from inventory.discovery import (
     build_dir_lookup,
     catalog_item_for_cmd,
@@ -15,47 +15,6 @@ from inventory.discovery import (
     is_legend_eligible,
 )
 from inventory.shared import SCHEMA_VERSION, Style, group_key, matches_filters, order_key
-
-
-def print_records(dir_records: list[dict[str, str]], cmd_records: list[dict[str, str]]) -> None:
-    for record in dir_records:
-        print(
-            "\t".join(
-                [
-                    "dir",
-                    record["source"],
-                    record["path"],
-                    record["component"],
-                    record["kind"],
-                    record["parent"],
-                    "-",
-                    "-",
-                    record["keywords"],
-                    record["desc"],
-                ]
-            )
-        )
-    for record in sorted(
-        cmd_records,
-        key=lambda x: (order_key(x.get("sort_component", x["component"])), x["group"], x["source"], display_command_name(x)),
-    ):
-        cmd = record.get("cmd", record["alias"] or record["name"])
-        print(
-            "\t".join(
-                [
-                    "cmd",
-                    record["source"],
-                    record["path"],
-                    record["component"],
-                    record["group"],
-                    record["name"],
-                    cmd,
-                    record["run"],
-                    record["keywords"],
-                    record["desc"],
-                ]
-            )
-        )
 
 
 def render_command_group(commands: list[dict[str, str]], show_paths: bool, style: Style, indent: str = "    ") -> None:

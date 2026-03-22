@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 
 from inventory.discovery import collect_records
-from inventory.output import print_index, print_legend, print_manifest, print_records, print_shell, print_summary
+from inventory.output import print_index, print_legend, print_manifest, print_shell, print_summary
 from inventory.shared import MODE_SET, parse_args
 from inventory.validate import validate
 
@@ -15,16 +15,13 @@ def main(argv: list[str]) -> int:
         return 1
     if mode not in MODE_SET:
         print(
-            f"usage: {argv[0]} [root] [summary|records|legend|validate|index|catalog|manifest|shell] [--paths] [filters...]",
+            f"usage: {argv[0]} [root] [summary|legend|validate|index|manifest|shell] [--paths] [filters...]",
             file=sys.stderr,
         )
         return 2
 
     dir_records, script_records, shell_records, cmd_records = collect_records(root)
 
-    if mode == "records":
-        print_records(dir_records, cmd_records)
-        return 0
     if mode == "summary":
         print_summary(dir_records, cmd_records, show_paths, color, filters)
         return 0
@@ -37,7 +34,7 @@ def main(argv: list[str]) -> int:
     if mode == "shell":
         print_shell(cmd_records, filters)
         return 0
-    if mode in {"catalog", "manifest"}:
+    if mode == "manifest":
         print_manifest(root, dir_records, script_records, shell_records, cmd_records, filters)
         return 0
     return validate(root, dir_records, script_records, shell_records)

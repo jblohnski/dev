@@ -1,64 +1,52 @@
 ## dev
 
 export DEV_ROOT="${DEV_ROOT:-$HOME/dev}"
+export DEV_SCAN="${DEV_SCAN:-$DEV_ROOT/component-scan.sh}"
 
-# dev-cmd: alias=comp name="Component Inventory" group=sys run=user legend=hide desc="Run the shared component inventory entrypoint"
+# dev-cmd: alias=comp name="Dev Inventory" group=sys run=user legend=hide desc="Run summary, legend, validate, manifest, or dashboard"
 comp() {
-  local cmd="${1:-scan}"
+  local cmd="${1:-summary}"
   [[ $# -gt 0 ]] && shift
 
   case "$cmd" in
-    scan)
-      python3 "$DEV_ROOT/component-scan.sh" summary --color "$@"
+    summary|scan)
+      python3 "$DEV_SCAN" summary --color "$@"
       ;;
     legend)
-      python3 "$DEV_ROOT/component-scan.sh" legend --color "$@"
-      ;;
-    records)
-      python3 "$DEV_ROOT/component-scan.sh" records "$@"
+      python3 "$DEV_SCAN" legend --color "$@"
       ;;
     validate)
-      python3 "$DEV_ROOT/component-scan.sh" validate "$@"
+      python3 "$DEV_SCAN" validate "$@"
+      ;;
+    manifest)
+      python3 "$DEV_SCAN" manifest "$@"
       ;;
     dash)
       "$DEV_ROOT/devdash" "$@"
       ;;
     *)
-      echo "comp commands: scan legend records validate dash"
+      echo "comp commands: summary legend validate manifest dash"
       return 1
       ;;
   esac
 }
-
-# dev-cmd: alias=comp.scan name="Component Summary" group=sys run=user legend=hide desc="Show component summary"
-alias comp.scan='comp scan'
-# dev-cmd: alias=comp.legend name="Component Legend" group=sys run=user legend=hide desc="Show unified command legend"
-alias comp.legend='comp legend'
-# dev-cmd: alias=comp.records name="Component Records" group=sys run=user legend=hide desc="Emit component records"
-alias comp.records='comp records'
-# dev-cmd: alias=comp.validate name="Component Validation" group=sys run=user legend=hide desc="Validate component metadata and taxonomy"
-alias comp.validate='comp validate'
-# dev-cmd: alias=comp.dash name="Component Dashboard" group=sys run=user legend=hide desc="Open dev dashboard"
-alias comp.dash='comp dash'
 
 ## dev
 
 # dev-cmd: alias=dd name="Dev Dashboard" group=sys run=user legend=hide desc="Open dev dashboard"
 alias dd='$DEV_ROOT/devdash'
 # dev-cmd: alias=ds name=Summary group=sys run=user legend=hide desc="Show component summary"
-alias ds='python3 "$DEV_ROOT/component-scan.sh" summary --color'
+alias ds='comp summary'
 # dev-cmd: alias=dl name=Legend group=sys run=user legend=hide desc="Show unified command legend"
-alias dl='python3 "$DEV_ROOT/component-scan.sh" legend --color'
-# dev-cmd: alias=dr name=Records group=sys run=user legend=hide desc="Emit component records"
-alias dr='python3 "$DEV_ROOT/component-scan.sh" records'
+alias dl='comp legend'
 # dev-cmd: alias=dv name=Validation group=sys run=user legend=hide desc="Validate component metadata and taxonomy"
-alias dv='python3 "$DEV_ROOT/component-scan.sh" validate'
+alias dv='comp validate'
 
 ## util
 
 # dev-cmd: alias=l name=Legend group=sys run=user legend=hide desc="Show unified command legend"
 l() {
-  python3 "$DEV_ROOT/component-scan.sh" legend --color "$@"
+  comp legend "$@"
 }
 
 dev_publish_discovered_commands() {
@@ -74,5 +62,5 @@ dev_publish_discovered_commands() {
       alias_value="\"\$DEV_ROOT/$rel_path\""
     fi
     alias -- "$alias_name=$alias_value"
-  done < <(python3 "$DEV_ROOT/component-scan.sh" shell)
+  done < <(python3 "$DEV_SCAN" shell)
 }
