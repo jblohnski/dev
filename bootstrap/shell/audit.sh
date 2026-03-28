@@ -97,3 +97,11 @@ azip() {
     -x "audit/*/.DS_Store" \
     -x "audit/._*"
 }
+
+# @component: ops
+# dev-cmd: alias=logsum.live name="Log Summary Live" group=audit run=user desc="Show latest 3 matching log entries from the last 15 minutes"
+alias logsum.live='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 15m --top 3'
+# dev-cmd: alias=logsum.wide name="Log Summary Wide" group=audit run=user desc="Show latest 5 matching log entries from the last hour"
+alias logsum.wide='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 1h --top 5'
+# dev-cmd: alias=logsum.counts name="Log Summary Counts" group=audit run=user desc="Show latest 5 matching log entries plus counts from the last 30 minutes"
+alias logsum.counts='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 30m --top 5 --counts'

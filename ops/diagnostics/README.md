@@ -4,5 +4,5 @@
 
 Operational diagnostics helpers.
 
-- `logsum.sh`: summarize recent system logs.
+- `logsum.sh`: summarize recent system logs with latest matching entries per section.
 - `wstrace.sh`: trace wake/sleep related events.
