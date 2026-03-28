@@ -1,46 +1,51 @@
-# pfkit.anchor
-# Loaded from /etc/pf.conf via:
-#   anchor "pfkit/*"
-#   load anchor "pfkit" from "/etc/pf.anchors/pfkit.anchor"
+# pfkit.anchor (hardened - final)
 
 set skip on lo0
 
-# Variables substituted by pfkit-apply.sh
-ext_if = "__EXT_IF__"
-router_ip = "__ROUTER_IP__"
-
-# DNS targets
-# - When DNS_MODE=router: dns_ok contains router_ip
-# - When DNS_MODE=direct: dns_ok contains explicit resolvers
-# Populated by pfkit-apply.sh
-
 table <dns_ok> persist { __DNS_OK__ }
-
-# LAN ranges (sanity allow)
 table <lan_nets> persist { __LAN_NETS__ }
 
 # ------------------------------
-# DNS enforcement
+# DNS enforcement (STRICT + CORRECT)
 # ------------------------------
-# Block outbound DNS everywhere except dns_ok.
-# Keep both UDP and TCP (TCP used for large responses / DNSSEC).
-block out quick on $ext_if proto { udp tcp } to any port 53
-pass  out quick on $ext_if proto { udp tcp } to <dns_ok> port 53 keep state
 
-# Optional: block DNS-over-TLS (tcp/853)
-# (If you want to force all name resolution to port 53 via router.)
-# Substituted by apply script.
-__DOT_RULES__
+# allow ONLY on primary interface
+pass out quick on __EXT_IF__ proto { udp tcp } to <dns_ok> port 53 keep state
+
+# block DNS everywhere else (no interface qualifier)
+block return log quick proto { udp tcp } to any port 53
 
 # ------------------------------
-# mDNS noise control (Bonjour)
+# Block DNS-over-TLS (DoT)
 # ------------------------------
-# Multicast DNS uses 224.0.0.251 (IPv4) and ff02::fb (IPv6).
-# Blocking only the multicast destinations avoids breaking normal unicast DNS.
-__MDNS_RULES__
+block return log quick proto tcp to any port 853
 
 # ------------------------------
-# Safety: do not accidentally block LAN basic traffic.
-# (We do NOT open inbound; Apple default pf.conf handles baseline.)
+# Core outbound allow (minimal)
 # ------------------------------
-pass out on $ext_if to <lan_nets> keep state
+
+# HTTPS / HTTP
+pass out quick on __EXT_IF__ proto tcp to any port { 80, 443 } keep state
+
+# NTP (time sync)
+pass out quick on __EXT_IF__ proto udp to any port 123 keep state
+
+# ------------------------------
+# Enforcement layer
+# ------------------------------
+
+# Kill all NetworkExtension tunnels
+block drop log quick on utun0
+block drop log quick on utun1
+block drop log quick on utun2
+block drop log quick on utun3
+
+# ------------------------------
+# LAN safety
+# ------------------------------
+pass out quick on __EXT_IF__ to <lan_nets> keep state
+
+# ------------------------------
+# Default deny
+# ------------------------------
+block log all
