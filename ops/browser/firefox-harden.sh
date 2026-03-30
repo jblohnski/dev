@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=firefox-harden name="Firefox Harden" group=sys run=user legend=hide desc="Apply arkenfox profile and Firefox hardening overrides"
+# dev-cmd: alias=firefox-harden name="Firefox Harden" group=sys run=user legend=hide desc="Apply hardened Firefox and LibreWolf profile overrides"
 
 # firefox.sh
 #
@@ -24,31 +24,32 @@ set -euo pipefail
 die() { echo "ERROR: $*" >&2; exit 1; }
 warn() { echo "WARN:  $*" >&2; }
 
-# Detect platform + Firefox profile root
+# Detect platform + browser profile roots
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-PROFILE_ROOT=""
+PROFILE_ROOTS=()
 case "$OS" in
   darwin)
-    PROFILE_ROOT="$HOME/Library/Application Support/Firefox"
+    [ -d "$HOME/Library/Application Support/Firefox" ] && PROFILE_ROOTS+=("Firefox:$HOME/Library/Application Support/Firefox")
+    [ -d "$HOME/Library/Application Support/librewolf" ] && PROFILE_ROOTS+=("LibreWolf:$HOME/Library/Application Support/librewolf")
     ;;
   linux)
-    PROFILE_ROOT="$HOME/.mozilla/firefox"
+    [ -d "$HOME/.mozilla/firefox" ] && PROFILE_ROOTS+=("Firefox:$HOME/.mozilla/firefox")
+    [ -d "$HOME/.librewolf" ] && PROFILE_ROOTS+=("LibreWolf:$HOME/.librewolf")
     ;;
   *)
     die "Unsupported OS for this script: $OS"
     ;;
 esac
 
-[ -d "$PROFILE_ROOT" ] || die "Firefox profile root not found: $PROFILE_ROOT"
+[ "${#PROFILE_ROOTS[@]}" -gt 0 ] || die "No Firefox or LibreWolf profile roots found"
 
-# Make sure Firefox is not running (best-effort)
-if pgrep -x "firefox" >/dev/null 2>&1 || pgrep -x "Firefox" >/dev/null 2>&1; then
-  die "Firefox appears to be running. Quit Firefox fully, then re-run."
+# Make sure browsers are not running (best-effort)
+if pgrep -x "firefox" >/dev/null 2>&1 || pgrep -x "Firefox" >/dev/null 2>&1 || \
+   pgrep -x "librewolf" >/dev/null 2>&1 || pgrep -x "LibreWolf" >/dev/null 2>&1; then
+  die "Firefox or LibreWolf appears to be running. Quit the browser fully, then re-run."
 fi
 
 TS="$(date +%Y%m%d_%H%M%S)"
-BACKUP_DIR="$PROFILE_ROOT/arkenfox_backup_$TS"
-mkdir -p "$BACKUP_DIR"
 
 # Embedded arkenfox user.js (from the provided zip)
 write_userjs() {
@@ -1364,6 +1365,14 @@ user_pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
 user_pref("network.cookie.lifetimePolicy", 2);             // 0=accept normally, 2=session only
 // Note: do NOT enable cookie clearing-on-shutdown here, or it will wipe exceptions too.
 
+// Keep DNS and web transport on the system path controlled by PF.
+user_pref("network.trr.mode", 5);                          // force DoH off
+user_pref("network.trr.uri", "");
+user_pref("network.trr.custom_uri", "");
+user_pref("network.trr.bootstrapAddr", "");
+user_pref("network.http.http3.enable", false);            // disable QUIC / HTTP3
+user_pref("media.peerconnection.enabled", false);         // disable WebRTC/STUN egress
+
 /*** end highinquires overrides ***/
 HI_OVERRIDES
 }
@@ -1422,12 +1431,14 @@ SQL
 
 apply_profile() {
   local prof_dir="$1"
-  echo "==> Profile: $prof_dir"
+  local backup_dir="$2"
+  local browser_name="$3"
+  echo "==> $browser_name profile: $prof_dir"
 
   # Backups
   for f in user.js prefs.js permissions.sqlite; do
     if [ -f "$prof_dir/$f" ]; then
-      cp -p "$prof_dir/$f" "$BACKUP_DIR/$(basename "$prof_dir")_$f"
+      cp -p "$prof_dir/$f" "$backup_dir/$(basename "$prof_dir")_$f"
     fi
   done
 
@@ -1451,41 +1462,51 @@ apply_profile() {
   echo "   Wrote: $prof_dir/user.js"
 }
 
-# Enumerate profiles (Profiles/*.default*, Profiles/*-release, etc.)
-PROFILES_DIR="$PROFILE_ROOT/Profiles"
-[ -d "$PROFILES_DIR" ] || die "Profiles directory not found: $PROFILES_DIR"
+apply_browser_root() {
+  local browser_name="$1"
+  local profile_root="$2"
+  local profiles_dir="$profile_root/Profiles"
+  local backup_dir="$profile_root/arkenfox_backup_$TS"
+  local found=0
 
-found=0
-for d in "$PROFILES_DIR"/*; do
-  [ -d "$d" ] || continue
-  # skip non-profile dirs
-  case "$(basename "$d")" in
-    *.default*|*.default-release*|*.default-esr*|*-release|*-esr|*.profile)
-      apply_profile "$d"
-      found=1
-      ;;
-    *)
-      # Many installs use random.profileName; include all dirs containing prefs.js to be safe
-      if [ -f "$d/prefs.js" ]; then
-        apply_profile "$d"
+  [ -d "$profiles_dir" ] || die "Profiles directory not found: $profiles_dir"
+  mkdir -p "$backup_dir"
+
+  for d in "$profiles_dir"/*; do
+    [ -d "$d" ] || continue
+    case "$(basename "$d")" in
+      *.default*|*.default-release*|*.default-esr*|*-release|*-esr|*.profile)
+        apply_profile "$d" "$backup_dir" "$browser_name"
         found=1
-      fi
-      ;;
-  esac
-done
+        ;;
+      *)
+        if [ -f "$d/prefs.js" ]; then
+          apply_profile "$d" "$backup_dir" "$browser_name"
+          found=1
+        fi
+        ;;
+    esac
+  done
 
-[ "$found" -eq 1 ] || die "No Firefox profiles found under: $PROFILES_DIR"
+  [ "$found" -eq 1 ] || die "No $browser_name profiles found under: $profiles_dir"
+
+  echo
+  echo "$browser_name backups saved to: $backup_dir"
+}
+
+for entry in "${PROFILE_ROOTS[@]}"; do
+  browser_name="${entry%%:*}"
+  profile_root="${entry#*:}"
+  apply_browser_root "$browser_name" "$profile_root"
+done
 
 echo
 echo "Done."
-echo "Backups saved to: $BACKUP_DIR"
 echo
 echo "Next:"
-echo "  1) Start Firefox."
+echo "  1) Start Firefox or LibreWolf."
 echo "  2) Visit about:config and confirm:"
+echo "       - network.trr.mode = 5"
+echo "       - network.http.http3.enable = false"
+echo "       - media.peerconnection.enabled = false"
 echo "       - network.cookie.lifetimePolicy = 2"
-echo "       - browser.startup.homepage = about:home"
-echo "       - browser.newtabpage.enabled = true"
-echo "  3) If Google login still does not persist, add exceptions manually:"
-echo "       Settings -> Privacy & Security -> Cookies and Site Data -> Manage Exceptions"
-echo "       Add: https://accounts.google.com (Allow)"

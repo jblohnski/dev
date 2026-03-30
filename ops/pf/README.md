@@ -6,7 +6,7 @@ PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, 
 
 ## Layout
 
-- `bin/`: operational entrypoints (`pfkit-install`, `pfkit-apply`, `pfkit-uninstall`, watch helpers).
+- `bin/`: operational entrypoints (`pfkit-install`, `pfkit-apply`, `pfkit-status`, `pfkit-uninstall`, watch helpers).
 - `anchors/`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`.
 - `config/`: environment inputs (`pfkit.env`) used by render/apply.
 
@@ -20,8 +20,8 @@ sudo ./bin/pfkit-apply.sh
 Validate:
 
 ```bash
-sudo pfctl -sr | sed -n '1,120p'
-sudo pfctl -sa | grep -i Status
+sudo ./bin/pfkit-status.sh
+sudo pfctl -a pfkit -sr
 sudo tcpdump -ni en0 port 53 or port 5353
 ```
 
@@ -32,14 +32,17 @@ sudo tcpdump -ni en0 port 53 or port 5353
 - `DNS_ALLOWED` — space-delimited IPs when `DNS_MODE=direct`.
 - `ALLOW_LAN_CIDRS` — LAN ranges allowed.
 - `BLOCK_MDNS` — block mDNS (default 1).
-- `BLOCK_DOT` — block DoT except allowed (default 0).
+- `BLOCK_DOT` — block DoT/DoQ on 853 (default 1).
+- `BLOCK_QUIC` — block QUIC/HTTP3 on UDP 443 (default 1).
 
 ## Behaviors
 
 - Keeps Apple default inbound posture (no blanket `pass in all`).
 - Blocks outbound UDP/TCP 53 except allowed DNS targets.
-- Blocks outbound UDP 5353 multicast.
-- Optional DoT (853) blocking when enabled.
+- Blocks outbound UDP 5353 with logging.
+- Blocks DoT/DoQ on 853 when enabled.
+- Blocks QUIC/HTTP3 on UDP 443 when enabled so browsers stay on TCP 443.
+- Logs every explicit block rule in the anchor.
 
 ## Uninstall
 
@@ -49,5 +52,6 @@ sudo ./bin/pfkit-uninstall.sh
 
 ## Live monitoring
 
+- Live PF status: `sudo ./bin/pfkit-status.sh`
 - DNS-only watch: `sudo ./bin/pfkit-watch-dns.sh`
 - PF block tail: `sudo ./bin/pfkit-watch-blocks.sh`

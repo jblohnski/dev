@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-ROOT="${HOME}/dev"
+ROOT="${DEV_ROOT:-$HOME/dev}"
 SCAN="${ROOT}/component-scan.sh"
 
 : "${TERM:=xterm-256color}"
@@ -115,6 +115,23 @@ runmode="$(printf "%s" "$entry" | cut -d'|' -f3)"
 shell_cmd="$(printf "%s" "$entry" | cut -d'|' -f4)"
 
 printf "\n%s→ Running %s%s\n\n" "$BOLD" "${shell_cmd:-$(basename "$cmd_path")}" "$RESET"
+
+if [[ "$shell_cmd" =~ ^[A-Za-z0-9_.-]+$ ]]; then
+  if DEV_ROOT="$ROOT" DEV_DASH_CMD="$shell_cmd" zsh -ic '
+    source "$DEV_ROOT/bootstrap/shell/dev.sh" >/dev/null 2>&1 || exit 1
+    if whence -w "$DEV_DASH_CMD" >/dev/null 2>&1; then
+      eval "$DEV_DASH_CMD"
+    else
+      exit 127
+    fi
+  '; then
+    exit 0
+  fi
+  status=$?
+  if [[ "$status" -ne 127 ]]; then
+    exit "$status"
+  fi
+fi
 
 if [[ "$runmode" == "sudo" ]]; then
   sudo "$cmd_path"

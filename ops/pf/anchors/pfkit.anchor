@@ -18,7 +18,12 @@ block return log quick proto { udp tcp } to any port 53
 # ------------------------------
 # Block DNS-over-TLS (DoT)
 # ------------------------------
-block return log quick proto tcp to any port 853
+__DOT_RULES__
+
+# ------------------------------
+# Block QUIC / HTTP3
+# ------------------------------
+__QUIC_RULES__
 
 # ------------------------------
 # Core outbound allow (minimal)
@@ -31,14 +36,14 @@ pass out quick on __EXT_IF__ proto tcp to any port { 80, 443 } keep state
 pass out quick on __EXT_IF__ proto udp to any port 123 keep state
 
 # ------------------------------
+# Block multicast DNS noise
+# ------------------------------
+__MDNS_RULES__
+
+# ------------------------------
 # Enforcement layer
 # ------------------------------
-
-# Kill all NetworkExtension tunnels
-block drop log quick on utun0
-block drop log quick on utun1
-block drop log quick on utun2
-block drop log quick on utun3
+__UTUN_RULES__
 
 # ------------------------------
 # LAN safety

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit-watch-dns name=pfkit-watch-dns group=sys run=sudo desc="Stream DNS packets from selected interface"
+# dev-cmd: alias=pfd name="PF DNS" group=sys run=sudo desc="Stream DNS packets from selected interface"
 
 set -euo pipefail
 

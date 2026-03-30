@@ -4,4 +4,4 @@
 
 Browser hardening operations.
 
-- `firefox-harden.sh`: applies arkenfox baseline plus local override policy.
+- `firefox-harden.sh`: applies arkenfox baseline plus local override policy to Firefox and LibreWolf profiles.

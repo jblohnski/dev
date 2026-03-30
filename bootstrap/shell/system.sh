@@ -83,6 +83,19 @@ alias snihttp='sudo tcpdump -n -i en0 port 443 or port 80'
 
 ## util
 
+alias pf.apply='pfa'
+alias pf.install='pfi'
+alias pf.remove='pfr'
+alias pf.status='pfs'
+alias pf.dns='pfd'
+alias pf.blocks='pfb'
+alias pfkit-apply='pfa'
+alias pfkit-install='pfi'
+alias pfkit-status='pfs'
+alias pfkit-uninstall='pfr'
+alias pfkit-watch-dns='pfd'
+alias pfkit-watch-blocks='pfb'
+
 # dev-cmd: alias=pa name=PATH group=sys run=user legend=hide desc="Print PATH entries"
 pa() {
   print -P "\n${CLR_HDR}path${CLR_RESET}"
