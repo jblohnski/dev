@@ -1,6 +1,7 @@
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
 export SHELL_SESSIONS_DISABLE=1
+export HOMEBREW_NO_AUTO_UPDATE=1
 autoload -Uz colors && colors
 
 CLR_HDR="%F{110}"

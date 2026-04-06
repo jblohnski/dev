@@ -10,10 +10,10 @@ table <lan_nets> persist { __LAN_NETS__ }
 # ------------------------------
 
 # allow ONLY on primary interface
-pass out quick on __EXT_IF__ proto { udp tcp } to <dns_ok> port 53 keep state
+pass out log (all) quick on __EXT_IF__ proto { udp tcp } to <dns_ok> port 53 keep state label "pfkit:dns-pass"
 
 # block DNS everywhere else (no interface qualifier)
-block return log quick proto { udp tcp } to any port 53
+block return log quick proto { udp tcp } to any port 53 label "pfkit:dns-block"
 
 # ------------------------------
 # Block DNS-over-TLS (DoT)
@@ -30,10 +30,10 @@ __QUIC_RULES__
 # ------------------------------
 
 # HTTPS / HTTP
-pass out quick on __EXT_IF__ proto tcp to any port { 80, 443 } keep state
+pass out quick on __EXT_IF__ proto tcp to any port { 80, 443 } keep state label "pfkit:web-pass"
 
 # NTP (time sync)
-pass out quick on __EXT_IF__ proto udp to any port 123 keep state
+pass out quick on __EXT_IF__ proto udp to any port 123 keep state label "pfkit:ntp-pass"
 
 # ------------------------------
 # Block multicast DNS noise
@@ -48,9 +48,9 @@ __UTUN_RULES__
 # ------------------------------
 # LAN safety
 # ------------------------------
-pass out quick on __EXT_IF__ to <lan_nets> keep state
+pass out quick on __EXT_IF__ to <lan_nets> keep state label "pfkit:lan-pass"
 
 # ------------------------------
 # Default deny
 # ------------------------------
-block log all
+block log all label "pfkit:default-block"

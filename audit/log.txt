@@ -1,0 +1,34 @@
+==== macOS Hang / Beachball Diagnostic Summary ====
+Range: --last 3h
+Recent entries per section: 3
+
+== FAULT (system-wide) ==
+latest 3 entries:
+  2026-04-02 12:51:36.641011-0700  localhost siriactionsd[1011]: (CoreFoundation) [com.apple.defaults:User Defaults] Couldn't read values in CFPrefsPlistSource<0xa97174000> (Domain: com.apple.appleaccount, User: kCFPreferencesCurrentUser, ByHost: No, Container: (null), Contents Need Refresh: Yes): accessing these preferences requires user-preference-read or file-read-data sandbox access
+  2026-04-02 12:51:36.706898-0700  localhost airportd[629]: (WiFiAnalytics) [com.apple.wifi.analytics:DeviceStore] -[WAEvent initWithEntity:bssid:at:withLqmHistory:]::58:entity nil
+  2026-04-02 12:51:52.735506-0700  localhost siriactionsd[1011]: (CoreFoundation) [com.apple.defaults:User Defaults] Couldn't read values in CFPrefsPlistSource<0xa97174000> (Domain: com.apple.appleaccount, User: kCFPreferencesCurrentUser, ByHost: No, Container: (null), Contents Need Refresh: Yes): accessing these preferences requires user-preference-read or file-read-data sandbox access
+
+== ERROR (system-wide) ==
+latest 3 entries:
+  2026-04-02 12:52:16.934760-0700  localhost StocksWidget[1364]: (Network) [com.apple.network:] nw_protocol_instance_set_output_handler Not calling remove_input_handler on 0xb860ba300:<private>
+  2026-04-02 12:52:16.935070-0700  localhost StocksWidget[1364]: (Network) [com.apple.network:] nw_protocol_instance_set_output_handler Not calling remove_input_handler on 0xb8607f5c0:<private>
+  2026-04-02 12:52:16.935139-0700  localhost StocksWidget[1364]: (Network) [com.apple.network:] nw_protocol_instance_set_output_handler Not calling remove_input_handler on 0xb8607f5c0:<private>
+
+== Firefox faults ==
+latest 3 entries:
+   Classes: [{}]
+   Reply block: (arg #2, (1 arguments, 0 proxies), signature 'v@?Q') [{}]
+  <NSXPCConnection: 0x16289ade0> connection to service with pid 12252 created from an endpoint
+
+== Firefox errors ==
+latest 3 entries:
+  2026-04-02 12:46:29.754326-0700  localhost firefox[12192]: (AppKit) [com.apple.AppKit:NSCGS] <private>
+  2026-04-02 12:46:29.757311-0700  localhost firefox[12192]: (QuartzCore) [com.apple.coreanimation:API] cannot add handler to 2 from 2 - dropping
+  2026-04-02 12:46:29.758054-0700  localhost firefox[12192]: (AppKit) [com.apple.AppKit:NSCGS] <private>
+
+== Network stack errors ==
+latest 3 entries:
+  2026-04-02 12:52:00.917521-0700  localhost kernel[0]: (Sandbox) Sandbox: siriactionsd(1011) deny(1) file-issue-extension target:/System/Library/PrivateFrameworks/StocksCore.framework extension-class:com.apple.app-sandbox.read
+  2026-04-02 12:52:15.873807-0700  localhost kernel[0]: SK[0]: fsw_flow_config                can't find flow
+  2026-04-02 12:52:15.873815-0700  localhost kernel[0]: SK[0]: nx_fsw_prov_config             nexus 0x0 (com.apple.nexus.flowswitch) cmd 22 (err 2)
+

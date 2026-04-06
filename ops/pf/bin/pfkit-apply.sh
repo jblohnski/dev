@@ -68,8 +68,8 @@ LAN_NETS="${ALLOW_LAN_CIDRS:-192.168.0.0/16 10.0.0.0/8 172.16.0.0/12}"
 DOT_RULES="# (DoT disabled)"
 if [[ "${BLOCK_DOT:-0}" == "1" ]]; then
 DOT_RULES=$(cat <<EOF
-block return log quick on __EXT_IF__ proto tcp to any port 853
-block return log quick on __EXT_IF__ proto udp to any port 853
+block return log quick on __EXT_IF__ proto tcp to any port 853 label "pfkit:dot-block-tcp"
+block return log quick on __EXT_IF__ proto udp to any port 853 label "pfkit:dot-block-udp"
 EOF
 )
 fi
@@ -77,7 +77,7 @@ fi
 QUIC_RULES="# (QUIC allowed)"
 if [[ "${BLOCK_QUIC:-1}" == "1" ]]; then
 QUIC_RULES=$(cat <<EOF
-block return log quick on __EXT_IF__ proto udp to any port 443
+block return log quick on __EXT_IF__ proto udp to any port 443 label "pfkit:quic-block"
 EOF
 )
 fi
@@ -85,7 +85,7 @@ fi
 MDNS_RULES="# (mDNS disabled)"
 if [[ "${BLOCK_MDNS:-1}" == "1" ]]; then
 MDNS_RULES=$(cat <<EOF
-block drop log quick on __EXT_IF__ proto udp to any port 5353
+block drop log quick on __EXT_IF__ proto udp to any port 5353 label "pfkit:mdns-block"
 EOF
 )
 fi
@@ -96,7 +96,7 @@ if [[ -n "$utun_ifaces" ]]; then
   UTUN_RULES="$(
     while IFS= read -r utun; do
       [[ -n "$utun" ]] || continue
-      printf 'block drop log quick on %s all\n' "$utun"
+      printf 'block drop log quick on %s all label "pfkit:utun-block:%s"\n' "$utun" "$utun"
     done <<<"$utun_ifaces"
   )"
 fi
@@ -150,3 +150,4 @@ echo "Validate:"
 echo "  sudo pfctl -s info | sed -n '/^Status:/p'"
 echo "  sudo pfctl -sr | grep 'anchor '"
 echo "  sudo pfctl -a pfkit -sr"
+echo "  sudo pfctl -s labels | grep 'pfkit:'"

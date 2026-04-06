@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfb name="PF Blocks" group=sys run=sudo desc="Stream blocked packets from pflog0"
+# dev-cmd: alias=pfb name="PF Blocks" group=sys run=sudo desc="Stream blocked PF log lines from pflog0"
 
 set -euo pipefail
 
@@ -10,4 +10,12 @@ if ! ifconfig pflog0 >/dev/null 2>&1; then
   exit 1
 fi
 
-exec sudo tcpdump -l -n -e -ttt -i pflog0
+sudo tcpdump -l -n -e -ttt -i pflog0 | awk '
+  {
+    line = tolower($0)
+    if (line ~ /(^|[[:space:]])block([[:space:]]|$)/) {
+      print
+      fflush()
+    }
+  }
+'
