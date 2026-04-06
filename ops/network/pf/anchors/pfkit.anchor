@@ -4,6 +4,7 @@ set skip on lo0
 
 table <dns_ok> persist { __DNS_OK__ }
 table <lan_nets> persist { __LAN_NETS__ }
+table <google_endpoints> persist { __GOOGLE_ALLOWED__ }
 
 # ------------------------------
 # DNS enforcement (STRICT + CORRECT)
@@ -29,11 +30,10 @@ __QUIC_RULES__
 # Core outbound allow (minimal)
 # ------------------------------
 
-# HTTPS / HTTP
-pass out quick on __EXT_IF__ proto tcp to any port { 80, 443 } keep state label "pfkit:web-pass"
-
-# NTP (time sync)
-pass out quick on __EXT_IF__ proto udp to any port 123 keep state label "pfkit:ntp-pass"
+# === GOOGLE-OWNED ENDPOINTS ONLY ===
+# Allow HTTPS only to Google-owned default-domain/API/service ranges.
+# No Comcast cache prefixes, no customer Cloud ranges, no third-party/CDN endpoints.
+pass out quick on __EXT_IF__ proto tcp to <google_endpoints> port 443 keep state label "pfkit:google-only-https"
 
 # ------------------------------
 # Block multicast DNS noise

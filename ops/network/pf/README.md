@@ -1,8 +1,8 @@
-<!-- dev-component: id=ops-pf kind=support group=sys desc="PF firewall toolkit (macOS) with DNS hardening anchors and helpers" -->
+<!-- dev-component: id=ops-pf kind=subcomponent group=net desc="PF firewall toolkit (macOS) with DNS hardening anchors and helpers" -->
 
 # pfkit (macOS)
 
-PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, and keeps Apple defaults intact by loading a single anchor.
+PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, and can restrict HTTPS to Google-owned endpoints by loading a single anchor.
 
 ## Layout
 
@@ -13,33 +13,26 @@ PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, 
 ## Quick start
 
 ```bash
-sudo ./bin/pfkit.sh start
+sudo pfo
 ```
 
 Validate:
 
 ```bash
-sudo ./bin/pfkit-status.sh
-sudo pfctl -a pfkit -sr
-sudo pfctl -s labels | grep 'pfkit:'
-sudo ./bin/pfkit.sh logs status
-sudo ./bin/pfkit-watch-dns.sh --iface en0
+sudo pfs
 ```
 
 ## Control Surface
 
-- `pf start` — install wiring if needed, then apply the tracked pfkit rules
-- `pf stop` — empty the `pfkit` anchor without disabling PF globally
-- `pf status` — show PF state, pfkit rules, label counters, and log-capture status
-- `pf update` — re-render and reload the tracked pfkit anchor
-- `pf revert` — restore backed-up system `pf.conf` state and remove pfkit wiring
-- `pf logs start|stop|status|tail|cat|path|clear` — manage the background block logger
+- `pfo` — install wiring if needed, apply the tracked pfkit rules, and start block logging
+- `pfs` — show concise PF on/off state plus recent block-log output
+- `pfk` — empty the `pfkit` anchor and stop block logging without disabling PF globally
 
-Why `stop` is not `pfctl -d`:
+Why `pfk` is not `pfctl -d`:
 
 - `pfctl -d` disables the packet filter globally, which is wider than “stop pfkit”.
-- `pf stop` only unloads the `pfkit` anchor so Apple/system PF usage outside this anchor is left alone.
-- Existing states may still flow until they expire; `stop` is a rules unload, not a global state purge.
+- `pfk` only unloads the `pfkit` anchor so Apple/system PF usage outside this anchor is left alone.
+- Existing states may still flow until they expire; `pfk` is a rules unload, not a global state purge.
 
 ## Config knobs (`config/pfkit.env`)
 
@@ -50,6 +43,8 @@ Why `stop` is not `pfctl -d`:
 - `BLOCK_MDNS` — block mDNS (default 1).
 - `BLOCK_DOT` — block DoT/DoQ on 853 (default 1).
 - `BLOCK_QUIC` — block QUIC/HTTP3 on UDP 443 (default 1).
+- `GOOGLE_ENDPOINT_MODE` — `official_default_domains` or `manual`.
+- `GOOGLE_ALLOWED` — manual space-delimited Google IPv4 CIDRs when `GOOGLE_ENDPOINT_MODE=manual`.
 
 ## Behaviors
 
@@ -58,10 +53,11 @@ Why `stop` is not `pfctl -d`:
 - Blocks outbound UDP 5353 with logging.
 - Blocks DoT/DoQ on 853 when enabled.
 - Blocks QUIC/HTTP3 on UDP 443 when enabled so browsers stay on TCP 443.
+- Can restrict HTTPS to Google-owned default-domain/service ranges computed from Google's official published IP datasets.
 - Logs every explicit block rule in the anchor.
 - Logs allowed DNS with `log (all)` so `pflog0` shows the PF decision path for approved resolvers.
 - Adds `pfkit:` rule labels so `pfctl -s labels` exposes per-rule counters even when live capture is quiet.
-- Background block logging writes text logs under `~/Library/Logs/pfkit/` for later `lnav`/grep use.
+- Background block logging writes text logs under `~/Library/Logs/pfkit/`, and `pfs` tails that file directly.
 
 ## Uninstall
 
@@ -71,9 +67,8 @@ sudo ./bin/pfkit-uninstall.sh
 
 ## Live monitoring
 
-- Live PF status: `sudo ./bin/pfkit-status.sh`
+- Live PF status: `sudo pfs`
 - Unified control entrypoint: `sudo ./bin/pfkit.sh help`
 - DNS-only watch (PF decisions on `pflog0`): `sudo ./bin/pfkit-watch-dns.sh`
 - DNS-only watch (raw interface traffic): `sudo ./bin/pfkit-watch-dns.sh --iface en0`
 - PF block tail (`pflog0` lines containing `block`): `sudo ./bin/pfkit-watch-blocks.sh`
-- PF block logger to file: `sudo ./bin/pfkit.sh logs start`
