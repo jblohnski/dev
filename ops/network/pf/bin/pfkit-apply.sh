@@ -30,20 +30,9 @@ if [[ ! -f "$PFCONF" ]]; then
   exit 1
 fi
 
-require_var() {
-  local name="$1"
-  if [[ -z "${!name:-}" ]]; then
-    echo "Missing required config: $name" >&2
-    exit 1
-  fi
-}
-
 # shellcheck disable=SC1090
 source "$ENV_FILE"
 
-# ------------------------------
-# Detect network
-# ------------------------------
 EXT_IF="${EXT_IF:-$(route -n get default | awk '/interface:/{print $2}')}"
 ROUTER_IP="$(route -n get default | awk '/gateway:/{print $2}')"
 
@@ -52,9 +41,6 @@ if [[ -z "$EXT_IF" || -z "$ROUTER_IP" ]]; then
   exit 1
 fi
 
-# ------------------------------
-# DNS mode
-# ------------------------------
 case "${DNS_MODE:-router}" in
   router)
     DNS_OK="$ROUTER_IP"
@@ -72,6 +58,7 @@ esac
 LAN_NETS="${ALLOW_LAN_CIDRS:-192.168.0.0/16 10.0.0.0/8 172.16.0.0/12}"
 GOOGLE_ENDPOINT_MODE="${GOOGLE_ENDPOINT_MODE:-official_default_domains}"
 GOOGLE_ALLOWED="${GOOGLE_ALLOWED:-${GGC_ALLOWED:-}}"
+GOOGLE_ONLY_MODE="${GOOGLE_ONLY_MODE:-0}"
 
 case "$GOOGLE_ENDPOINT_MODE" in
   official_default_domains)
@@ -98,15 +85,11 @@ case "$GOOGLE_ENDPOINT_MODE" in
     ;;
 esac
 
-# ------------------------------
-# Optional rules (multiline-safe)
-# ------------------------------
-
 DOT_RULES="# (DoT disabled)"
 if [[ "${BLOCK_DOT:-0}" == "1" ]]; then
 DOT_RULES=$(cat <<EOF
-block return log quick on __EXT_IF__ proto tcp to any port 853 label "pfkit:dot-block-tcp"
-block return log quick on __EXT_IF__ proto udp to any port 853 label "pfkit:dot-block-udp"
+block return log quick on __EXT_IF__ inet proto tcp to any port 853 label "pfkit:dot-block-tcp"
+block return log quick on __EXT_IF__ inet proto udp to any port 853 label "pfkit:dot-block-udp"
 EOF
 )
 fi
@@ -114,15 +97,15 @@ fi
 QUIC_RULES="# (QUIC allowed)"
 if [[ "${BLOCK_QUIC:-1}" == "1" ]]; then
 QUIC_RULES=$(cat <<EOF
-block return log quick on __EXT_IF__ proto udp to any port 443 label "pfkit:quic-block"
+block return log quick on __EXT_IF__ inet proto udp to any port 443 label "pfkit:quic-block"
 EOF
 )
 fi
 
-MDNS_RULES="# (mDNS disabled)"
+MDNS_RULES="# (mDNS allowed)"
 if [[ "${BLOCK_MDNS:-1}" == "1" ]]; then
 MDNS_RULES=$(cat <<EOF
-block drop log quick on __EXT_IF__ proto udp to any port 5353 label "pfkit:mdns-block"
+block drop log quick on __EXT_IF__ inet proto udp to any port 5353 label "pfkit:mdns-block"
 EOF
 )
 fi
@@ -138,17 +121,33 @@ if [[ -n "$utun_ifaces" ]]; then
   )"
 fi
 
-# Export for perl
-export EXT_IF ROUTER_IP DNS_OK LAN_NETS GOOGLE_ALLOWED_RENDERED DOT_RULES QUIC_RULES MDNS_RULES UTUN_RULES
+if [[ "$GOOGLE_ONLY_MODE" == "1" ]]; then
+EGRESS_RULES=$(cat <<EOF
+# Google-only HTTPS lockdown mode
+pass out quick on __EXT_IF__ inet proto icmp all keep state label "pfkit:icmp-pass"
+pass out quick on __EXT_IF__ inet proto { tcp udp } to <lan_nets> keep state label "pfkit:lan-pass"
+pass out quick on __EXT_IF__ inet proto tcp to <google_endpoints> port 443 keep state label "pfkit:google-only-https"
+block return log quick on __EXT_IF__ inet proto tcp to any port 443 label "pfkit:https-non-google-block"
+pass out quick on __EXT_IF__ inet proto { tcp udp } all keep state label "pfkit:egress-pass-non443"
+EOF
+)
+else
+EGRESS_RULES=$(cat <<EOF
+# Normal browsing mode
+pass out quick on __EXT_IF__ inet proto icmp all keep state label "pfkit:icmp-pass"
+pass out quick on __EXT_IF__ inet proto { tcp udp } all keep state label "pfkit:egress-pass"
+EOF
+)
+fi
 
-# ------------------------------
-# Render (PERL - multiline safe)
-# ------------------------------
+export EXT_IF ROUTER_IP DNS_OK LAN_NETS GOOGLE_ALLOWED_RENDERED DOT_RULES QUIC_RULES MDNS_RULES UTUN_RULES EGRESS_RULES
+
 rendered=$(perl -pe '
 s/__DOT_RULES__/$ENV{DOT_RULES}/g;
 s/__QUIC_RULES__/$ENV{QUIC_RULES}/g;
 s/__MDNS_RULES__/$ENV{MDNS_RULES}/g;
 s/__UTUN_RULES__/$ENV{UTUN_RULES}/g;
+s/__EGRESS_RULES__/$ENV{EGRESS_RULES}/g;
 s/__EXT_IF__/$ENV{EXT_IF}/g;
 s/__ROUTER_IP__/$ENV{ROUTER_IP}/g;
 s/__DNS_OK__/$ENV{DNS_OK}/g;
@@ -163,9 +162,6 @@ if [[ -n "$unresolved_tokens" ]]; then
   exit 1
 fi
 
-# ------------------------------
-# Write + load
-# ------------------------------
 printf "%s\n" "$rendered" > "$ANCHOR_DST"
 chmod 644 "$ANCHOR_DST"
 
@@ -178,19 +174,17 @@ pfctl -a pfkit -nf "$ANCHOR_DST"
 pfctl -a pfkit -f "$ANCHOR_DST"
 pfctl -e 2>/dev/null || true
 
-# ------------------------------
-# Output
-# ------------------------------
 echo ">> Applied pfkit"
-echo "   ext_if   : $EXT_IF"
-echo "   router_ip: $ROUTER_IP"
-echo "   dns_mode : ${DNS_MODE:-router}"
-echo "   dns_ok   : $DNS_OK"
+echo "   ext_if     : $EXT_IF"
+echo "   router_ip  : $ROUTER_IP"
+echo "   dns_mode   : ${DNS_MODE:-router}"
+echo "   dns_ok     : $DNS_OK"
 echo "   google_mode: $GOOGLE_ENDPOINT_MODE"
-echo "   block_mdns: ${BLOCK_MDNS:-1}"
-echo "   block_dot : ${BLOCK_DOT:-0}"
-echo "   block_quic: ${BLOCK_QUIC:-1}"
-echo "   utuns    : ${utun_ifaces//$'\n'/ }"
+echo "   google_only: $GOOGLE_ONLY_MODE"
+echo "   block_mdns : ${BLOCK_MDNS:-1}"
+echo "   block_dot  : ${BLOCK_DOT:-0}"
+echo "   block_quic : ${BLOCK_QUIC:-1}"
+echo "   utuns      : ${utun_ifaces//$'\n'/ }"
 echo
 echo "Validate:"
 echo "  sudo pfctl -s info | sed -n '/^Status:/p'"
