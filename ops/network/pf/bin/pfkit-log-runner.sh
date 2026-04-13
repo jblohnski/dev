@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pf.logrun name="PF Log Runner" group=sys run=sudo legend=hide desc="Internal pfkit block-log capture runner"
 # Background block-log capture for pfkit.
 
 set -euo pipefail

@@ -6,7 +6,7 @@ PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, 
 
 ## Layout
 
-- `bin/`: operational entrypoints (`pfkit-install`, `pfkit-apply`, `pfkit-status`, `pfkit-uninstall`, watch helpers).
+- `bin/`: public entrypoints (`pfo`, `pfs`, `pfk`) plus internal helpers used by those wrappers.
 - `anchors/`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`.
 - `config/`: environment inputs (`pfkit.env`) used by render/apply.
 
@@ -40,7 +40,9 @@ Why `pfk` is not `pfctl -d`:
 - `DNS_MODE` — `router` (force DNS to gateway) or `direct` (force to specific IPs).
 - `DNS_ALLOWED` — space-delimited IPs when `DNS_MODE=direct`.
 - `ALLOW_LAN_CIDRS` — LAN ranges allowed.
-- `BLOCK_MDNS` — block mDNS (default 1).
+- `BLOCK_MDNS` — block mDNS on the primary interface (default 0).
+- `ALLOW_APPLE_P2P` — pass AWDL / llw continuity traffic without logging noise (default 1).
+- `BLOCK_UTUN` — block `utun*` interfaces instead of passing them (default 0).
 - `BLOCK_DOT` — block DoT/DoQ on 853 (default 1).
 - `BLOCK_QUIC` — block QUIC/HTTP3 on UDP 443 (default 1).
 - `GOOGLE_ENDPOINT_MODE` — `official_default_domains` or `manual`.
@@ -50,14 +52,16 @@ Why `pfk` is not `pfctl -d`:
 
 - Keeps Apple default inbound posture (no blanket `pass in all`).
 - Blocks outbound UDP/TCP 53 except allowed DNS targets.
-- Blocks outbound UDP 5353 with logging.
+- Allows normal mDNS by default so Bonjour / AirDrop / local discovery do not flood the block log.
+- Passes `awdl0`, `llw0`, and `utun*` by default so PF does not fight Apple-managed local transport.
+- Can still block mDNS or utun traffic explicitly through config knobs when you want a tighter diagnostic posture.
 - Blocks DoT/DoQ on 853 when enabled.
 - Blocks QUIC/HTTP3 on UDP 443 when enabled so browsers stay on TCP 443.
 - Can restrict HTTPS to Google-owned default-domain/service ranges computed from Google's official published IP datasets.
 - Logs every explicit block rule in the anchor.
 - Logs allowed DNS with `log (all)` so `pflog0` shows the PF decision path for approved resolvers.
 - Adds `pfkit:` rule labels so `pfctl -s labels` exposes per-rule counters even when live capture is quiet.
-- Background block logging writes text logs under `~/Library/Logs/pfkit/`, and `pfs` tails that file directly.
+- Background block logging writes text logs under `~/dev/logs/pfkit/`, and `pfs` tails that file directly.
 
 ## Uninstall
 

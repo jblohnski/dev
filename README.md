@@ -13,7 +13,8 @@ If a top-level file is not source, config, schema, or this README, it probably d
 - `audit/`: evidence collection, Zeek workflows, and reports
 - `ops/`: live system actions and operational checks
 - `inventory/`: discovery, validation, and rendering modules
-- `zlogs/`: local Zeek log staging
+- `logs/`: consolidated runtime logs for declared commands
+- `zlogs/`: legacy Zeek log staging fallback
 - `projects/`, `proposals/`, `arkenfox/`: supporting workspace material outside the main command surface
 
 Rule of thumb:
@@ -22,7 +23,7 @@ Rule of thumb:
 - put collection and comparison flows in `audit/`
 - put self-contained utilities under the owning component tree
 - keep shell wrappers thin in `bootstrap/shell/`
-- keep runtime artifacts and generated reports out of tracked source
+- keep runtime artifacts and generated reports out of tracked source, under `logs/` when they need a repo-local home
 
 ## Working Model
 
@@ -124,7 +125,8 @@ pz
 ## Audit And Zeek
 
 The audit stack auto-ingests Zeek logs when available.
-Primary locations are `audit/zlogs/`, `../zlogs/`, and `~/zlogs/`.
+Primary location is `logs/zeek/`.
+Legacy fallbacks are `audit/zlogs/`, `zlogs/`, and `~/zlogs/`.
 Reports are written under `audit/report/zeek/`.
 
 Useful entrypoints:

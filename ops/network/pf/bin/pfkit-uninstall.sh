@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfr name="PF Remove" group=net run=sudo legend=hide desc="Internal PF uninstall helper"
-
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then

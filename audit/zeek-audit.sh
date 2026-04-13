@@ -14,9 +14,9 @@ Usage:
 
 Examples:
   ./zeek-audit.sh
-  ./zeek-audit.sh ./zlogs run01
-  ./zeek-audit.sh ./zlogs run01 -- --uid CtvOlP1Ej5cQULCyA5 --window-seconds 180
-  ./zeek-audit.sh ./zlogs run02 -- --src-ip 192.168.1.157 --dst-ip 75.102.5.99 --dst-port 443 --ts 2026-03-06T20:45:25Z
+  ./zeek-audit.sh ./../logs/zeek run01
+  ./zeek-audit.sh ./../logs/zeek run01 -- --uid CtvOlP1Ej5cQULCyA5 --window-seconds 180
+  ./zeek-audit.sh ./../logs/zeek run02 -- --src-ip 192.168.1.157 --dst-ip 75.102.5.99 --dst-port 443 --ts 2026-03-06T20:45:25Z
 
 Analyzer passthrough examples:
   --uid <zeek_uid>
@@ -33,7 +33,7 @@ if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   exit 0
 fi
 
-LOG_DIR="${1:-${ZEEK_LOG_DIR:-$ROOT_DIR/zlogs}}"
+LOG_DIR="${1:-${ZEEK_LOG_DIR:-${DEV_LOG_ROOT:-$ROOT_DIR/../logs}/zeek}}"
 RUN_ID="${2:-$(date +%Y%m%d-%H%M%S)}"
 
 EXTRA=()
@@ -47,7 +47,7 @@ elif [[ $# -gt 2 ]]; then
 fi
 
 if [[ ! -d "$LOG_DIR" || ! -f "$LOG_DIR/conn.log" ]]; then
-  for fallback in "$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$ROOT_DIR" "$HOME/zlogs"; do
+  for fallback in "$ROOT_DIR/../logs/zeek" "$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$ROOT_DIR" "$HOME/zlogs"; do
     if [[ -d "$fallback" && -f "$fallback/conn.log" ]]; then
       LOG_DIR="$fallback"
       break
@@ -57,7 +57,7 @@ fi
 
 if [[ ! -d "$LOG_DIR" || ! -f "$LOG_DIR/conn.log" ]]; then
   echo "error: conn.log not found in '$LOG_DIR'" >&2
-  echo "checked: \$ROOT_DIR/zlogs, \$ROOT_DIR/../zlogs, \$HOME/zlogs" >&2
+  echo "checked: \$ROOT_DIR/../logs/zeek, \$ROOT_DIR/zlogs, \$ROOT_DIR/../zlogs, \$HOME/zlogs" >&2
   exit 1
 fi
 

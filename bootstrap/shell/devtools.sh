@@ -25,10 +25,8 @@ devzip() {
   echo "created $out from $root"
 }
 
-# dev-cmd: alias=dz name="Dev Zip Alias" group=sys run=user desc="Shorthand for devzip"
 alias dz='devzip'
 
-# dev-cmd: alias=ed name=Edit group=sys run=user legend=hide desc="Open in Sublime"
 alias ed='subl'
 
 # dev-cmd: alias=gorilla name=Gorilla group=sys run=user desc="Run the local gorilla entrypoint when installed"

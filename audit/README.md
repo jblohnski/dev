@@ -24,7 +24,7 @@ Optional:
 ./audit.sh --out /tmp/my_snapshot.json
 ./audit.sh --id maple
 ./audit.sh --no-color
-./audit.sh --zeek-dir ./zlogs
+./audit.sh --zeek-dir ../logs/zeek
 ./audit.sh --no-zeek
 ./audit.sh --zeek-ipinfo
 ```
@@ -33,10 +33,11 @@ Optional:
 
 The audit workflow now auto-ingests Zeek logs when available.
 
-- Primary path: `audit/zlogs/`
-- Fallback path: `../zlogs/`
+- Primary path: `../logs/zeek/`
+- Legacy fallback path: `audit/zlogs/`
+- Legacy fallback path: `../zlogs/`
 - Local direct-log fallback: `audit/*.log`
-- Home path: `~/zlogs/`
+- Home fallback path: `~/zlogs/`
 - Env override: `ZEEK_LOG_DIR=/absolute/path`
 - Required file: `conn.log`
 - Optional files: `dns.log`, `ssl.log`, `http.log`, `quic.log`, `files.log`, `weird.log`
@@ -50,7 +51,7 @@ Background capture quickstart (replace `en0` if needed):
 That wrapper starts Zeek with the project’s expected write-path parameters:
 
 ```bash
-sudo zeek -i en0 -C "Log::default_logdir=$HOME/zlogs"
+sudo zeek -i en0 -C "Log::default_logdir=$HOME/dev/logs/zeek"
 ```
 
 - `-i en0`: capture from the selected interface
@@ -62,7 +63,7 @@ Useful variants:
 ```bash
 ./zeek-capture.sh status
 ./zeek-capture.sh stop
-ZEEK_LOG_DIR=./zlogs ./zeek-capture.sh start en0
+ZEEK_LOG_DIR=../logs/zeek ./zeek-capture.sh start en0
 ./zeek-capture.sh start en0 -- Site::local_nets+=192.168.1.0/24
 ./zeek-logsync.sh
 ```
@@ -71,9 +72,9 @@ Standalone Zeek report command:
 
 ```bash
 ./zeek-audit.sh
-./zeek-audit.sh ./zlogs run01
-./zeek-audit.sh ./zlogs run01 -- --uid CtvOlP1Ej5cQULCyA5
-./zeek-audit.sh ./zlogs run02 -- --src-ip 192.168.1.157 --dst-ip 75.102.5.99 --dst-port 443 --ts 2026-03-06T20:45:25Z
+./zeek-audit.sh ../logs/zeek run01
+./zeek-audit.sh ../logs/zeek run01 -- --uid CtvOlP1Ej5cQULCyA5
+./zeek-audit.sh ../logs/zeek run02 -- --src-ip 192.168.1.157 --dst-ip 75.102.5.99 --dst-port 443 --ts 2026-03-06T20:45:25Z
 ```
 
 Artifacts are written under `audit/report/`:

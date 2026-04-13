@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfi name="PF Install" group=net run=sudo legend=hide desc="Internal PF install helper"
-
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then

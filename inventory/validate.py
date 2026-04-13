@@ -8,6 +8,11 @@ from inventory.commands import command_object
 from inventory.shared import SECTION_RE, SHELL_SECTION_OWNER, VALID_GROUPS, VALID_KINDS, VALID_RUN, is_excluded, parse_md_meta, parse_sh_meta, rel_str
 
 
+INTERNAL_SCRIPT_PREFIXES = (
+    "ops/network/pf/bin/pfkit",
+)
+
+
 def validate(root: Path, dir_records: list[dict[str, str]], script_records: list[dict[str, str]], shell_records: list[dict[str, str]]) -> int:
     warnings: list[str] = []
     errors: list[str] = []
@@ -41,6 +46,8 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
         if rel.startswith("arkenfox/") or rel.startswith("projects/"):
             continue
         if rel.startswith("bootstrap/shell/"):
+            continue
+        if any(rel.startswith(prefix) for prefix in INTERNAL_SCRIPT_PREFIXES):
             continue
         for key in ("alias", "name", "group", "desc"):
             if key not in meta:

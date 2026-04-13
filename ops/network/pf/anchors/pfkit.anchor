@@ -1,6 +1,9 @@
 # pfkit.anchor
 
-set skip on lo0
+# Anchor-local skip is not reliable on macOS. Pass loopback early so local
+# service chatter does not fall into the default block logger.
+pass quick on lo0 all label "pfkit:loopback-pass"
+__APPLE_LOCAL_RULES__
 
 table <dns_ok> persist { __DNS_OK__ }
 table <lan_nets> persist { __LAN_NETS__ }

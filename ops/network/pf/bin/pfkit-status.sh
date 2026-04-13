@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfs name="PF Status" group=net run=sudo legend=hide desc="Internal PF status helper"
-
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
@@ -12,6 +10,9 @@ if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
   echo "Run with sudo" >&2
   exit 1
 fi
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$ROOT_DIR/../../.." && pwd)"
 
 resolve_owner() {
   if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]]; then
@@ -31,9 +32,11 @@ resolve_owner_home() {
   printf '%s\n' "$home"
 }
 
-LOG_DIR="$(resolve_owner_home)/Library/Logs/pfkit"
+LOG_DIR="${DEV_LOG_ROOT:-$REPO_ROOT/logs}/pfkit"
+LEGACY_LOG_DIR="$(resolve_owner_home)/Library/Logs/pfkit"
 LOG_FILE="$LOG_DIR/blocks.log"
 LOG_PID="$LOG_DIR/blocks.pid"
+LEGACY_LOG_PID="$LEGACY_LOG_DIR/blocks.pid"
 LOG_LINES="${PFKIT_STATUS_LOG_LINES:-20}"
 
 status_line="$(pfctl -q -s info | sed -n '/^Status:/p')"
@@ -52,6 +55,8 @@ fi
 logger_status="stopped"
 if [[ -f "$LOG_PID" ]] && kill -0 "$(cat "$LOG_PID")" 2>/dev/null; then
   logger_status="running"
+elif [[ -f "$LEGACY_LOG_PID" ]] && kill -0 "$(cat "$LEGACY_LOG_PID")" 2>/dev/null; then
+  logger_status="running (legacy)"
 elif ! ifconfig pflog0 >/dev/null 2>&1; then
   logger_status="unavailable (pflog0 missing)"
 fi

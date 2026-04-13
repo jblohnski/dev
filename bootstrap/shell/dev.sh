@@ -1,6 +1,7 @@
 [[ -o interactive ]] || return
 
 export DEV_ROOT="${DEV_ROOT:-$HOME/dev}"
+export DEV_LOG_ROOT="${DEV_LOG_ROOT:-$DEV_ROOT/logs}"
 export DEV_BOOTSTRAP_DIR="${DEV_BOOTSTRAP_DIR:-$HOME/dev/bootstrap}"
 export DEV_SHELL_DIR="${DEV_SHELL_DIR:-$DEV_BOOTSTRAP_DIR/shell}"
 export DEV_ZSHRC_SRC="${DEV_ZSHRC_SRC:-$DEV_BOOTSTRAP_DIR/.zshrc}"

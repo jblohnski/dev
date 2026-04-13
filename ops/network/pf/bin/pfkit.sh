@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pf name="PF Control" group=net run=sudo legend=hide desc="Internal PF lifecycle helper"
-
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then

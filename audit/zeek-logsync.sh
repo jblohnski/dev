@@ -5,7 +5,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE_DIR="${1:-$ROOT_DIR}"
-TARGET_DIR="${2:-${ZEEK_LOG_DIR:-$ROOT_DIR/../zlogs}}"
+TARGET_DIR="${2:-${ZEEK_LOG_DIR:-${DEV_LOG_ROOT:-$ROOT_DIR/../logs}/zeek}}"
 FILES=(conn.log dns.log http.log ssl.log quic.log files.log weird.log packet_filter.log)
 
 usage() {
@@ -15,7 +15,7 @@ Usage:
 
 Defaults:
   source_dir = $ROOT_DIR
-  target_dir = ${ZEEK_LOG_DIR:-$ROOT_DIR/../zlogs}
+  target_dir = ${ZEEK_LOG_DIR:-${DEV_LOG_ROOT:-$ROOT_DIR/../logs}/zeek}
 
 Behavior:
   - copies missing Zeek log files into the target dir

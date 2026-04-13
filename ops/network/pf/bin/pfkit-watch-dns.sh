@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfd name="PF DNS" group=net run=sudo legend=hide desc="Internal PF DNS watch helper"
-
 set -euo pipefail
 
 usage() {

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfb name="PF Blocks" group=net run=sudo legend=hide desc="Internal PF block watch helper"
-
 set -euo pipefail
 
 # Shows PF blocked packets on pflog0.

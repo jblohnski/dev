@@ -1,10 +1,12 @@
 ## audit
 
 export AUDIT_DIR="$HOME/dev/audit"
-export ZEEK_LOG_DIR="${ZEEK_LOG_DIR:-$HOME/zlogs}"
+export ZEEK_LOG_DIR="${ZEEK_LOG_DIR:-${DEV_LOG_ROOT:-$HOME/dev/logs}/zeek}"
 
 # dev-cmd: alias=a name=Audit group=audit run=user desc="Run the main audit entrypoint"
-alias a='builtin cd "$AUDIT_DIR" && ./audit.sh'
+a() {
+  "$AUDIT_DIR/audit.sh" "$@"
+}
 
 # dev-cmd: alias=az name="Zeek Workflow" group=audit run=user desc="Run Zeek capture and report workflow subcommands"
 az() {
@@ -13,31 +15,25 @@ az() {
 
   case "$cmd" in
     run)
-      builtin cd "$AUDIT_DIR" || return
-      ./zeek-audit.sh "$ZEEK_LOG_DIR" "$@"
+      "$AUDIT_DIR/zeek-audit.sh" "$ZEEK_LOG_DIR" "$@"
       ;;
     start)
       local iface="${1:-${ZEEK_CAPTURE_IFACE:-en0}}"
       [[ $# -gt 0 ]] && shift
-      builtin cd "$AUDIT_DIR" || return
-      ./zeek-capture.sh start "$iface" "$@"
+      "$AUDIT_DIR/zeek-capture.sh" start "$iface" "$@"
       ;;
     stop)
-      builtin cd "$AUDIT_DIR" || return
-      ./zeek-capture.sh stop
+      "$AUDIT_DIR/zeek-capture.sh" stop
       ;;
     stat|status)
-      builtin cd "$AUDIT_DIR" || return
-      ./zeek-capture.sh status
+      "$AUDIT_DIR/zeek-capture.sh" status
       ;;
     merge)
-      builtin cd "$AUDIT_DIR" || return
-      ./zeek-logsync.sh
+      "$AUDIT_DIR/zeek-logsync.sh"
       ;;
     uid)
       local uid="${1:?uid required}"
-      builtin cd "$AUDIT_DIR" || return
-      ./zeek-audit.sh "$ZEEK_LOG_DIR" "uid-$(date +%Y%m%d-%H%M%S)" -- --uid "$uid"
+      "$AUDIT_DIR/zeek-audit.sh" "$ZEEK_LOG_DIR" "uid-$(date +%Y%m%d-%H%M%S)" -- --uid "$uid"
       ;;
     tuple)
       local src="${1:?src_ip required}"
@@ -45,8 +41,7 @@ az() {
       local port="${3:?dst_port required}"
       local ts="${4:?timestamp required}"
       local run="${5:-tuple-$(date +%Y%m%d-%H%M%S)}"
-      builtin cd "$AUDIT_DIR" || return
-      ./zeek-audit.sh "$ZEEK_LOG_DIR" "$run" -- \
+      "$AUDIT_DIR/zeek-audit.sh" "$ZEEK_LOG_DIR" "$run" -- \
         --src-ip "$src" --dst-ip "$dst" --dst-port "$port" --ts "$ts"
       ;;
     *)
@@ -56,19 +51,12 @@ az() {
   esac
 }
 
-# dev-cmd: alias=az.run name="Zeek Run" group=audit run=user desc="Run Zeek report generation"
 alias az.run='az run'
-# dev-cmd: alias=az.start name="Zeek Start" group=audit run=user desc="Start background Zeek capture"
 alias az.start='az start'
-# dev-cmd: alias=az.stop name="Zeek Stop" group=audit run=user desc="Stop background Zeek capture"
 alias az.stop='az stop'
-# dev-cmd: alias=az.stat name="Zeek Status" group=audit run=user desc="Show background Zeek capture status"
 alias az.stat='az stat'
-# dev-cmd: alias=az.merge name="Zeek Merge" group=audit run=user desc="Merge stray local Zeek logs into $ZEEK_LOG_DIR"
 alias az.merge='az merge'
-# dev-cmd: alias=az.uid name="Zeek UID" group=audit run=user desc="Run Zeek report by uid"
 alias az.uid='az uid'
-# dev-cmd: alias=az.tuple name="Zeek Tuple" group=audit run=user desc="Run Zeek report by tuple"
 alias az.tuple='az tuple'
 
 # dev-cmd: alias=arpt name="Audit Report" group=audit run=user desc="Print latest Zeek markdown report path"
@@ -99,9 +87,6 @@ azip() {
 }
 
 # @component: ops
-# dev-cmd: alias=logsum.live name="Log Summary Live" group=audit run=user desc="Show latest 3 matching log entries from the last 15 minutes"
 alias logsum.live='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 15m --top 3'
-# dev-cmd: alias=logsum.wide name="Log Summary Wide" group=audit run=user desc="Show latest 5 matching log entries from the last hour"
 alias logsum.wide='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 1h --top 5'
-# dev-cmd: alias=logsum.counts name="Log Summary Counts" group=audit run=user desc="Show latest 5 matching log entries plus counts from the last 30 minutes"
 alias logsum.counts='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 30m --top 5 --counts'

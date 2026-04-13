@@ -5,9 +5,9 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STATE_DIR="$ROOT_DIR/state"
-DEFAULT_LOG_DIR="${ZEEK_LOG_DIR:-$HOME/zlogs}"
+DEFAULT_LOG_DIR="${ZEEK_LOG_DIR:-${DEV_LOG_ROOT:-$ROOT_DIR/../logs}/zeek}"
 PID_FILE="${ZEEK_CAPTURE_PID_FILE:-$STATE_DIR/zeek-capture.pid}"
-OUT_FILE="${ZEEK_CAPTURE_OUT:-$STATE_DIR/zeek-capture.out}"
+OUT_FILE="${ZEEK_CAPTURE_OUT:-$DEFAULT_LOG_DIR/zeek-capture.out}"
 IFACE_DEFAULT="${ZEEK_CAPTURE_IFACE:-}"
 
 usage() {
@@ -19,9 +19,10 @@ Usage:
 
 Env overrides:
   ZEEK_LOG_DIR=/absolute/path
+  DEV_LOG_ROOT=/absolute/path/to/dev/logs
   ZEEK_CAPTURE_IFACE=en0
   ZEEK_CAPTURE_PID_FILE=$STATE_DIR/zeek-capture.pid
-  ZEEK_CAPTURE_OUT=$STATE_DIR/zeek-capture.out
+  ZEEK_CAPTURE_OUT=$DEFAULT_LOG_DIR/zeek-capture.out
 
 Start behavior:
   sudo zeek -i <iface> -C "Log::default_logdir=<log_dir>" [extra args...]
@@ -29,7 +30,7 @@ Start behavior:
 Examples:
   ./zeek-capture.sh start en0
   ./zeek-capture.sh start en0 -- Site::local_nets+=192.168.1.0/24
-  ZEEK_LOG_DIR=$ROOT_DIR/zlogs ./zeek-capture.sh start en0
+  ZEEK_LOG_DIR=$ROOT_DIR/../logs/zeek ./zeek-capture.sh start en0
   ./zeek-capture.sh status
   ./zeek-capture.sh stop
 EOF

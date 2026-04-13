@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-LOGDIR="${1:-$HOME/dev/zlogs}"
+LOGDIR="${1:-${ZEEK_LOG_DIR:-${DEV_LOG_ROOT:-$ROOT_DIR/logs}/zeek}}"
 
 if [ ! -d "$LOGDIR" ]; then
     echo "Log directory not found: $LOGDIR"

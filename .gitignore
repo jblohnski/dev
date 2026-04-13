@@ -3,6 +3,8 @@ projects/
 proposals/
 arkenfox/
 zlogs/
+logs/*
+!logs/README.md
 
 _gpt-dictation.txt
 

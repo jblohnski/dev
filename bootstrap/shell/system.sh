@@ -1,6 +1,9 @@
+## dev
+
+alias sudo='sudo '
+
 ## python
 
-# dev-cmd: alias=py name="Python 3" group=sys run=user legend=hide desc="Use Python 3 for python shortcuts"
 alias py='python3'
 alias python='python3'
 alias pip='pip3'
@@ -11,16 +14,13 @@ alias ls='ls -G'
 alias ll='ls -laG'
 alias la='ls -AG'
 
-# dev-cmd: alias=tr name=Tree group=sys run=user legend=hide desc="Tree view"
 alias tr='tree -C -A -F'
 
-# dev-cmd: alias=lt name="Tree Dirs" group=sys run=user legend=hide desc="Show trimmed tree directories to depth 3"
 lt() {
   command tree -C -A -F -d -L 3 \
     -I 'node_modules|__pycache__|.git|.venv|venv|dist|build|target'
 }
 
-# dev-cmd: alias=ltf name="Tree Full" group=sys run=user legend=hide desc="Show trimmed tree with files"
 ltf() {
   command tree -C -A -F \
     -I 'node_modules|__pycache__|.git|.venv|venv|dist|build|target'
@@ -33,21 +33,16 @@ cd() {
 
 setopt AUTO_PUSHD PUSHD_IGNORE_DUPS
 
-# dev-cmd: alias=d name=Dirs group=sys run=user legend=hide desc="Show directory stack"
 alias d='dirs -v'
 
 ## git
 
-# dev-cmd: alias=gs name="Git Status" group=sys run=user legend=hide desc="Git status"
 alias gs='git status -sb'
 
-# dev-cmd: alias=gl name="Git Log" group=sys run=user legend=hide desc="Git log graph"
 alias gl='git log --oneline --decorate --graph --all'
 
-# dev-cmd: alias=gd name="Git Diff" group=sys run=user legend=hide desc="Git diff"
 alias gd='git diff'
 
-# dev-cmd: alias=gc name="Git Cached Diff" group=sys run=user legend=hide desc="Staged diff"
 alias gc='git diff --cached'
 
 ## network
@@ -83,20 +78,6 @@ alias snihttp='sudo tcpdump -n -i en0 port 443 or port 80'
 
 ## util
 
-alias pf.start='pfo'
-alias pf.stop='pfk'
-alias pf.status='pfs'
-alias pf.install='pfo'
-alias pf.dns='pfd'
-alias pf.blocks='pfb'
-alias pfkit-apply='pfa'
-alias pfkit-install='pfi'
-alias pfkit-status='pfs'
-alias pfkit-uninstall='pfr'
-alias pfkit-watch-dns='pfd'
-alias pfkit-watch-blocks='pfb'
-
-# dev-cmd: alias=pa name=PATH group=sys run=user legend=hide desc="Print PATH entries"
 pa() {
   print -P "\n${CLR_HDR}path${CLR_RESET}"
   print -l -- ${(s/:/)PATH} | while read -r p; do
@@ -105,7 +86,6 @@ pa() {
   echo
 }
 
-# dev-cmd: alias=e name=Env group=sys run=user legend=hide desc="List environment variables"
 e() {
   print -P "\n${CLR_HDR}environment${CLR_RESET}\n"
   local -A vars
@@ -123,17 +103,13 @@ e() {
   print ""
 }
 
-# dev-cmd: alias=grep name=Grep group=sys run=user legend=hide desc="Grep with color"
 alias grep='grep --color=auto'
 has bat && alias cat='bat -P --color=auto'
 
-# dev-cmd: alias=src name=Source group=sys run=user legend=hide desc="Reload zshrc"
 alias src='source ~/.zshrc'
 
-# dev-cmd: alias=c name=Clear group=sys run=user legend=hide desc="Clear screen"
 alias c='clear'
 
-# dev-cmd: alias=cc name="Clear Hard" group=sys run=user legend=hide desc="Wipe screen, scrollback, and background jobs"
 cc() {
   jobs -p | xargs -r kill 2>/dev/null
   print -n $'\C-u'
@@ -142,7 +118,6 @@ cc() {
   printf '\e[H'
 }
 
-# dev-cmd: alias=cmp name=Compare group=sys run=user legend=hide desc="Side-by-side diff"
 cmp() {
   local a="${1:?file1 required}"
   local b="${2:?file2 required}"

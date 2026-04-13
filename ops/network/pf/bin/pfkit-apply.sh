@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfa name="PF Apply" group=net run=sudo legend=hide desc="Internal PF anchor render/apply helper"
-
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
@@ -59,6 +57,8 @@ LAN_NETS="${ALLOW_LAN_CIDRS:-192.168.0.0/16 10.0.0.0/8 172.16.0.0/12}"
 GOOGLE_ENDPOINT_MODE="${GOOGLE_ENDPOINT_MODE:-official_default_domains}"
 GOOGLE_ALLOWED="${GOOGLE_ALLOWED:-${GGC_ALLOWED:-}}"
 GOOGLE_ONLY_MODE="${GOOGLE_ONLY_MODE:-0}"
+ALLOW_APPLE_P2P="${ALLOW_APPLE_P2P:-1}"
+BLOCK_UTUN="${BLOCK_UTUN:-0}"
 
 case "$GOOGLE_ENDPOINT_MODE" in
   official_default_domains)
@@ -102,10 +102,26 @@ EOF
 )
 fi
 
-MDNS_RULES="# (mDNS allowed)"
-if [[ "${BLOCK_MDNS:-1}" == "1" ]]; then
+APPLE_LOCAL_RULES="# (Apple peer / continuity interfaces use default policy)"
+if [[ "$ALLOW_APPLE_P2P" == "1" ]]; then
+APPLE_LOCAL_RULES=$(cat <<EOF
+pass quick on awdl0 all label "pfkit:awdl-pass"
+pass quick on llw0 all label "pfkit:llw-pass"
+EOF
+)
+fi
+
+MDNS_RULES=$(cat <<EOF
+pass in quick on __EXT_IF__ inet proto udp from any to 224.0.0.251 port 5353 keep state label "pfkit:mdns-pass-in"
+pass out quick on __EXT_IF__ inet proto udp to 224.0.0.251 port 5353 keep state label "pfkit:mdns-pass-out"
+pass in quick on __EXT_IF__ inet6 proto udp from any to ff02::fb port 5353 keep state label "pfkit:mdns6-pass-in"
+pass out quick on __EXT_IF__ inet6 proto udp to ff02::fb port 5353 keep state label "pfkit:mdns6-pass-out"
+EOF
+)
+if [[ "${BLOCK_MDNS:-0}" == "1" ]]; then
 MDNS_RULES=$(cat <<EOF
 block drop log quick on __EXT_IF__ inet proto udp to any port 5353 label "pfkit:mdns-block"
+block drop log quick on __EXT_IF__ inet6 proto udp to any port 5353 label "pfkit:mdns6-block"
 EOF
 )
 fi
@@ -116,7 +132,11 @@ if [[ -n "$utun_ifaces" ]]; then
   UTUN_RULES="$(
     while IFS= read -r utun; do
       [[ -n "$utun" ]] || continue
-      printf 'block drop log quick on %s all label "pfkit:utun-block:%s"\n' "$utun" "$utun"
+      if [[ "$BLOCK_UTUN" == "1" ]]; then
+        printf 'block drop log quick on %s all label "pfkit:utun-block:%s"\n' "$utun" "$utun"
+      else
+        printf 'pass quick on %s all label "pfkit:utun-pass:%s"\n' "$utun" "$utun"
+      fi
     done <<<"$utun_ifaces"
   )"
 fi
@@ -140,9 +160,10 @@ EOF
 )
 fi
 
-export EXT_IF ROUTER_IP DNS_OK LAN_NETS GOOGLE_ALLOWED_RENDERED DOT_RULES QUIC_RULES MDNS_RULES UTUN_RULES EGRESS_RULES
+export EXT_IF ROUTER_IP DNS_OK LAN_NETS GOOGLE_ALLOWED_RENDERED APPLE_LOCAL_RULES DOT_RULES QUIC_RULES MDNS_RULES UTUN_RULES EGRESS_RULES
 
 rendered=$(perl -pe '
+s/__APPLE_LOCAL_RULES__/$ENV{APPLE_LOCAL_RULES}/g;
 s/__DOT_RULES__/$ENV{DOT_RULES}/g;
 s/__QUIC_RULES__/$ENV{QUIC_RULES}/g;
 s/__MDNS_RULES__/$ENV{MDNS_RULES}/g;
@@ -181,9 +202,11 @@ echo "   dns_mode   : ${DNS_MODE:-router}"
 echo "   dns_ok     : $DNS_OK"
 echo "   google_mode: $GOOGLE_ENDPOINT_MODE"
 echo "   google_only: $GOOGLE_ONLY_MODE"
-echo "   block_mdns : ${BLOCK_MDNS:-1}"
+echo "   allow_p2p  : $ALLOW_APPLE_P2P"
+echo "   block_mdns : ${BLOCK_MDNS:-0}"
 echo "   block_dot  : ${BLOCK_DOT:-0}"
 echo "   block_quic : ${BLOCK_QUIC:-1}"
+echo "   block_utun : $BLOCK_UTUN"
 echo "   utuns      : ${utun_ifaces//$'\n'/ }"
 echo
 echo "Validate:"

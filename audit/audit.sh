@@ -25,7 +25,7 @@ Usage:
   ./audit.sh --out /path/to/output.json
   ./audit.sh --id shortword
   ./audit.sh --no-color
-  ./audit.sh --zeek-dir /path/to/zlogs
+  ./audit.sh --zeek-dir /path/to/logs/zeek
   ./audit.sh --no-zeek
   ./audit.sh --zeek-ipinfo
 
@@ -124,7 +124,7 @@ resolve_zeek_log_dir() {
   if [[ -n "${ZEEK_LOG_DIR:-}" ]]; then
     candidates+=("$ZEEK_LOG_DIR")
   fi
-  candidates+=("$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$ROOT_DIR" "$HOME/zlogs")
+  candidates+=("$ROOT_DIR/../logs/zeek" "$ROOT_DIR/zlogs" "$ROOT_DIR/../zlogs" "$ROOT_DIR" "$HOME/zlogs")
 
   local d
   for d in "${candidates[@]}"; do
@@ -430,7 +430,7 @@ printf "%sINFO%s  net-delta=%s\n" "$DIM" "$RST" "$delta_show"
 if [[ -f "$ZEEK_REPORT_JSON" ]]; then
   printf "%sINFO%s  zeek=%s (%s)\n" "$DIM" "$RST" "${ZEEK_LOG_DIR_RESOLVED:-unknown}" "${ZEEK_SUMMARY_HEADLINE:-snapshot ready}"
 else
-  [[ "$ZEEK_MODE" -eq 1 ]] && printf "%sINFO%s  zeek=not found (use --zeek-dir or place logs in audit/zlogs)\n" "$DIM" "$RST"
+  [[ "$ZEEK_MODE" -eq 1 ]] && printf "%sINFO%s  zeek=not found (use --zeek-dir or place logs in logs/zeek)\n" "$DIM" "$RST"
 fi
 printf "%sINFO%s  disk root_used=%s%% free=%s  persistence ua=%s sa=%s sd=%s li=%s\n" "$DIM" "$RST" "$(show_num "$ROOT_USED_PCT")" "$ROOT_FREE_HUMAN" "$(show_num "$USER_LAUNCH_AGENTS")" "$(show_num "$SYS_LAUNCH_AGENTS")" "$(show_num "$SYS_LAUNCH_DAEMONS")" "$(show_num "$LOGIN_ITEMS_COUNT")"
 
