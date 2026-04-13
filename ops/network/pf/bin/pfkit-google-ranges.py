@@ -4,9 +4,11 @@
 from __future__ import annotations
 
 import json
+import argparse
 import sys
 import urllib.error
 import urllib.request
+from pathlib import Path
 from ipaddress import IPv4Network
 
 GOOG_URL = "https://www.gstatic.com/ipranges/goog.json"
@@ -50,6 +52,10 @@ def subtract_many(base: list[IPv4Network], removals: list[IPv4Network]) -> list[
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--state-dir")
+    args = parser.parse_args()
+
     try:
         goog = fetch_json(GOOG_URL)
         cloud = fetch_json(CLOUD_URL)
@@ -64,6 +70,20 @@ def main() -> int:
     if not google_only:
         print("pfkit-google-ranges: no Google-owned IPv4 ranges produced", file=sys.stderr)
         return 1
+
+    if args.state_dir:
+        state_dir = Path(args.state_dir)
+        state_dir.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "source": "goog.json - cloud.json",
+            "goog_sync_token": goog.get("syncToken", ""),
+            "goog_creation_time": goog.get("creationTime", ""),
+            "cloud_sync_token": cloud.get("syncToken", ""),
+            "cloud_creation_time": cloud.get("creationTime", ""),
+            "range_count": len(google_only),
+            "ranges": [str(net) for net in google_only],
+        }
+        (state_dir / "google-ranges.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
     print(" ".join(str(net) for net in google_only))
     return 0

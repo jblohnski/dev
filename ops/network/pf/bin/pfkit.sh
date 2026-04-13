@@ -63,7 +63,7 @@ stop_pfkit() {
 }
 
 status_pfkit() {
-  "$BIN_DIR/pfkit-status.sh"
+  "$BIN_DIR/pfkit-status.sh" "$@"
 }
 
 cmd="${1:-status}"
@@ -76,7 +76,7 @@ case "$cmd" in
     start_pfkit
     ;;
   pfs|status)
-    status_pfkit
+    status_pfkit "$@"
     ;;
   pfk|stop|kill|off)
     stop_pfkit

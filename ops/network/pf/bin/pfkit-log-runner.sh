@@ -9,11 +9,35 @@ if ! ifconfig pflog0 >/dev/null 2>&1; then
 fi
 
 exec tcpdump -l -n -e -tttt -i pflog0 | awk '
-  {
-    line = tolower($0)
-    if (line ~ /(^|[[:space:]])block([[:space:]]|$)/) {
-      print
-      fflush()
+  function flush_prev() {
+    if (prev == "") {
+      return
     }
+    if (count > 1) {
+      print prev " [x" count "]"
+    } else {
+      print prev
+    }
+    fflush()
+  }
+
+  {
+    lower = tolower($0)
+    if (lower !~ /(^|[[:space:]])block([[:space:]]|$)/) {
+      next
+    }
+
+    if ($0 == prev) {
+      count++
+      next
+    }
+
+    flush_prev()
+    prev = $0
+    count = 1
+  }
+
+  END {
+    flush_prev()
   }
 '

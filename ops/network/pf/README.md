@@ -40,21 +40,25 @@ Why `pfk` is not `pfctl -d`:
 - `DNS_MODE` — `router` (force DNS to gateway) or `direct` (force to specific IPs).
 - `DNS_ALLOWED` — space-delimited IPs when `DNS_MODE=direct`.
 - `ALLOW_LAN_CIDRS` — LAN ranges allowed.
-- `BLOCK_MDNS` — block mDNS on the primary interface (default 0).
-- `ALLOW_APPLE_P2P` — pass AWDL / llw continuity traffic without logging noise (default 1).
-- `BLOCK_UTUN` — block `utun*` interfaces instead of passing them (default 0).
+- `BASELINE_PROFILE` — terse statement of the intended egress posture shown in `pfs`.
+- `BLOCK_MDNS` — block mDNS on the primary interface (default 1).
+- `ALLOW_APPLE_P2P` — allow AWDL / llw continuity traffic (default 0).
+- `BLOCK_UTUN` — block `utun*` interfaces instead of passing them (default 1).
 - `BLOCK_DOT` — block DoT/DoQ on 853 (default 1).
 - `BLOCK_QUIC` — block QUIC/HTTP3 on UDP 443 (default 1).
 - `GOOGLE_ENDPOINT_MODE` — `official_default_domains` or `manual`.
 - `GOOGLE_ALLOWED` — manual space-delimited Google IPv4 CIDRs when `GOOGLE_ENDPOINT_MODE=manual`.
+- `EXTRA_HTTPS_ALLOWED` — manual extra HTTPS CIDRs to allow alongside Google.
+- `EXTRA_HTTPS_ALLOWED_HOSTS` — narrow hostname exceptions resolved to `/32` CIDRs at apply time.
 
 ## Behaviors
 
 - Keeps Apple default inbound posture (no blanket `pass in all`).
 - Blocks outbound UDP/TCP 53 except allowed DNS targets.
-- Allows normal mDNS by default so Bonjour / AirDrop / local discovery do not flood the block log.
-- Passes `awdl0`, `llw0`, and `utun*` by default so PF does not fight Apple-managed local transport.
-- Can still block mDNS or utun traffic explicitly through config knobs when you want a tighter diagnostic posture.
+- Blocks mDNS by default for a tighter host posture.
+- Blocks `utun*` by default and keeps AWDL / llw disabled unless you explicitly allow them.
+- Uses Google's official published `goog.json - cloud.json` dataset for Google-only HTTPS mode and caches the resolved CIDRs for `pfs`.
+- Allows a narrow hostname-based HTTPS exception list for sites that must work without opening the broader web.
 - Blocks DoT/DoQ on 853 when enabled.
 - Blocks QUIC/HTTP3 on UDP 443 when enabled so browsers stay on TCP 443.
 - Can restrict HTTPS to Google-owned default-domain/service ranges computed from Google's official published IP datasets.
@@ -72,6 +76,7 @@ sudo ./bin/pfkit-uninstall.sh
 ## Live monitoring
 
 - Live PF status: `sudo pfs`
+- Raw block-log tail: `sudo pfs --tail`
 - Unified control entrypoint: `sudo ./bin/pfkit.sh help`
 - DNS-only watch (PF decisions on `pflog0`): `sudo ./bin/pfkit-watch-dns.sh`
 - DNS-only watch (raw interface traffic): `sudo ./bin/pfkit-watch-dns.sh --iface en0`

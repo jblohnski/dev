@@ -1,0 +1,632 @@
+USER               PID  %CPU %MEM      VSZ    RSS   TT  STAT STARTED      TIME COMMAND
+jagov             3198  99.0  0.5 442032144  86032   ??  Rs    9:44PM   0:29.58 /System/Library/ExtensionKit/Extensions/ODDIExperimentationExtension.appex/Contents/MacOS/ODDIExperimentationExtension -LaunchArguments eyJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZSwidHlwZSI6MSwic2VydmljZU5hbWUiOiJjb20uYXBwbGUuc2lyaS5PRERJRXhwZXJpbWVudGF0aW9uRXh0ZW5zaW9uIn0=
+jagov             3091   7.3  2.8 447426832 476336   ??  S     9:37PM   0:19.09 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:43955 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {247010b6-cfb8-4566-9f69-b5f7188b859f} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.1281659395 151 tab
+_coreaudiod        177   5.1  0.6 442357024  92736   ??  Ss   12:52PM  39:12.43 /usr/sbin/coreaudiod
+jagov              413   3.2  0.1 441952448  22800   ??  S    12:52PM   0:46.16 /System/Library/PrivateFrameworks/BiomeStreams.framework/Support/BiomeAgent
+jagov              795   2.8  8.6 590147872 1447184   ??  S    12:54PM  29:59.32 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:43714 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {41fa1ff0-2f44-40fc-a3f5-49b2f04775a4} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.673778818 10 tab
+jagov              773   1.7  3.2 1860339712 533360   ??  S    12:54PM  18:43.55 /Applications/Firefox.app/Contents/MacOS/firefox
+_windowserver      166   1.4  1.0 1845730688 161968   ??  Ss   12:52PM  52:48.80 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer -daemon
+jagov              789   0.7  0.3 443545456  42912   ??  S    12:54PM   3:43.76 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -parentBuildID 20260309125808 -sandboxingKind 0 -prefsHandle 0:48303 -prefMapHandle 1:282468 -sbStartup -sbAppPath /Applications/Firefox.app -ipcHandle 0 -initialChannelId {73707bcc-3fc2-4ec1-8117-19153fe29af0} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.1905484598 6 utility
+root               146   0.6  0.2 441963760  30896   ??  Ss   12:52PM   0:35.25 /usr/libexec/dasd
+_driverkit         301   0.5  0.3 443831232  44784   ??  Ss   12:52PM   1:54.86 /System/Library/DriverExtensions/com.apple.DriverKit-AppleBCMWLAN.dext/com.apple.DriverKit-AppleBCMWLAN com.apple.bcmwlan 0x100000bfd com.apple.DriverKit-AppleBCMWLAN
+jagov              799   0.4  0.7 443183680 120816   ??  S    12:55PM   0:09.39 /System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal
+root                94   0.3  0.4 442812288  66816   ??  Ss   12:52PM   0:59.88 /usr/libexec/logd
+jagov              786   0.3  1.6 478218144 275472   ??  S    12:54PM   0:31.78 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:38121 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {da6305c2-371a-490c-904e-758f5097f0ff} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.1868846640 5 tab
+root               160   0.2  0.0 441934016   8144   ??  Ss   12:52PM   0:10.43 /usr/sbin/notifyd
+jagov              802   0.1  0.0 442220064   6592 s000  S    12:55PM   0:00.78 -zsh
+jagov              739   0.1  0.1 441967408  10384   ??  S    12:54PM   0:00.17 /System/Library/PrivateFrameworks/SafariSafeBrowsing.framework/com.apple.Safari.SafeBrowsing.Service
+root               133   0.1  0.1 441981904  20720   ??  Ss   12:52PM   0:05.53 /System/Library/PrivateFrameworks/CoreDuetContext.framework/Resources/contextstored
+jagov             3090   0.0  0.8 446209344 127008   ??  S     9:37PM   0:00.50 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:43955 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {791d6039-a8f9-4a80-82ac-b77590014a80} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.1522091644 150 tab
+jagov             3088   0.0  0.5 445759824  80016   ??  S     9:36PM   0:00.45 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:43955 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {a2f0b8fa-14d3-4ab5-a7ea-2ccd7aed5cab} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.251875087 148 tab
+jagov             3017   0.0  0.1 441951200  15152   ??  S     9:22PM   0:00.12 /System/Library/PrivateFrameworks/Stickers.framework/Support/stickersd
+jagov             2853   0.0  0.1 441928896  10256   ??  Ss    7:45PM   0:00.05 /System/Library/PrivateFrameworks/MediaAnalysisAccess.framework/Versions/A/XPCServices/mediaanalysisd-access.xpc/Contents/MacOS/mediaanalysisd-access
+root              2832   0.0  0.3 441986144  53936   ??  Ss    7:43PM   0:01.52 /System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XprotectService.xpc/Contents/MacOS/XprotectService
+root              2796   0.0  0.3 448081920  46848   ??  Ss    7:35PM   0:02.32 /usr/sbin/spindump
+_neuralengine     2737   0.0  0.0 441910256   6864   ??  S     7:33PM   0:00.06 /usr/sbin/cfprefsd agent
+_neuralengine     2735   0.0  0.0 441910112   5872   ??  S     7:33PM   0:00.11 /usr/sbin/distnoted agent
+_neuralengine     2734   0.0  0.0 441902608   2208   ??  Ss    7:33PM   0:00.02 /System/Library/PrivateFrameworks/AppleNeuralEngine.framework/XPCServices/ANEStorageMaintainer.xpc/Contents/MacOS/ANEStorageMaintainer
+root              2729   0.0  0.0 441901920   2416   ??  Ss    7:33PM   0:00.03 /System/Library/PrivateFrameworks/AppleNeuralEngine.framework/XPCServices/ANEStorageMaintainer.xpc/Contents/MacOS/ANEStorageMaintainer
+jagov             2727   0.0  0.0 441899344   4832   ??  Ss    7:33PM   0:00.06 /System/Library/PrivateFrameworks/CloudTelemetry.framework/Versions/A/XPCServices/CloudTelemetryService.xpc/Contents/MacOS/CloudTelemetryService
+root              2695   0.0  0.1 441950512  10176   ??  Ss    7:02PM   0:00.10 /usr/libexec/dprivacyd
+jagov             2690   0.0  0.0 441899328   4896   ??  Ss    7:02PM   0:00.06 /System/Library/PrivateFrameworks/CloudTelemetry.framework/Versions/A/XPCServices/CloudTelemetryService.xpc/Contents/MacOS/CloudTelemetryService
+_rmd              2689   0.0  0.0 441909792   6752   ??  S     7:02PM   0:00.06 /usr/sbin/cfprefsd agent
+_installcoordinationd  2688   0.0  0.0 441909504   6784   ??  S     7:02PM   0:00.06 /usr/sbin/cfprefsd agent
+_applepay         2681   0.0  0.0 441909872   6784   ??  S     7:02PM   0:00.06 /usr/sbin/cfprefsd agent
+jagov             2675   0.0  0.1 441949088  10048   ??  S     7:02PM   0:00.12 /usr/libexec/dprivacyd
+_accessoryupdater  2674   0.0  0.0 441909408   6752   ??  S     7:02PM   0:00.07 /usr/sbin/cfprefsd agent
+_nsurlsessiond    2673   0.0  0.0 441909776   6816   ??  S     7:02PM   0:00.07 /usr/sbin/cfprefsd agent
+_audiomxd         2672   0.0  0.0 441909488   6784   ??  S     7:02PM   0:00.06 /usr/sbin/cfprefsd agent
+_softwareupdate   2671   0.0  0.0 441909808   6768   ??  S     7:02PM   0:00.06 /usr/sbin/cfprefsd agent
+jagov             2661   0.0  0.1 441947008  13168   ??  S     7:02PM   0:00.07 /usr/libexec/ciphermld
+root              2658   0.0  0.0 441900976   3088   ??  Ss    7:02PM   0:00.02 /usr/libexec/griddatad
+jagov             2654   0.0  0.0 441967056   6816   ??  S     7:02PM   0:00.12 /System/Library/PrivateFrameworks/CoreParsec.framework/parsec-fbf
+jagov             2652   0.0  0.1 441945440  10000   ??  S     7:02PM   0:00.08 /System/Library/PrivateFrameworks/IMDPersistence.framework/IMAutomaticHistoryDeletionAgent.app/Contents/MacOS/IMAutomaticHistoryDeletionAgent
+jagov             2642   0.0  0.0 441952096   5744   ??  S     7:02PM   0:00.09 /System/Library/PrivateFrameworks/AMPLibrary.framework/Versions/A/Support/AMPArtworkAgent --launchd
+jagov             2641   0.0  0.0 441941712   4992   ??  S     7:02PM   0:00.08 /System/Library/PrivateFrameworks/BookKit.framework/Versions/A/XPCServices/com.apple.BKAgentService.xpc/Contents/MacOS/com.apple.BKAgentService
+jagov             2640   0.0  0.0 441947088   6016   ??  S     7:02PM   0:00.08 /System/Library/PrivateFrameworks/PodcastServices.framework/XPCServices/PodcastContentService.xpc/Contents/MacOS/PodcastContentService
+jagov             2639   0.0  0.1 442021664  19232   ??  S     7:02PM   0:00.42 /System/Library/PrivateFrameworks/AMPLibrary.framework/Versions/A/Support/AMPLibraryAgent --launchd
+jagov             2638   0.0  0.1 441987296  11696   ??  Ss    7:02PM   0:00.07 /System/Library/PrivateFrameworks/AssistantServices.framework/Versions/A/XPCServices/media-indexer.xpc/Contents/MacOS/media-indexer
+root              2634   0.0  0.0 441942288   5840   ??  Ss    7:02PM   0:00.04 /usr/libexec/sysdiagnosed
+jagov             2631   0.0  0.0 441894432   3648   ??  Ss    7:01PM   0:00.12 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ManagedSettingsSubscriber.xpc/Contents/MacOS/ManagedSettingsSubscriber
+jagov             2630   0.0  0.0 441947984   6432   ??  Ss    7:01PM   0:00.08 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ASConfigurationSubscriber.xpc/Contents/MacOS/ASConfigurationSubscriber
+jagov             2628   0.0  0.0 441893632   3136   ??  Ss    7:01PM   0:00.10 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ManagementTestSubscriber.xpc/Contents/MacOS/ManagementTestSubscriber
+jagov             2627   0.0  0.0 441893840   3632   ??  Ss    7:01PM   0:00.09 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ManagedAppsSubscriber.xpc/Contents/MacOS/ManagedAppsSubscriber
+jagov             2626   0.0  0.0 441893184   4416   ??  Ss    7:01PM   0:00.11 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/AccountSubscriber.xpc/Contents/MacOS/AccountSubscriber
+jagov             2625   0.0  0.0 441946112   8048   ??  S     7:01PM   0:00.16 /usr/libexec/proactiveeventtrackerd
+jagov             2624   0.0  0.0 441893232   3120   ??  Ss    7:01PM   0:00.07 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/PasscodeSettingsSubscriber.xpc/Contents/MacOS/PasscodeSettingsSubscriber
+jagov             2623   0.0  0.0 441893312   3136   ??  Ss    7:01PM   0:00.07 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/LegacyProfilesSubscriber.xpc/Contents/MacOS/LegacyProfilesSubscriber
+jagov             2619   0.0  0.0 441894144   4944   ??  Ss    7:01PM   0:00.09 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ScreenSharingSubscriber.xpc/Contents/MacOS/ScreenSharingSubscriber
+jagov             2618   0.0  0.1 441979440  21024   ??  S     7:01PM   0:00.60 /usr/libexec/tipsd
+jagov             2617   0.0  0.1 441947008  10752   ??  S     7:01PM   0:00.11 /System/Library/PrivateFrameworks/AssetCacheServices.framework/Versions/A/XPCServices/AssetCacheLocatorService.xpc/Contents/MacOS/AssetCacheLocatorService -a
+jagov             2616   0.0  0.1 441950736   9264   ??  S     7:01PM   0:00.23 /System/Library/PrivateFrameworks/MapsSync.framework/mapssyncd
+jagov             2615   0.0  0.0 441893504   3136   ??  Ss    7:01PM   0:00.07 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/InteractiveLegacyProfilesSubscriber.xpc/Contents/MacOS/InteractiveLegacyProfilesSubscriber
+jagov             2614   0.0  0.0 441894032   3232   ??  Ss    7:01PM   0:00.06 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/SecuritySubscriber.xpc/Contents/MacOS/SecuritySubscriber
+jagov             2613   0.0  0.0 441951792   6304   ??  Ss    7:01PM   0:00.42 /System/Library/PrivateFrameworks/AppleIntelligenceReportingProcessing.framework/Versions/A/XPCServices/AppleIntelligenceReportingProcessingService.xpc/Contents/MacOS/AppleIntelligenceReportingProcessingService
+jagov             2611   0.0  0.0 441948240   6144   ??  Ss    7:01PM   0:00.08 /System/Library/PrivateFrameworks/SafariFoundation.framework/Versions/A/XPCServices/SafariConfigurationSubscriber.xpc/Contents/MacOS/SafariConfigurationSubscriber
+jagov             2609   0.0  0.0 441946832   5952   ??  S     7:01PM   0:00.18 /System/Library/PrivateFrameworks/RemoteManagement.framework/RemoteManagementAgent
+jagov             2607   0.0  0.0 442007296   7312   ??  Ss    7:01PM   0:01.36 /System/Library/PrivateFrameworks/CoreEmbeddedSpeechRecognition.framework/Versions/A/XPCServices/com.apple.siri.embeddedspeech.xpc/Contents/MacOS/com.apple.siri.embeddedspeech
+jagov             2600   0.0  0.1 441960256  14976   ??  Ss    7:01PM   0:00.70 /System/Library/Frameworks/ExtensionFoundation.framework/Versions/A/XPCServices/extensionkitservice.xpc/Contents/MacOS/extensionkitservice
+jagov             2599   0.0  0.1 441921824   9552   ??  S     7:01PM   0:00.05 /usr/libexec/backgroundassets.user
+jagov             2594   0.0  0.0 441959216    496   ??  Ss    7:01PM   0:00.25 /System/Library/PrivateFrameworks/MessagesBlastDoorSupport.framework/Versions/A/XPCServices/MessagesBlastDoorService.xpc/Contents/MacOS/MessagesBlastDoorService
+jagov             2593   0.0  0.1 441967232  17760   ??  S     7:01PM   0:02.21 /usr/libexec/mlhostd
+jagov             2592   0.0  0.1 441961824   8704   ??  S     7:01PM   0:00.22 /System/Library/PrivateFrameworks/BusinessChatService.framework/businessservicesd
+jagov             2591   0.0  0.1 441947184   8768   ??  S     7:01PM   0:00.25 /System/Library/PrivateFrameworks/PrivateCloudCompute.framework/privatecloudcomputed.app/Contents/MacOS/privatecloudcomputed
+jagov             2588   0.0  0.1 441940736  11776   ??  S     7:01PM   0:00.17 /System/Library/PrivateFrameworks/PhotoAnalysis.framework/Versions/A/Support/photoanalysisd
+jagov             2587   0.0  0.2 442086944  40480   ??  S     7:01PM   0:00.47 /System/Library/CoreServices/PowerChime.app/Contents/MacOS/PowerChime
+root              2561   0.0  0.0 441909408   2624   ??  Ss    5:55PM   0:00.05 /usr/libexec/betaenrollmentd
+jagov             2560   0.0  0.1 441964752   9984   ??  S     5:55PM   0:00.07 /usr/libexec/betaenrollmentagent
+jagov             2559   0.0  0.1 441965680  11360   ??  S     5:55PM   0:00.29 /System/Library/PrivateFrameworks/JetCore.framework/Support/jetpackassetd
+jagov             2543   0.0  0.1 441945776  11888   ??  S     5:43PM   0:00.17 /System/Library/PrivateFrameworks/GeoAnalytics.framework/geoanalyticsd
+jagov             2509   0.0  0.0 441952176   7056   ??  S     5:11PM   0:00.29 /usr/libexec/filevaultd
+jagov             2500   0.0  0.1 441969008  19488   ??  S     4:35PM   0:00.46 /System/Library/Frameworks/ManagedAppDistribution.framework/Support/managedappdistributionagent
+jagov             2255   0.0  0.0 442291728   8272   ??  Ss    3:36PM   0:00.04 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+jagov             2254   0.0  0.1 442292256   8432   ??  Ss    3:36PM   0:00.04 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+root              2231   0.0  0.1 441947008   9552   ??  Ss    3:35PM   0:00.23 /System/Library/CoreServices/SubmitDiagInfo server-init
+jagov             2186   0.0  0.1 441983488  19312   ??  S     2:36PM   0:00.26 /System/Library/CoreServices/Keychain Circle Notification.app/Contents/MacOS/Keychain Circle Notification
+jagov             2184   0.0  0.0 441944672   6208   ??  S     2:36PM   0:00.07 /System/Library/CoreServices/EscrowSecurityAlert.app/Contents/MacOS/EscrowSecurityAlert
+jagov             2175   0.0  0.0 441975488   3056   ??  Ss    2:26PM   0:00.01 /System/Library/Frameworks/NetFS.framework/Versions/A/XPCServices/PlugInLibraryService.xpc/Contents/MacOS/PlugInLibraryService
+jagov             2137   0.0  0.1 441964752  10176   ??  S     1:32PM   0:00.06 /usr/libexec/fskit_agent
+jagov             2113   0.0  0.0 441910256   7008   ??  S     1:20PM   0:00.09 /System/Library/PrivateFrameworks/ProtectedCloudStorage.framework/Helpers/ProtectedCloudKeySyncing
+jagov             2102   0.0  0.0 441888608   2496   ??  S     1:15PM   0:00.03 /Library/Apple/System/Library/CoreServices/XProtect.app/Contents/MacOS/XProtect
+jagov             2104   0.0  0.0 441909056   3504   ??  S     1:15PM   0:00.05 /usr/libexec/metrickitd
+root              2103   0.0  0.0 441889376   2544   ??  Ss    1:15PM   0:00.03 /Library/Apple/System/Library/CoreServices/XProtect.app/Contents/MacOS/XProtect
+jagov             2099   0.0  0.0 441947376   5264   ??  S     1:15PM   0:00.08 cloudphotod
+root              2100   0.0  0.0 441946064   4288   ??  Ss    1:15PM   0:00.05 /usr/libexec/mmaintenanced
+jagov             2093   0.0  0.2 442051904  25216   ??  S     1:14PM   0:00.22 /System/Library/Frameworks/LocalAuthentication.framework/Support/coreautha.bundle/Contents/MacOS/coreautha
+jagov             2092   0.0  0.1 441986400  20288   ??  S     1:14PM   0:00.30 /System/Cryptexes/App/usr/libexec/AuthenticationServicesAgent
+root              2089   0.0  0.1 442035984  19520   ??  Ss    1:14PM   0:05.89 /System/Library/Frameworks/Metal.framework/Versions/A/XPCServices/MTLCompilerService.xpc/Contents/MacOS/MTLCompilerService
+root              2090   0.0  0.1 442024336  13296   ??  Ss    1:14PM   0:00.05 /System/Library/Frameworks/Metal.framework/Versions/A/XPCServices/MTLCompilerService.xpc/Contents/MacOS/MTLCompilerService
+root              2079   0.0  0.0 441889360   1584   ??  Ss    1:08PM   0:00.03 /usr/libexec/seputil --daemonize-reseed
+jagov             2080   0.0  0.1 441945632  19216   ??  S     1:08PM   0:00.17 /System/iOSSupport/System/Library/PrivateFrameworks/HomeEnergyDaemon.framework/Support/homeenergyd
+jagov             2059   0.0  0.2 441952208  28496   ??  Ss   12:59PM   0:01.44 /System/Library/PrivateFrameworks/AppPredictionFoundation.framework/Versions/A/XPCServices/AppPredictionIntentsHelperService.xpc/Contents/MacOS/AppPredictionIntentsHelperService
+jagov             1092   0.0  0.1 441962320  13296   ??  Ss   12:58PM   0:00.04 /System/Library/ExtensionKit/Extensions/GMSSELFIngestor.appex/Contents/MacOS/GMSSELFIngestor -LaunchArguments eyJ0eXBlIjoxLCJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5zaXJpLkdNU1NFTEZJbmdlc3RvciIsImVuaGFuY2VkU2VjdXJpdHkiOmZhbHNlfQ==
+jagov             1091   0.0  0.1 441961936  11872   ??  Ss   12:58PM   0:00.03 /System/Library/ExtensionKit/Extensions/IFTelemetrySELFIngestor.appex/Contents/MacOS/IFTelemetrySELFIngestor -LaunchArguments eyJ0eXBlIjoxLCJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5saWdodGhvdXNlLklGVGVsZW1ldHJ5U0VMRkluZ2VzdG9yIiwiZW5oYW5jZWRTZWN1cml0eSI6ZmFsc2V9
+jagov             1090   0.0  0.1 441962112  12064   ??  Ss   12:58PM   0:00.07 /System/Library/ExtensionKit/Extensions/BiomeSELFIngestor.appex/Contents/MacOS/BiomeSELFIngestor -LaunchArguments eyJ0eXBlIjoxLCJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5saWdodGhvdXNlLkJpb21lU0VMRkluZ2VzdG9yIiwiZW5oYW5jZWRTZWN1cml0eSI6ZmFsc2V9
+jagov             1089   0.0  0.1 441961888  12096   ??  Ss   12:58PM   0:00.06 /System/Library/ExtensionKit/Extensions/IFTranscriptSELFIngestor.appex/Contents/MacOS/IFTranscriptSELFIngestor -LaunchArguments eyJ0eXBlIjoxLCJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5saWdodGhvdXNlLklGVHJhbnNjcmlwdFNFTEZJbmdlc3RvciIsImVuaGFuY2VkU2VjdXJpdHkiOmZhbHNlfQ==
+jagov             1088   0.0  0.1 441960576  10624   ??  Ss   12:58PM   0:00.32 /System/Library/Frameworks/ExtensionFoundation.framework/Versions/A/XPCServices/extensionkitservice.xpc/Contents/MacOS/extensionkitservice
+jagov             1087   0.0  0.1 441943872  13456   ??  Ss   12:58PM   0:00.15 /System/Library/PrivateFrameworks/SiriAnalytics.framework/Versions/A/XPCServices/SAExtensionOrchestrator.xpc/Contents/MacOS/SAExtensionOrchestrator
+root              1085   0.0  0.0 441911424   4832   ??  Ss   12:58PM   0:00.06 /usr/libexec/ASPCarryLog
+jagov             1082   0.0  0.0 441945344   7168   ??  S    12:58PM   0:00.07 /System/Library/PrivateFrameworks/CoreRecents.framework/Versions/A/Support/recentsd
+jagov             1081   0.0  0.1 441910032   8944   ??  S    12:58PM   0:00.08 /usr/libexec/feedbackd
+jagov             1079   0.0  0.1 441949168  10032   ??  S    12:58PM   0:00.73 /System/Library/PrivateFrameworks/OnDeviceStorage.framework/Support/amsondevicestoraged
+jagov             1077   0.0  0.0 441956944   3968   ??  S    12:57PM   0:00.08 /System/Library/Frameworks/CoreSpotlight.framework/spotlightknowledged -x
+jagov             1070   0.0  0.3 443545840  45504   ??  S    12:57PM   0:41.68 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -parentBuildID 20260309125808 -sandboxingKind 1 -prefsHandle 0:48465 -prefMapHandle 1:282468 -sbStartup -sbAppPath /Applications/Firefox.app -ipcHandle 0 -initialChannelId {9f098814-fdd9-4ae5-8d76-704d3717b06f} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.735810421 13 utility
+root              1024   0.0  0.0 442225424   2832   ??  S    12:57PM   0:07.03 tcpdump -l -n -e -tttt -i pflog0
+root              1025   0.0  0.0 441900368   1824   ??  S    12:57PM   0:00.35 awk \012  {\012    line = tolower($0)\012    if (line ~ /(^|[[:space:]])block([[:space:]]|$)/) {\012      print\012      fflush()\012    }\012  }\012
+root              1000   0.0  0.0 442193248   1952   ??  S    12:57PM   0:00.00 bash /Users/jagov/dev/ops/network/pf/bin/pfkit-log-runner.sh
+root               801   0.0  0.1 442292448  12032   ??  Ss   12:55PM   0:00.03 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+root               800   0.0  0.1 442201360   9632 s000  Ss   12:55PM   0:00.01 login -pf jagov
+jagov              797   0.0  0.1 441952192  16512   ??  S    12:55PM   0:00.21 /System/Library/PrivateFrameworks/DataAccess.framework/Support/dataaccessd
+jagov              793   0.0  0.1 441946704  17168   ??  S    12:54PM   0:00.13 /System/Library/PrivateFrameworks/WeatherDaemon.framework/weatherd
+jagov              787   0.0  0.2 442092032  35712   ??  Ss   12:54PM   0:00.26 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+jagov              785   0.0  0.1 447157776  24832   ??  Ss   12:54PM  16:33.73 /System/Library/Frameworks/VideoToolbox.framework/Versions/A/XPCServices/VTDecoderXPCService.xpc/Contents/MacOS/VTDecoderXPCService
+jagov              784   0.0  0.2 444917040  41200   ??  S    12:54PM   7:53.29 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -parentBuildID 20260309125808 -prefsHandle 0:37509 -prefMapHandle 1:282468 -sbStartup -sbAppPath /Applications/Firefox.app -ipcHandle 0 -initialChannelId {8ec7b2a1-37b4-4ff6-ad2a-b499b70038b4} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.1924764994 4 rdd
+jagov              783   0.0  1.0 449259024 168032   ??  S    12:54PM   0:08.60 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:37509 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {afb4d2ae-42a6-452a-a86e-6bcabec656bc} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.1219571734 3 tab
+jagov              780   0.0  0.2 443496960  35184   ??  S    12:54PM   0:00.14 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -parentBuildID 20260309125808 -prefsHandle 0:37395 -prefMapHandle 1:282468 -sbStartup -sbAppPath /Applications/Firefox.app -ipcHandle 0 -initialChannelId {b855d53c-f285-4ed9-9d94-90b276a2f8cf} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.220738365 2 socket
+jagov              779   0.0  2.0 1387546640 334768   ??  S    12:54PM  21:54.97 /Applications/Firefox.app/Contents/MacOS/gpu-helper.app/Contents/MacOS/Firefox GPU Helper -parentBuildID 20260309125808 -prefsHandle 0:37328 -prefMapHandle 1:282468 -sbStartup -sbAppPath /Applications/Firefox.app -ipcHandle 0 -initialChannelId {8944af44-b27f-41d2-8c2f-952746a412d7} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.65508389 1 gpu
+jagov              778   0.0  0.1 441966352  15584   ??  S    12:54PM   0:00.27 /usr/libexec/adprivacyd
+jagov              777   0.0  0.0 441946608   7584   ??  S    12:54PM   0:00.10 /System/Library/PrivateFrameworks/HomeKitEvents.framework/Support/homeeventsd
+jagov              776   0.0  0.0 435823712   2032   ??  S    12:54PM   0:00.02 /Applications/Firefox.app/Contents/MacOS/crashhelper 773 gecko-crash-server-pipe.773 /private/var/folders/f6/qqlp57jj1dscs18gs7nslsyh0000gn/T/TemporaryItems/ 9
+_rmd               772   0.0  0.0 441894192   3424   ??  Ss   12:54PM   0:00.09 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ManagedConfigurationFilesSubscriber.xpc/Contents/MacOS/ManagedConfigurationFilesSubscriber
+_rmd               771   0.0  0.0 441893264   2992   ??  Ss   12:54PM   0:00.09 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ManagementTestSubscriber.xpc/Contents/MacOS/ManagementTestSubscriber
+root               770   0.0  0.1 441969280  19936   ??  Ss   12:54PM   0:00.48 /System/Library/Frameworks/ManagedAppDistribution.framework/Support/managedappdistributiond
+_rmd               769   0.0  0.0 441893600   3520   ??  Ss   12:54PM   0:00.09 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ManagedAppsSubscriber.xpc/Contents/MacOS/ManagedAppsSubscriber
+root               768   0.0  0.0 441944800   5872   ??  Ss   12:54PM   0:00.05 /System/Library/CoreServices/iconservicesagent runAsRoot
+root               767   0.0  0.1 441963920  13360   ??  Ss   12:54PM   0:00.09 /System/Library/PrivateFrameworks/SystemMigration.framework/Resources/systemmigrationd
+_rmd               766   0.0  0.0 441893936   5072   ??  Ss   12:54PM   0:00.11 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/MigrationSubscriber.xpc/Contents/MacOS/MigrationSubscriber
+_rmd               765   0.0  0.0 441894576   4608   ??  Ss   12:54PM   0:00.10 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/SoftwareUpdateSubscriber.xpc/Contents/MacOS/SoftwareUpdateSubscriber
+_rmd               764   0.0  0.0 441894704   3440   ??  Ss   12:54PM   0:00.10 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ManagedPreferencesSubscriber.xpc/Contents/MacOS/ManagedPreferencesSubscriber
+_rmd               763   0.0  0.0 441893280   3072   ??  Ss   12:54PM   0:00.09 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/DiskManagementSubscriber.xpc/Contents/MacOS/DiskManagementSubscriber
+_rmd               762   0.0  0.0 441893728   3088   ??  Ss   12:54PM   0:00.08 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/PasscodeSettingsSubscriber.xpc/Contents/MacOS/PasscodeSettingsSubscriber
+_assetcache        761   0.0  0.1 441947120   8720   ??  Ss   12:54PM   0:00.15 /System/Library/PrivateFrameworks/AssetCacheServices.framework/Versions/A/XPCServices/AssetCacheLocatorService.xpc/Contents/MacOS/AssetCacheLocatorService -d
+_rmd               760   0.0  0.0 441893216   3104   ??  Ss   12:54PM   0:00.09 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/LegacyProfilesSubscriber.xpc/Contents/MacOS/LegacyProfilesSubscriber
+_rmd               757   0.0  0.0 441894016   4896   ??  Ss   12:54PM   0:00.10 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/ScreenSharingSubscriber.xpc/Contents/MacOS/ScreenSharingSubscriber
+_rmd               756   0.0  0.0 441893312   3104   ??  Ss   12:54PM   0:00.06 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/InteractiveLegacyProfilesSubscriber.xpc/Contents/MacOS/InteractiveLegacyProfilesSubscriber
+_rmd               755   0.0  0.0 441909904   5632   ??  S    12:54PM   0:00.70 /usr/sbin/distnoted agent
+_rmd               754   0.0  0.0 441894096   3104   ??  Ss   12:54PM   0:00.05 /System/Library/PrivateFrameworks/RemoteManagement.framework/XPCServices/SecuritySubscriber.xpc/Contents/MacOS/SecuritySubscriber
+jagov              753   0.0  0.1 441948208  13888   ??  S    12:54PM   0:00.69 /System/Library/PrivateFrameworks/IntelligencePlatformCore.framework/Versions/A/intelligenceplatformd
+_rmd               752   0.0  0.0 441946992   6240   ??  Ss   12:54PM   0:00.24 /System/Library/PrivateFrameworks/RemoteManagement.framework/remotemanagementd
+jagov              751   0.0  0.0 441941200   6672   ??  S    12:54PM   0:00.08 /System/Library/PrivateFrameworks/NewDeviceOutreach.framework/ndoagent
+jagov              750   0.0  0.1 441957840  22288   ??  S    12:54PM   0:07.70 /System/Library/PrivateFrameworks/IntelligencePlatformCore.framework/Versions/A/knowledgeconstructiond
+jagov              748   0.0  0.0 441901872   4240   ??  S    12:54PM   0:00.02 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdwrite
+jagov              744   0.0  0.1 446274704   9920   ??  S    12:54PM   0:00.14 /System/Library/PrivateFrameworks/CoreSuggestions.framework/Versions/A/Support/reversetemplated
+jagov              742   0.0  0.0 441945424   7104   ??  S    12:54PM   0:00.07 /System/Library/PrivateFrameworks/CoreAnalytics.framework/Support/analyticsagent
+jagov              741   0.0  0.1 441944672  11456   ??  S    12:54PM   0:00.06 /System/Library/PrivateFrameworks/iCloudNotification.framework/iCloudNotificationAgent
+jagov              740   0.0  0.1 441966176  13200   ??  S    12:54PM   0:00.21 /System/Library/PrivateFrameworks/Categories.framework/Versions/A/XPCServices/CategoriesService.xpc/Contents/MacOS/CategoriesService
+jagov              734   0.0  0.1 441965856  22192   ??  Ss   12:53PM   0:00.07 /System/Applications/Messages.app/Contents/Extensions/MessagesActionExtension.appex/Contents/MacOS/MessagesActionExtension -LaunchArguments eyJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZSwidHlwZSI6MSwic2VydmljZU5hbWUiOiJjb20uYXBwbGUuTW9iaWxlU01TLk1lc3NhZ2VzQWN0aW9uRXh0ZW5zaW9uIn0=
+jagov              733   0.0  0.1 441965632  15136   ??  Ss   12:53PM   0:00.06 /System/Applications/Calendar.app/Contents/Extensions/CalendarIntentsExtension.appex/Contents/MacOS/CalendarIntentsExtension -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5jYWxlbmRhci5DYWxlbmRhckludGVudHNFeHRlbnNpb24iLCJ0eXBlIjoxLCJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZX0=
+jagov              732   0.0  0.1 441960960  12864   ??  Ss   12:53PM   0:00.05 /System/Library/Frameworks/ExtensionFoundation.framework/Versions/A/XPCServices/extensionkitservice.xpc/Contents/MacOS/extensionkitservice
+jagov              731   0.0  0.0 441901920   2016   ??  S    12:53PM   0:00.03 /System/Library/PrivateFrameworks/MobileAccessoryUpdater.framework/Support/fudHelperAgent
+jagov              723   0.0  0.0 441945056   8192   ??  Ss   12:53PM   0:00.06 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService
+jagov              722   0.0  0.1 441974128  19520   ??  S    12:53PM   0:00.25 /System/Library/PrivateFrameworks/BackgroundTaskManagement.framework/Support/BackgroundTaskManagementAgent.app/Contents/MacOS/BackgroundTaskManagementAgent
+jagov              720   0.0  0.0 441945184   4912   ??  S    12:53PM   0:00.16 /usr/libexec/MTLAssetUpgraderD
+jagov              721   0.0  0.0 441901136   6624   ??  S    12:53PM   0:00.03 /System/Library/Frameworks/MediaExtension.framework/Versions/A/Helpers/MENotificationAgent
+jagov              711   0.0  0.1 441949520  11632   ??  S    12:53PM   0:00.08 /usr/libexec/keyboardservicesd
+jagov              710   0.0  0.1 441944112   8992   ??  S    12:53PM   0:00.05 /usr/libexec/naturallanguaged
+jagov              709   0.0  0.2 442080064  34544   ??  S    12:53PM   0:00.20 /System/Library/Services/AppleSpell.service/Contents/MacOS/AppleSpell
+jagov              708   0.0  0.2 442362112  26624   ??  S    12:53PM   0:00.44 /System/Library/PrivateFrameworks/WorkflowKit.framework/XPCServices/ShortcutsViewService.xpc/Contents/MacOS/ShortcutsViewService
+jagov              705   0.0  0.0 441967504   3024   ??  Ss   12:53PM   0:00.01 /System/Library/Frameworks/NetFS.framework/Versions/A/XPCServices/PlugInLibraryService.xpc/Contents/MacOS/PlugInLibraryService
+jagov              699   0.0  0.1 441984032  17168   ??  S    12:53PM   0:00.65 /usr/libexec/swcd
+_usbmuxd           696   0.0  0.0 441895568   4672   ??  Ss   12:53PM   0:00.02 /Library/Apple/System/Library/PrivateFrameworks/RemotePairing.framework/Versions/A/Resources/bin/RemotePairingDataVaultHelper
+root               694   0.0  0.0 441933824   7776   ??  Ss   12:53PM   0:00.07 /System/Library/PrivateFrameworks/CloudTelemetry.framework/Versions/A/XPCServices/CloudTelemetryService.xpc/Contents/MacOS/CloudTelemetryService
+root               695   0.0  0.1 441936432  14512   ??  Ss   12:53PM   0:00.15 /System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XProtectBridgeService.xpc/Contents/MacOS/XProtectBridgeService
+jagov              693   0.0  0.1 441959680   9808   ??  S    12:53PM   0:00.04 /Library/Apple/System/Library/PrivateFrameworks/RemotePairing.framework/Versions/A/XPCServices/remotepairingd.xpc/Contents/MacOS/remotepairingd
+jagov              691   0.0  0.1 442174208   9728   ??  S    12:53PM   0:00.05 /System/Cryptexes/App/usr/libexec/webpushd --machServiceName com.apple.webkit.webpushd.service
+jagov              690   0.0  0.1 441954672  10720   ??  S    12:53PM   0:00.07 /System/Cryptexes/App/usr/libexec/SafariLaunchAgent
+root               688   0.0  0.1 442017248  19280   ??  Ss   12:53PM   0:00.28 /System/Library/Frameworks/Metal.framework/Versions/A/XPCServices/MTLCompilerService.xpc/Contents/MacOS/MTLCompilerService
+jagov              687   0.0  0.1 441945584  10576   ??  S    12:53PM   0:00.32 /System/Library/PrivateFrameworks/Synapse.framework/Support/contentlinkingd
+jagov              686   0.0  0.1 441946704   9840   ??  S    12:53PM   0:00.08 /System/Cryptexes/App/usr/libexec/PasswordBreachAgent
+jagov              684   0.0  0.1 441947264  15264   ??  S    12:53PM   0:00.25 /System/Library/Frameworks/Translation.framework/translationd
+jagov              680   0.0  0.1 442140000  19296   ??  S    12:53PM   0:00.17 /System/Cryptexes/App/usr/libexec/SafariBookmarksSyncAgent
+jagov              678   0.0  0.0 441910208   5728   ??  S    12:53PM   0:00.04 /System/Library/Frameworks/MediaAccessibility.framework/Versions/A/XPCServices/com.apple.accessibility.mediaaccessibilityd.xpc/Contents/MacOS/com.apple.accessibility.mediaaccessibilityd
+root               677   0.0  0.0 441917824   3312   ??  Ss   12:53PM   0:00.03 /System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/CVMServer
+jagov              676   0.0  0.1 441954816   9808   ??  S    12:53PM   0:00.07 /System/Cryptexes/App/usr/libexec/SafariNotificationAgent
+jagov              675   0.0  0.3 442101920  47040   ??  S    12:53PM   0:00.70 /System/Library/PrivateFrameworks/PassKitCore.framework/passd
+jagov              673   0.0  0.1 441949440  13424   ??  S    12:53PM   0:00.20 /System/Library/PrivateFrameworks/WebPrivacy.framework/webprivacyd
+jagov              672   0.0  0.1 441950528  13200   ??  S    12:53PM   0:00.10 /System/Library/PrivateFrameworks/TextToSpeechVoiceBankingSupport.framework/Support/voicebankingd
+jagov              670   0.0  0.1 442077664  11200   ??  S    12:53PM   0:00.11 /System/Cryptexes/App/usr/libexec/com.apple.Safari.History
+jagov              666   0.0  0.0 441922368   8192   ??  S    12:52PM   0:00.08 /System/Library/PrivateFrameworks/IMTransferServices.framework/IMTransferAgent.app/Contents/MacOS/IMTransferAgent
+jagov              663   0.0  0.1 441980416  16976   ??  SN   12:52PM   0:01.16 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdbulkimport -s mdworker-bundle -c MDSImporterBundleFinder -m com.apple.metadata.mdbulkimport
+jagov              662   0.0  0.1 441945600  16720   ??  S    12:52PM   0:00.85 /System/Library/PrivateFrameworks/ModelCatalogRuntime.framework/Versions/A/ModelCatalogAgent
+jagov              661   0.0  0.0 441975888   3152   ??  Ss   12:52PM   0:00.01 /System/Library/Frameworks/NetFS.framework/Versions/A/XPCServices/PlugInLibraryService.xpc/Contents/MacOS/PlugInLibraryService
+jagov              660   0.0  0.2 441983920  26608   ??  S    12:52PM   0:00.25 /usr/libexec/GamePolicyAgent
+root               659   0.0  0.1 441946912   9872   ??  Ss   12:52PM   0:01.22 /usr/libexec/ospredictiond
+root               658   0.0  0.1 442034688  16576   ??  Ss   12:52PM   0:04.59 /usr/libexec/gamepolicyd
+root               657   0.0  0.0 441904880   2432   ??  Ss   12:52PM   0:00.02 /System/Library/CoreServices/CrashReporterSupportHelper server-init
+jagov              656   0.0  0.0 441928624   7072   ??  Ss   12:52PM   0:00.14 /System/Library/PrivateFrameworks/SiriSuggestionsSupport.framework/Versions/A/XPCServices/SiriSuggestionsBookkeepingService.xpc/Contents/MacOS/SiriSuggestionsBookkeepingService
+root               655   0.0  0.0 441946880   6880   ??  Ss   12:52PM   0:00.16 /System/Library/PrivateFrameworks/Ecosystem.framework/Support/ecosystemd
+root               653   0.0  0.1 441958272  13760   ??  Ss   12:52PM   0:00.16 /usr/libexec/wifivelocityd
+jagov              652   0.0  0.1 441945344  11504   ??  S    12:52PM   0:00.09 /System/Library/PrivateFrameworks/LockdownMode.framework/Versions/A/XPCServices/lockdownmoded
+jagov              643   0.0  0.0 441894000   2656   ??  Ss   12:52PM   0:00.09 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/AUCrashHandlerService.xpc/Contents/MacOS/AUCrashHandlerService
+jagov              651   0.0  0.0 441945840   6432   ??  S    12:52PM   0:02.65 /Library/Apple/System/Library/CoreServices/XProtect.app/Contents/XPCServices/XProtectPluginService.xpc/Contents/MacOS/XProtectPluginService
+_fpsd              650   0.0  0.0 441951088   3760   ??  Ss   12:52PM   0:00.14 /usr/libexec/fairplaydeviceidentityd
+_installcoordinationd   646   0.0  0.0 441909984   4272   ??  S    12:52PM   0:00.72 /usr/sbin/distnoted agent
+jagov              649   0.0  0.1 441954528  16624   ??  S    12:52PM   0:00.54 /usr/libexec/promotedcontentd
+jagov              647   0.0  0.1 446428784  20992   ??  S    12:52PM   0:04.45 /System/Library/PrivateFrameworks/AppleMediaServicesUI.framework/amsengagementd
+root               648   0.0  0.0 441893680   6720   ??  Ss   12:52PM   0:00.05 /System/Library/PrivateFrameworks/AppStoreDaemon.framework/Versions/A/XPCServices/com.apple.AppStoreDaemon.StorePrivilegedODRService.xpc/Contents/MacOS/com.apple.AppStoreDaemon.StorePrivilegedODRService
+root               645   0.0  0.0 441939904   4752   ??  Ss   12:52PM   0:00.02 /System/Library/PrivateFrameworks/MobileInstallation.framework/XPCServices/com.apple.MobileInstallationHelperService.xpc/Contents/MacOS/com.apple.MobileInstallationHelperService
+_installcoordinationd   644   0.0  0.1 441910032   8944   ??  Ss   12:52PM   0:00.06 /System/Library/PrivateFrameworks/InstallCoordination.framework/Support/installcoordinationd
+jagov              642   0.0  0.1 442283424  11392   ??  Ss   12:52PM   0:00.04 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+jagov              493   0.0  0.1 441946992  10176   ??  S    12:52PM   0:00.40 /System/Library/CoreServices/diagnostics_agent
+jagov              641   0.0  0.1 442283904  11376   ??  Ss   12:52PM   0:00.04 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+root               640   0.0  0.0 441926432   3904   ??  Ss   12:52PM   0:00.05 /System/Library/PrivateFrameworks/AssetCacheServicesExtensions.framework/XPCServices/AssetCacheTetheratorService.xpc/Contents/MacOS/AssetCacheTetheratorService
+jagov              639   0.0  0.1 441944256   9792   ??  Ss   12:52PM   0:00.17 /System/Library/PrivateFrameworks/StocksKit.framework/XPCServices/StocksKitService.xpc/Contents/MacOS/StocksKitService
+jagov              638   0.0  0.2 441966304  27456   ??  Ss   12:52PM   0:05.06 /System/Library/PrivateFrameworks/IntelligencePlatformCompute.framework/Versions/A/XPCServices/IntelligencePlatformComputeService.xpc/Contents/MacOS/IntelligencePlatformComputeService
+root               637   0.0  0.0 441946528   8304   ??  Ss   12:52PM   0:01.19 /usr/libexec/assetsubscriptiond
+jagov              636   0.0  0.2 442020688  31248   ??  S    12:52PM   0:00.23 /System/Library/PrivateFrameworks/IntelligenceFlowContextRuntime.framework/Versions/A/intelligencecontextd
+root               519   0.0  0.0 441945968   4848   ??  Ss   12:52PM   0:00.10 /System/Library/PrivateFrameworks/EcosystemAnalytics.framework/Support/ecosystemanalyticsd
+_applepay          635   0.0  0.0 441909840   4624   ??  S    12:52PM   0:00.73 /usr/sbin/distnoted agent
+_applepay          634   0.0  0.0 441932320   5328   ??  Ss   12:52PM   0:00.03 /System/Library/PrivateFrameworks/NearFieldPrivateServices.framework/Versions/A/XPCServices/NFStorageServer.xpc/Contents/MacOS/NFStorageServer
+root               633   0.0  0.0 441905712   3024   ??  S    12:52PM   0:00.10 /System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/HIServices.framework/Versions/A/XPCServices/com.apple.hiservices-xpcservice.xpc/Contents/MacOS/com.apple.hiservices-xpcservice
+_fpsd              632   0.0  0.1 441921104  15376   ??  Ss   12:52PM   0:00.15 /System/Library/PrivateFrameworks/CoreFP.framework/Versions/A/fairplayd
+jagov              630   0.0  0.1 441954768  10192   ??  S    12:52PM   0:00.39 /System/Library/Frameworks/FinanceKit.framework/financed
+_applepay          629   0.0  0.1 441963360  11536   ??  Ss   12:52PM   0:00.35 /usr/libexec/nfcd
+root               627   0.0  0.0 441940848   5632   ??  Ss   12:52PM   0:00.03 /System/Library/PrivateFrameworks/AppleDeviceQuerySupport.framework/Versions/A/XPCServices/AppleDeviceQueryService.xpc/Contents/MacOS/AppleDeviceQueryService
+root               622   0.0  0.0 441905488   4528   ??  Ss   12:52PM   0:00.13 /System/Library/PrivateFrameworks/PackageKit.framework/Resources/installd
+jagov              619   0.0  0.1 442001296  24256   ??  S    12:52PM   0:01.21 /System/Library/PrivateFrameworks/AppStoreDaemon.framework/Support/appstoreagent
+jagov              620   0.0  0.0 441902096   3424   ??  S    12:52PM   0:00.03 /System/Library/PrivateFrameworks/GeoServices.framework/geodMachServiceBridge
+root               621   0.0  0.0 441906160   4576   ??  Ss   12:52PM   0:00.12 /System/Library/PrivateFrameworks/PackageKit.framework/Resources/system_installd
+_assetcache        618   0.0  0.0 441948160   8064   ??  Ss   12:52PM   0:00.09 /usr/libexec/AssetCache/AssetCache
+jagov              617   0.0  0.1 441945808  12032   ??  S    12:52PM   0:00.26 /usr/libexec/inputanalyticsd
+jagov              616   0.0  0.1 441910944  10528   ??  S    12:52PM   0:01.13 /usr/libexec/gamecontrolleragentd
+_gamecontrollerd   615   0.0  0.0 441910112   5920   ??  S    12:52PM   0:00.74 /usr/sbin/distnoted agent
+jagov              611   0.0  0.0 441933904   5744   ??  Ss   12:52PM   0:00.09 /System/Library/PrivateFrameworks/CloudTelemetry.framework/Versions/A/XPCServices/CloudTelemetryService.xpc/Contents/MacOS/CloudTelemetryService
+_accessoryupdater   613   0.0  0.0 441893520   2816   ??  Ss   12:52PM   0:00.05 /System/Library/PrivateFrameworks/UARPAssetManager.framework/XPCServices/UARPAssetManagerServiceMobileAsset.xpc/Contents/MacOS/UARPAssetManagerServiceMobileAsset
+jagov              614   0.0  0.1 441945120  11696   ??  Ss   12:52PM   0:00.06 /System/Library/PrivateFrameworks/CascadeSets.framework/Versions/A/XPCServices/SetStoreUpdateService.xpc/Contents/MacOS/SetStoreUpdateService
+jagov              612   0.0  0.1 441950928  13840   ??  S    12:52PM   0:00.71 /System/Library/PrivateFrameworks/GenerativeExperiencesRuntime.framework/Versions/A/generativeexperiencesd
+jagov              610   0.0  0.1 441961088  20544   ??  Ss   12:52PM   0:00.04 /System/Applications/Weather.app/Contents/PlugIns/WeatherIntents.appex/Contents/MacOS/WeatherIntents -AppleLanguages ("en-US", "en")
+jagov              609   0.0  0.1 442007616  11504   ??  Ss   12:52PM   0:00.10 /System/Library/Frameworks/Metal.framework/Versions/A/XPCServices/MTLCompilerService.xpc/Contents/MacOS/MTLCompilerService
+jagov              607   0.0  0.2 442001744  30816   ??  Ss   12:52PM   0:00.70 /System/Applications/Calendar.app/Contents/PlugIns/CalendarWidgetExtension.appex/Contents/MacOS/CalendarWidgetExtension -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5pQ2FsLkNhbGVuZGFyV2lkZ2V0RXh0ZW5zaW9uIiwiZW5oYW5jZWRTZWN1cml0eSI6ZmFsc2UsInR5cGUiOjF9
+jagov              606   0.0  0.2 441968480  33008   ??  Ss   12:52PM   0:00.09 /System/Applications/News.app/Contents/PlugIns/NewsTodayIntents.appex/Contents/MacOS/NewsTodayIntents -AppleLanguages ("en-US", "en")
+jagov              605   0.0  0.4 442195088  63120   ??  Ss   12:52PM   0:12.80 /System/Applications/Weather.app/Contents/PlugIns/WeatherWidget.appex/Contents/MacOS/WeatherWidget -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS53ZWF0aGVyLndpZGdldCIsImVuaGFuY2VkU2VjdXJpdHkiOmZhbHNlLCJ0eXBlIjoxfQ==
+jagov              604   0.0  0.2 441985456  32336   ??  Ss   12:52PM   0:03.89 /System/Library/CoreServices/Batteries.app/Contents/PlugIns/BatteriesAvocadoWidgetExtension.appex/Contents/MacOS/BatteriesAvocadoWidgetExtension -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5CYXR0ZXJpZXMuQmF0dGVyaWVzQXZvY2Fkb1dpZGdldEV4dGVuc2lvbiIsImVuaGFuY2VkU2VjdXJpdHkiOmZhbHNlLCJ0eXBlIjoxfQ==
+jagov              603   0.0  0.1 441969040  21328   ??  Ss   12:52PM   0:00.05 /System/Library/CoreServices/Screen Time.app/Contents/PlugIns/ScreenTimeWidgetIntentsExtension.appex/Contents/MacOS/ScreenTimeWidgetIntentsExtension -AppleLanguages ("en-US", "en")
+jagov              601   0.0  0.2 441970272  33792   ??  Ss   12:52PM   0:00.07 /System/Applications/Home.app/Contents/PlugIns/HomeWidget.appex/Contents/MacOS/HomeWidget -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5Ib21lLkhvbWVXaWRnZXQuSW50ZXJhY3RpdmUiLCJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZSwidHlwZSI6MX0=
+_fpsd              602   0.0  0.1 417091216   9152   ??  Ss   12:52PM   0:00.05 /System/Library/PrivateFrameworks/CoreADI.framework/adid
+jagov              600   0.0  0.1 441970352  13712   ??  S    12:52PM   0:00.25 /System/Library/PrivateFrameworks/EmailDaemon.framework/Versions/A/maild
+jagov              598   0.0  0.1 441951840  16352   ??  S    12:52PM   0:00.38 /System/Library/PrivateFrameworks/UsageTracking.framework/Versions/A/UsageTrackingAgent
+jagov              599   0.0  0.1 441956544  11888   ??  S    12:52PM   0:00.14 /usr/libexec/diagnosticextensionsd
+jagov              489   0.0  0.0 441944592   6032   ??  S    12:52PM   0:00.04 /usr/libexec/mobilerepaird
+jagov              597   0.0  0.1 441964992  12592   ??  Ss   12:52PM   0:00.04 /System/Library/PrivateFrameworks/MobileTimer.framework/PlugIns/MobileTimerIntents.appex/Contents/MacOS/MobileTimerIntents -AppleLanguages ("en-US", "en")
+jagov              596   0.0  0.2 441972256  39472   ??  Ss   12:52PM   0:00.11 /System/Applications/News.app/Contents/PlugIns/NewsTag.appex/Contents/MacOS/NewsTag -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5uZXdzLnRhZyIsImVuaGFuY2VkU2VjdXJpdHkiOmZhbHNlLCJ0eXBlIjoxfQ==
+jagov              595   0.0  0.1 441940272   8656   ??  S    12:52PM   0:00.05 /System/Library/PrivateFrameworks/CoreCDP.framework/Versions/A/Resources/cdpd
+jagov              594   0.0  0.1 441963344  20464   ??  S    12:52PM   0:00.31 /System/Library/PrivateFrameworks/AuthKit.framework/Versions/A/Support/akd
+jagov              593   0.0  0.1 441968304  25024   ??  Ss   12:52PM   0:00.05 /System/Applications/Journal.app/Contents/PlugIns/JournalWidgetsSecure.appex/Contents/MacOS/JournalWidgetsSecure -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5qb3VybmFsLndpZGdldHMuc2VjdXJlIiwiZW5oYW5jZWRTZWN1cml0eSI6ZmFsc2UsInR5cGUiOjF9
+jagov              592   0.0  0.2 442054432  38080   ??  S    12:52PM   0:01.44 /System/Library/PrivateFrameworks/SiriInference.framework/Versions/A/siriinferenced
+jagov              591   0.0  0.1 442036336  13312   ??  Ss   12:52PM   0:00.05 /System/iOSSupport/System/Library/ExtensionKit/Extensions/MauiAUSP.appex/Contents/MacOS/MauiAUSP -AppleLanguages ("en-US", "en")
+jagov              590   0.0  0.1 442348592  23056   ??  Ss   12:52PM   0:00.07 /System/Library/PrivateFrameworks/MacinTalk.framework/PlugIns/WardaSynthesizer.appex/Contents/MacOS/WardaSynthesizer -AppleLanguages ("en-US", "en")
+jagov              589   0.0  0.1 442291520  11088   ??  Ss   12:52PM   0:00.03 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+jagov              588   0.0  0.2 441981904  32656   ??  S    12:52PM   0:00.53 /usr/libexec/siriknowledged
+jagov              587   0.0  0.1 441977632  22112   ??  S    12:52PM   0:00.20 /System/Library/PrivateFrameworks/CloudSubscriptionFeatures.framework/FeatureAccessAgent
+jagov              586   0.0  0.1 441948992  14032   ??  S    12:52PM   0:00.22 /usr/libexec/swtransparencyd
+jagov              480   0.0  0.1 441966112  17952   ??  S    12:52PM   0:02.77 /System/Library/PrivateFrameworks/AXAssetLoader.framework/Support/axassetsd
+jagov              585   0.0  0.2 441970224  35104   ??  Ss   12:52PM   0:00.10 /System/Applications/Home.app/Contents/PlugIns/HomeEnergyWidgetsExtension.appex/Contents/MacOS/HomeEnergyWidgetsExtension -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5Ib21lLkhvbWVFbmVyZ3lXaWRnZXRzIiwiZW5oYW5jZWRTZWN1cml0eSI6ZmFsc2UsInR5cGUiOjF9
+jagov              584   0.0  0.1 442283712  10784   ??  Ss   12:52PM   0:00.02 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+jagov              583   0.0  0.1 441966432  23664   ??  Ss   12:52PM   0:00.06 /System/Library/CoreServices/Screen Time.app/Contents/PlugIns/ScreenTimeWidgetExtension.appex/Contents/MacOS/ScreenTimeWidgetExtension -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5TY3JlZW5UaW1lV2lkZ2V0QXBwbGljYXRpb24uU2NyZWVuVGltZVdpZGdldEV4dGVuc2lvbiIsImVuaGFuY2VkU2VjdXJpdHkiOmZhbHNlLCJ0eXBlIjoxfQ==
+jagov              582   0.0  0.1 441967632  25120   ??  Ss   12:52PM   0:00.05 /System/Applications/FindMy.app/Contents/PlugIns/FindMyWidgetItems.appex/Contents/MacOS/FindMyWidgetItems -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5maW5kbXkuRmluZE15V2lkZ2V0SXRlbXMiLCJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZSwidHlwZSI6MX0=
+jagov              425   0.0  0.2 441996560  25216   ??  S    12:52PM   0:02.58 /System/Library/PrivateFrameworks/CoreDuetContext.framework/Resources/ContextStoreAgent
+jagov              581   0.0  0.1 442292176  11232   ??  Ss   12:52PM   0:00.04 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+jagov              580   0.0  0.3 442020336  54288   ??  S    12:52PM   0:14.37 /System/Library/PrivateFrameworks/AssistantServices.framework/Versions/A/Support/assistantd
+jagov              579   0.0  0.0 441909712   6576   ??  S    12:52PM   0:00.04 /System/Library/PrivateFrameworks/CoreThreadCommissionerService.framework/CoreThreadCommissionerServiced
+jagov              578   0.0  0.3 442054288  43472   ??  Ss   12:52PM   0:02.88 /System/Applications/Clock.app/Contents/PlugIns/WorldClockWidget.appex/Contents/MacOS/WorldClockWidget -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5jbG9jay5Xb3JsZENsb2NrV2lkZ2V0IiwiZW5oYW5jZWRTZWN1cml0eSI6ZmFsc2UsInR5cGUiOjF9
+jagov              577   0.0  0.1 441949648  15024   ??  Ss   12:52PM   0:00.34 /System/Library/PrivateFrameworks/TrialServer.framework/Versions/A/XPCServices/TrialArchivingService.xpc/Contents/MacOS/TrialArchivingService
+jagov              576   0.0  0.2 441970048  25568   ??  Ss   12:52PM   0:00.06 /System/Applications/FindMy.app/Contents/PlugIns/FindMyWidgetPeople.appex/Contents/MacOS/FindMyWidgetPeople -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5maW5kbXkuRmluZE15V2lkZ2V0UGVvcGxlIiwiZW5oYW5jZWRTZWN1cml0eSI6ZmFsc2UsInR5cGUiOjF9
+jagov              575   0.0  0.2 441990032  30000   ??  Ss   12:52PM   0:00.09 /System/Applications/Podcasts.app/Contents/PlugIns/PodcastsWidget.appex/Contents/MacOS/PodcastsWidget -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5wb2RjYXN0cy53aWRnZXQiLCJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZSwidHlwZSI6MX0=
+jagov              487   0.0  0.1 441946464   9088   ??  S    12:52PM   0:00.63 /System/Library/PrivateFrameworks/AskPermission.framework/Versions/A/Resources/askpermissiond
+jagov              574   0.0  0.4 442207328  74960   ??  Ss   12:52PM   0:03.01 /System/Applications/Stocks.app/Contents/PlugIns/StocksWidget.appex/Contents/MacOS/StocksWidget -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5zdG9ja3Mud2lkZ2V0IiwiZW5oYW5jZWRTZWN1cml0eSI6ZmFsc2UsInR5cGUiOjF9
+jagov              558   0.0  0.2 442098256  33088   ??  S    12:52PM   0:00.97 /usr/libexec/searchpartyuseragent
+jagov              573   0.0  0.1 442291840   9136   ??  Ss   12:52PM   0:00.02 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+jagov              572   0.0  0.1 442292336   9200   ??  Ss   12:52PM   0:00.02 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+jagov              571   0.0  0.1 442054800  13856   ??  S    12:52PM   0:00.07 /System/Library/PrivateFrameworks/ContextKit.framework/Versions/A/XPCServices/ContextService.xpc/Contents/MacOS/ContextService
+jagov              556   0.0  0.1 441967136  24752   ??  Ss   12:52PM   0:00.06 /System/Applications/Journal.app/Contents/PlugIns/JournalWidgets.appex/Contents/MacOS/JournalWidgets -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5qb3VybmFsLndpZGdldHMiLCJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZSwidHlwZSI6MX0=
+jagov              570   0.0  0.0 441923568   6576   ??  Ss   12:52PM   0:00.02 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/AudioConverterService.xpc/Contents/MacOS/AudioConverterService
+jagov              569   0.0  0.1 441950080   9664   ??  Ss   12:52PM   0:00.10 /System/Library/PrivateFrameworks/CloudTelemetry.framework/Versions/A/XPCServices/CloudTelemetryService.xpc/Contents/MacOS/CloudTelemetryService
+jagov              568   0.0  0.1 441951696  13872   ??  S    12:52PM   0:00.07 /System/Library/PrivateFrameworks/ContactsDonation.framework/Versions/A/Support/contactsdonationagent
+root               567   0.0  0.1 442199904  19776   ??  Ss   12:52PM   0:00.44 /System/Library/PrivateFrameworks/AppSSO.framework/Support/AppSSODaemon
+jagov              566   0.0  0.1 441968544  18432   ??  S    12:52PM   0:00.16 /usr/libexec/avconferenced
+jagov              565   0.0  0.0 441905248   4560   ??  S    12:52PM   0:00.08 /System/Library/PrivateFrameworks/MediaRemote.framework/Support/mediaremoteagent
+jagov              563   0.0  0.1 441945808  11312   ??  Ss   12:52PM   0:00.06 /System/Library/Frameworks/Speech.framework/Versions/A/XPCServices/localspeechrecognition.xpc/Contents/MacOS/localspeechrecognition
+jagov              562   0.0  0.1 441995696  18288   ??  S    12:52PM   0:00.31 /System/Library/PrivateFrameworks/SiriTTSService.framework/sirittsd
+jagov              564   0.0  0.3 442140992  43728   ??  S    12:52PM   0:00.24 /System/Library/PrivateFrameworks/AppSSO.framework/Support/AppSSOAgent.app/Contents/MacOS/AppSSOAgent
+jagov              552   0.0  0.5 442733648  91232   ??  Ss   12:52PM   0:01.39 /System/Library/Frameworks/Speech.framework/Versions/A/XPCServices/localspeechrecognition.xpc/Contents/MacOS/localspeechrecognition
+jagov              561   0.0  0.1 442022848  10032   ??  Ss   12:52PM   0:00.04 /System/Library/PrivateFrameworks/TelephonyUtilities.framework/XPCServices/com.apple.FaceTime.FTConversationService.xpc/Contents/MacOS/com.apple.FaceTime.FTConversationService
+jagov              557   0.0  0.0 441984016   4000   ??  Ss   12:52PM   0:00.01 /System/Library/PrivateFrameworks/WiFiPolicy.framework/XPCServices/WiFiCloudAssetsXPCService.xpc/Contents/MacOS/WiFiCloudAssetsXPCService
+jagov              560   0.0  0.3 442052464  54656   ??  S    12:52PM   0:00.96 /System/Library/PrivateFrameworks/HomeKitDaemon.framework/Support/homed
+jagov              559   0.0  0.0 441967296   3152   ??  Ss   12:52PM   0:00.01 /System/Library/Frameworks/NetFS.framework/Versions/A/XPCServices/PlugInLibraryService.xpc/Contents/MacOS/PlugInLibraryService
+jagov              486   0.0  0.1 441954896   8944   ??  S    12:52PM   0:00.04 /System/Library/CoreServices/appplaceholdersyncd
+jagov              496   0.0  0.1 441950368  20864   ??  S    12:52PM   0:00.79 /System/Library/PrivateFrameworks/AppleMediaServices.framework/Resources/amsaccountsd
+jagov              555   0.0  0.1 441946032  12096   ??  S    12:52PM   0:00.09 /usr/libexec/frauddefensed
+jagov              542   0.0  0.1 441962368  18720   ??  Ss   12:52PM   0:00.05 /System/Applications/VoiceMemos.app/Contents/PlugIns/RecordWidgetExtension.appex/Contents/MacOS/RecordWidgetExtension -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5Wb2ljZU1lbW9zLlJlY29yZFdpZGdldCIsImVuaGFuY2VkU2VjdXJpdHkiOmZhbHNlLCJ0eXBlIjoxfQ==
+jagov              554   0.0  0.2 442062240  34400   ??  S    12:52PM   0:00.24 /usr/libexec/appleaccountd
+jagov              553   0.0  0.1 441947024  12448   ??  S    12:52PM   0:00.76 /System/Library/CoreServices/ScopedBookmarkAgent
+jagov              550   0.0  0.2 441951488  25424   ??  S    12:52PM   0:15.35 /usr/libexec/triald
+jagov              551   0.0  0.1 442034144  24096   ??  S    12:52PM   0:00.32 /System/Library/PrivateFrameworks/IMDPersistence.framework/XPCServices/IMDPersistenceAgent.xpc/Contents/MacOS/IMDPersistenceAgent
+jagov              549   0.0  0.2 442010432  31632   ??  S    12:52PM   0:05.70 /usr/libexec/networkserviceproxy
+jagov              548   0.0  0.1 441948800  23504   ??  S    12:52PM   0:00.37 /System/Library/PrivateFrameworks/iTunesCloud.framework/Support/itunescloudd
+jagov              547   0.0  0.2 441976544  25664   ??  S    12:52PM   0:01.24 /System/Library/PrivateFrameworks/PhotoLibraryServices.framework/Versions/A/Support/photolibraryd
+jagov              546   0.0  0.0 441905824   5824   ??  S    12:52PM   0:00.03 /System/Library/PrivateFrameworks/CoreFollowUp.framework/Versions/A/Support/followupd
+jagov              452   0.0  0.3 442159280  43840   ??  S    12:52PM   0:10.08 /System/Library/CoreServices/WiFiAgent.app/Contents/MacOS/WiFiAgent
+jagov              544   0.0  0.7 442255616 125696   ??  S    12:52PM   0:03.46 /System/Library/PrivateFrameworks/MediaAnalysis.framework/Versions/A/mediaanalysisd
+root               543   0.0  0.0 441905568   4432   ??  Ss   12:52PM   0:00.13 /System/Library/PrivateFrameworks/CacheDelete.framework/deleted_helper
+jagov              541   0.0  0.1 441962832  20048   ??  Ss   12:52PM   0:00.04 /System/Applications/VoiceMemos.app/Contents/PlugIns/VoiceMemosSettingsWidgetExtension.appex/Contents/MacOS/VoiceMemosSettingsWidgetExtension -LaunchArguments eyJzZXJ2aWNlTmFtZSI6ImNvbS5hcHBsZS5Wb2ljZU1lbW9zLlZvaWNlTWVtb3NTZXR0aW5nc1dpZGdldCIsImVuaGFuY2VkU2VjdXJpdHkiOmZhbHNlLCJ0eXBlIjoxfQ==
+jagov              540   0.0  0.2 441975792  38928   ??  Ss   12:52PM   0:00.16 /System/Applications/News.app/Contents/PlugIns/NewsToday2.appex/Contents/MacOS/NewsToday2 -LaunchArguments eyJ0eXBlIjoxLCJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZSwic2VydmljZU5hbWUiOiJjb20uYXBwbGUubmV3cy53aWRnZXQifQ==
+jagov              538   0.0  0.1 441983408  17776   ??  S    12:52PM   0:00.27 /usr/libexec/neagent
+jagov              539   0.0  0.2 444370272  36064   ??  Ss   12:52PM   0:01.28 /System/Library/Frameworks/VideoToolbox.framework/Versions/A/XPCServices/VTDecoderXPCService.xpc/Contents/MacOS/VTDecoderXPCService
+jagov              537   0.0  0.1 441984768  15888   ??  Ss   12:52PM   0:07.95 /System/Library/Frameworks/ExtensionFoundation.framework/Versions/A/XPCServices/extensionkitservice.xpc/Contents/MacOS/extensionkitservice
+jagov              536   0.0  0.1 441946608  17248   ??  S    12:52PM   0:00.19 /System/Library/PrivateFrameworks/ContinuousDialogManagerService.framework/assistant_cdmd
+jagov              534   0.0  0.4 442084336  69856   ??  S    12:52PM   1:42.53 /usr/libexec/duetexpertd
+jagov              533   0.0  0.1 441950288  15520   ??  S    12:52PM   0:00.25 /System/Library/PrivateFrameworks/FamilyCircle.framework/Versions/A/Resources/familycircled
+jagov              532   0.0  0.0 441902224   4384   ??  S    12:52PM   0:00.02 /System/Library/CoreServices/ReportCrash agent
+jagov              531   0.0  0.1 442382432  21488   ??  S    12:52PM   0:02.75 /usr/libexec/spotlightknowledged.updater -u
+jagov              530   0.0  2.3 447552432 383376   ??  Ss   12:52PM   1:08.37 /System/Library/CoreServices/Dock.app/Contents/XPCServices/com.apple.dock.extra.xpc/Contents/MacOS/com.apple.dock.extra
+jagov              529   0.0  0.1 441911856  11440   ??  S    12:52PM   0:00.32 /System/Library/PrivateFrameworks/UserActivity.framework/Agents/useractivityd
+jagov              490   0.0  0.1 441911296   9952   ??  S    12:52PM   0:00.06 /System/Library/Frameworks/ManagedSettings.framework/Versions/A/ManagedSettingsAgent
+root               528   0.0  0.1 441961216  23632   ??  Ss   12:52PM   0:00.86 /usr/libexec/kernelmanager_helper
+root               527   0.0  0.0 441908704   5152   ??  Ss   12:52PM   0:00.02 /Library/Apple/System/Library/PrivateFrameworks/DeviceInterface.framework/Support/deviceinterfaced
+jagov              526   0.0  0.1 441951184  17152   ??  S    12:52PM   0:00.16 /usr/libexec/milod
+jagov              525   0.0  0.2 442628608  38496   ??  S    12:52PM   0:03.21 /System/Library/PrivateFrameworks/TextInputUIMacHelper.framework/Versions/A/XPCServices/CursorUIViewService.xpc/Contents/MacOS/CursorUIViewService
+jagov              524   0.0  0.1 441965520  15872   ??  S    12:52PM   0:00.09 /System/Library/PrivateFrameworks/SessionCore.framework/Support/liveactivitiesd
+jagov              523   0.0  0.1 441950912  24496   ??  S    12:52PM   0:00.57 /System/Library/PrivateFrameworks/CoreParsec.framework/parsecd
+jagov              522   0.0  0.1 441996256  18096   ??  S    12:52PM   0:00.12 /System/Library/PrivateFrameworks/StatusKit.framework/StatusKitAgent
+jagov              516   0.0  0.1 441970720  10544   ??  S    12:52PM   0:00.12 /System/Library/PrivateFrameworks/IntlPreferences.framework/Support/localizationswitcherd
+jagov              520   0.0  0.1 441953696  20992   ??  S    12:52PM   0:00.20 /System/Library/PrivateFrameworks/ScreenTimeCore.framework/Versions/A/ScreenTimeAgent
+jagov              521   0.0  0.1 441970976  23520   ??  S    12:52PM   0:01.18 /System/Library/CoreServices/UIKitSystem.app/Contents/MacOS/UIKitSystem system_app_start
+jagov              518   0.0  0.1 441960096  22112   ??  S    12:52PM   0:00.19 /System/Library/PrivateFrameworks/ReplicatorCore.framework/Support/replicatord
+jagov              517   0.0  0.1 441973408  21456   ??  S    12:52PM   0:00.15 /usr/libexec/findmylocateagent
+_oahd              515   0.0  0.0 441901440   2976   ??  Ss   12:52PM   0:00.01 /usr/libexec/rosetta/oahd
+jagov              514   0.0  0.0 441979664   8368   ??  S    12:52PM   0:00.06 /System/Library/CoreServices/pbs
+jagov              512   0.0  0.0 441906336   6608   ??  S    12:52PM   0:00.02 /System/Library/PrivateFrameworks/CommunicationsFilter.framework/CMFSyncAgent
+_nearbyd           511   0.0  0.1 441985024  17824   ??  Ss   12:52PM   0:02.28 /usr/libexec/nearbyd
+jagov              510   0.0  1.1 442716224 176576   ??  S    12:52PM   0:03.88 /System/Library/CoreServices/Spotlight.app/Contents/MacOS/Spotlight
+jagov              509   0.0  0.1 441954784  10736   ??  S    12:52PM   0:00.07 /System/Library/Frameworks/AudioToolbox.framework/AudioComponentRegistrar
+jagov              508   0.0  0.5 442236640  86928   ??  S    12:52PM   0:02.33 /System/Library/Frameworks/Contacts.framework/Support/contactsd
+jagov              507   0.0  0.2 442047296  28384   ??  S    12:52PM   0:00.41 /System/Library/CoreServices/TextInputSwitcher.app/Contents/MacOS/TextInputSwitcher
+jagov              506   0.0  0.2 441985568  25664   ??  S    12:52PM   0:04.35 /System/Library/PrivateFrameworks/CacheDelete.framework/deleted
+jagov              500   0.0  0.2 442131408  41248   ??  S    12:52PM   0:00.24 /System/Library/PrivateFrameworks/SoftwareUpdate.framework/Resources/SoftwareUpdateNotificationManager.app/Contents/MacOS/SoftwareUpdateNotificationManager
+jagov              505   0.0  0.1 441948336  18672   ??  S    12:52PM   0:01.01 /System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod
+jagov              492   0.0  0.2 441982192  34064   ??  S    12:52PM   0:01.22 /System/Library/PrivateFrameworks/IMCore.framework/imagent.app/Contents/MacOS/imagent
+jagov              498   0.0  0.1 441909584  12704   ??  S    12:52PM   0:00.05 /System/Library/Frameworks/CryptoTokenKit.framework/ctkahp.bundle/Contents/MacOS/ctkahp
+jagov              478   0.0  0.2 441953264  35328   ??  S    12:52PM   0:04.97 /System/Library/PrivateFrameworks/HearingCore.framework/heard
+jagov              485   0.0  0.0 441944656   8192   ??  S    12:52PM   0:00.04 /System/Library/Image Capture/Support/icdd
+jagov              479   0.0  0.3 442044432  55728   ??  S    12:52PM   0:02.93 /System/Library/PrivateFrameworks/CoreSpeech.framework/corespeechd
+jagov              475   0.0  0.5 442485760  85376   ??  S    12:52PM   0:02.82 /usr/libexec/sharingd
+root               501   0.0  0.0 441901376   3936   ??  Ss   12:52PM   0:00.01 /System/Library/PrivateFrameworks/FindMyMac.framework/Resources/FindMyMacd
+jagov              504   0.0  0.2 443970768  33952   ??  Ss   12:52PM   0:04.34 /System/Library/ExtensionKit/Extensions/WallpaperAerialsExtension.appex/Contents/MacOS/WallpaperAerialsExtension -LaunchArguments eyJ0eXBlIjoxLCJlbmhhbmNlZFNlY3VyaXR5IjpmYWxzZSwic2VydmljZU5hbWUiOiJjb20uYXBwbGUud2FsbHBhcGVyLmV4dGVuc2lvbi5hZXJpYWxzIn0=
+jagov              503   0.0  0.1 441951520  13696   ??  S    12:52PM   0:00.13 /System/Library/PrivateFrameworks/CommunicationTrust.framework/Support/communicationtrustd
+root               477   0.0  0.0 441901728   4368   ??  Ss   12:52PM   0:00.01 /usr/libexec/wallpaperexportd
+jagov              502   0.0  0.1 441951312   9104   ??  Ss   12:52PM   0:00.01 /System/Library/Frameworks/ExtensionFoundation.framework/Versions/A/XPCServices/extensionkitservice.xpc/Contents/MacOS/extensionkitservice
+jagov              483   0.0  0.5 442421008  90832   ??  S    12:52PM   1:01.20 /System/Library/CoreServices/NotificationCenter.app/Contents/MacOS/NotificationCenter
+jagov              494   0.0  0.3 442223200  54400   ??  S    12:52PM   0:00.28 /System/Library/CoreServices/TextInputMenuAgent.app/Contents/MacOS/TextInputMenuAgent
+jagov              491   0.0  0.1 441973360  18928   ??  S    12:52PM   0:00.19 /System/Library/CoreServices/AirPlayUIAgent.app/Contents/MacOS/AirPlayUIAgent --launchd
+jagov              474   0.0  0.0 441905984   2784   ??  Ss   12:52PM   0:00.01 /System/Library/PrivateFrameworks/login.framework/Versions/A/XPCServices/LoginUserService.xpc/Contents/MacOS/LoginUserService
+jagov              476   0.0  0.2 441982128  25472   ??  S    12:52PM   0:00.31 /System/Library/PrivateFrameworks/DoNotDisturbServer.framework/Support/donotdisturbd
+jagov              473   0.0  0.4 442036752  66624   ??  S    12:52PM   0:12.39 /System/Library/PrivateFrameworks/ChronoCore.framework/Support/chronod
+jagov              472   0.0  0.1 442069840  20720   ??  S    12:52PM   0:01.94 /usr/libexec/replayd
+jagov              471   0.0  0.1 441949152  14192   ??  S    12:52PM   0:00.89 /System/Library/PrivateFrameworks/MobileTimer.framework/Executables/mobiletimerd
+jagov              468   0.0  0.1 441950272  13616   ??  S    12:52PM   0:00.10 /usr/libexec/intelligentroutingd
+jagov              469   0.0  0.2 441949712  28304   ??  S    12:52PM   0:00.35 /System/Library/CoreServices/audioaccessoryd
+jagov              470   0.0  0.1 441942704  14640   ??  S    12:52PM   0:00.15 /System/Library/Frameworks/LocalAuthentication.framework/Support/coreauthd
+jagov              467   0.0  0.1 441993248  22240   ??  Ss   12:52PM   0:00.29 /System/Library/Input Methods/PressAndHold.app/Contents/PlugIns/PAH_Extension.appex/Contents/MacOS/PAH_Extension -AppleLanguages ("en-US", "en")
+jagov              465   0.0  0.1 441954688  12496   ??  S    12:52PM   0:00.08 /System/Library/Frameworks/CryptoTokenKit.framework/ctkd -tw
+jagov              466   0.0  0.1 441970176  14688   ??  S    12:52PM   0:00.40 /System/Library/PrivateFrameworks/ViewBridge.framework/Versions/A/XPCServices/ViewBridgeAuxiliary.xpc/Contents/MacOS/ViewBridgeAuxiliary
+jagov              464   0.0  0.2 441996800  27600   ??  S    12:52PM   0:01.65 /System/Library/PrivateFrameworks/CloudKitDaemon.framework/Support/cloudd
+jagov              463   0.0  0.2 442004784  26096   ??  S    12:52PM   0:00.35 /usr/libexec/transparencyd
+jagov              462   0.0  0.1 441977584  19056   ??  S    12:52PM   0:00.41 /System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/ATS.framework/Versions/A/Support/fontworker
+jagov              459   0.0  0.1 442002992  18480   ??  S    12:52PM   0:00.19 /System/Library/PrivateFrameworks/FileProvider.framework/Support/fileproviderd
+jagov              460   0.0  0.1 441964080  10304   ??  S    12:52PM   0:00.06 /System/Library/PrivateFrameworks/AMPDevices.framework/Versions/A/Support/AMPDeviceDiscoveryAgent --launchd
+jagov              456   0.0  0.2 442073360  37216   ??  S    12:52PM   0:01.27 /System/Library/PrivateFrameworks/CoreSuggestions.framework/Versions/A/Support/suggestd
+jagov              461   0.0  0.4 442684288  73072   ??  S    12:52PM   0:03.60 /System/Library/CoreServices/iconservicesagent
+jagov              454   0.0  0.1 441986112  19216   ??  S    12:52PM   0:01.94 /System/Library/PrivateFrameworks/TCC.framework/Support/tccd
+jagov              457   0.0  0.1 441950848  13568   ??  S    12:52PM   0:00.61 /System/Library/Frameworks/ApplicationServices.framework/Frameworks/ATS.framework/Support/fontd
+jagov              455   0.0  0.1 441937040  12688   ??  S    12:52PM   0:00.09 /System/Library/PrivateFrameworks/SocialLayer.framework/sociallayerd.app/Contents/MacOS/sociallayerd
+jagov              458   0.0  0.2 441992144  25424   ??  S    12:52PM   0:00.55 /System/Library/PrivateFrameworks/CalendarDaemon.framework/Support/calaccessd
+jagov              450   0.0  0.1 441910560  10416   ??  S    12:52PM   0:00.04 /usr/libexec/assessmentagent
+jagov              451   0.0  0.1 441944528  15120   ??  S    12:52PM   0:01.06 /System/Library/PrivateFrameworks/iCloudDriveCore.framework/Versions/A/Support/bird
+jagov              453   0.0  0.3 442138656  55856   ??  S    12:52PM   0:13.16 /System/Library/PrivateFrameworks/VoiceShortcuts.framework/Versions/A/Support/siriactionsd
+jagov              446   0.0  0.1 441950560  14960   ??  S    12:52PM   0:00.13 /usr/libexec/dmd
+jagov              449   0.0  0.2 442550256  34304   ??  S    12:52PM   0:00.26 /System/Library/Frameworks/QuickLookThumbnailing.framework/Support/com.apple.quicklook.ThumbnailsAgent
+jagov              448   0.0  0.1 442264528  20672   ??  S    12:52PM   0:00.08 /System/Library/CoreServices/sharedfilelistd
+jagov              447   0.0  0.1 441919344  18848   ??  Ss   12:52PM   0:00.20 /System/Library/Frameworks/QuickLookUI.framework/Versions/A/XPCServices/QuickLookUIService.xpc/Contents/MacOS/QuickLookUIService
+_appleevents       438   0.0  0.0 441909808   5360   ??  S    12:52PM   0:00.78 /usr/sbin/distnoted agent
+jagov              445   0.0  0.1 441949152  19744   ??  S    12:52PM   0:05.42 /usr/libexec/trustd --agent
+jagov              444   0.0  0.0 441905504   4960   ??  S    12:52PM   0:00.11 /System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/HIServices.framework/Versions/A/XPCServices/com.apple.hiservices-xpcservice.xpc/Contents/MacOS/com.apple.hiservices-xpcservice
+jagov              443   0.0  0.1 441949024  10928   ??  S    12:52PM   0:02.67 /System/Library/Frameworks/Accounts.framework/Versions/A/Support/accountsd
+jagov              439   0.0  0.3 442087168  46336   ??  S    12:52PM   0:00.79 /System/Library/PrivateFrameworks/TelephonyUtilities.framework/callservicesd
+jagov              440   0.0  0.1 441960832  14544   ??  S    12:52PM   0:00.40 /System/Library/PrivateFrameworks/SyncedDefaults.framework/Support/syncdefaultsd
+jagov              441   0.0  0.3 442105136  46832   ??  S    12:52PM   0:01.55 /System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd
+jagov              442   0.0  0.2 442033760  36624   ??  S    12:52PM   0:00.48 /System/Library/CoreServices/WallpaperAgent.app/Contents/MacOS/WallpaperAgent
+jagov              437   0.0  0.0 441906160   3344   ??  S    12:52PM   0:00.01 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/CarbonCore.framework/Versions/A/XPCServices/csnameddatad.xpc/Contents/MacOS/csnameddatad
+jagov              436   0.0  0.4 442217360  60880   ??  S    12:52PM   0:00.40 /System/Library/CoreServices/AccessibilityUIServer.app/Contents/MacOS/AccessibilityUIServer
+jagov              435   0.0  0.8 449979216 140544   ??  S    12:52PM   0:06.90 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/corespotlightd
+jagov              432   0.0  0.3 442131040  43728   ??  S    12:52PM   0:00.21 /System/Library/CoreServices/CoreLocationAgent.app/Contents/MacOS/CoreLocationAgent
+jagov              431   0.0  1.1 442504448 187264   ??  S    12:52PM   0:16.28 /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder
+jagov              430   0.0  0.3 442141264  45168   ??  S    12:52PM   0:00.28 /System/Library/CoreServices/SystemUIServer.app/Contents/MacOS/SystemUIServer
+jagov              429   0.0  0.6 442396672 104752   ??  S    12:52PM   0:14.95 /System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter
+jagov              428   0.0  0.3 442804240  57952   ??  S    12:52PM   0:02.03 /System/Library/CoreServices/Dock.app/Contents/MacOS/Dock
+jagov              427   0.0  0.1 442072720  22256   ??  S    12:52PM   0:01.10 /System/Library/CoreServices/talagentd
+jagov              426   0.0  0.2 441985456  30768   ??  S    12:52PM   0:04.06 /System/Library/CoreServices/WindowManager.app/Contents/MacOS/WindowManager
+jagov              424   0.0  0.1 441984864  17904   ??  S    12:52PM   0:00.23 /System/Library/PrivateFrameworks/UserNotificationsCore.framework/Support/usernotificationsd
+jagov              423   0.0  0.1 441989200  16432   ??  S    12:52PM   0:01.04 /usr/libexec/secinitd
+jagov              422   0.0  0.2 441991504  25168   ??  S    12:52PM   0:00.52 /usr/sbin/usernoted
+jagov              421   0.0  0.2 442000784  29840   ??  S    12:52PM   0:00.60 /usr/libexec/routined LAUNCHED_BY_LAUNCHD
+jagov              420   0.0  0.2 442016496  36608   ??  S    12:52PM   0:00.85 /usr/libexec/linkd
+jagov              419   0.0  0.3 442249712  50256   ??  S    12:52PM   0:44.02 /System/Library/PrivateFrameworks/UniversalAccess.framework/Versions/A/Resources/AXVisualSupportAgent.app/Contents/MacOS/AXVisualSupportAgent launchd -s
+jagov              418   0.0  0.2 441978896  27696   ??  S    12:52PM   0:00.49 /usr/libexec/rapportd
+jagov              417   0.0  0.1 441984304  23152   ??  S    12:52PM   0:01.90 /usr/libexec/nsurlsessiond
+jagov              415   0.0  0.0 441905872   4944   ??  S    12:52PM   0:00.03 /System/Library/CoreServices/APFSUserAgent
+jagov              414   0.0  0.2 442013520  30528   ??  S    12:52PM   0:00.33 /System/Library/Frameworks/CoreTelephony.framework/Support/CommCenter -L
+jagov              412   0.0  0.1 441944848  10688   ??  S    12:52PM   0:01.70 /usr/libexec/containermanagerd --runmode=agent --user-container-mode=current --bundle-container-mode=proxy --system-container-mode=none
+jagov              411   0.0  0.1 441993408  21584   ??  S    12:52PM   0:00.67 /usr/libexec/pkd
+jagov              410   0.0  0.1 441955520  17056   ??  S    12:52PM   0:02.09 /usr/libexec/lsd
+jagov              409   0.0  0.1 441948640  10928   ??  S    12:52PM   0:00.06 /System/Library/Frameworks/InputMethodKit.framework/Resources/imklaunchagent
+jagov              408   0.0  0.1 441941104  11552   ??  S    12:52PM   0:00.17 /usr/libexec/pboard
+jagov              407   0.0  0.1 441946624  11552   ??  S    12:52PM   0:00.13 /usr/libexec/ContinuityCaptureAgent server
+jagov              404   0.0  0.0 441941792   3856   ??  S    12:52PM   0:00.03 /System/Library/PrivateFrameworks/CloudServices.framework/Helpers/com.apple.sbd
+jagov              406   0.0  0.2 441968256  30016   ??  S    12:52PM   0:00.65 /usr/libexec/knowledge-agent
+jagov              398   0.0  0.2 441983664  26736   ??  S    12:52PM   0:03.71 /usr/libexec/UserEventAgent (Aqua)
+jagov              405   0.0  0.1 441965280  22240   ??  S    12:52PM   0:01.34 /usr/sbin/universalaccessd launchd -s
+jagov              403   0.0  0.2 442165520  38848   ??  S    12:52PM   0:01.82 /System/Library/CoreServices/CoreServicesUIAgent.app/Contents/MacOS/CoreServicesUIAgent
+_accessoryupdater   401   0.0  0.0 441911840   4720   ??  Ss   12:52PM   0:00.06 /usr/libexec/uarpd
+_applepay          400   0.0  0.0 441922096   5200   ??  Ss   12:52PM   0:00.09 /usr/libexec/seld
+_gamecontrollerd   399   0.0  0.0 441910128   5296   ??  Ss   12:52PM   0:01.19 /usr/libexec/gamecontrollerd
+jagov              396   0.0  0.1 441969376  19632   ??  S    12:52PM   0:15.43 /usr/libexec/secd
+root               397   0.0  0.0 441910016   7136   ??  Ss   12:52PM   0:00.04 /System/Library/PrivateFrameworks/CoreKDL.framework/Support/corekdld
+jagov              395   0.0  0.1 441925552  10272   ??  S    12:52PM   0:05.21 /usr/sbin/cfprefsd agent
+jagov              394   0.0  0.0 441909952   8144   ??  S    12:52PM   0:05.12 /usr/sbin/distnoted agent
+root               393   0.0  0.0 441909648   4656   ??  Ss   12:52PM   0:00.04 /usr/libexec/applekeystored
+root               390   0.0  0.1 441911488  13552   ??  Ss   12:52PM   0:00.07 /System/Library/Frameworks/GSS.framework/Helpers/GSSCred
+_driverkit         388   0.0  0.0 441544608   3984   ??  Ss   12:52PM   0:00.02 /System/Library/DriverExtensions/IOUserBluetoothSerialDriver.dext/IOUserBluetoothSerialDriver com.apple.IOUserBluetoothSerialDriver 0x100000d63 com.apple.IOUserBluetoothSerialDriver
+root               387   0.0  0.1 441947104  12656   ??  Ss   12:52PM   0:00.27 /usr/libexec/rtcreportingd
+root               386   0.0  0.1 442016480  20400   ??  Ss   12:52PM   0:00.74 /usr/libexec/wifianalyticsd
+root               375   0.0  0.0 441976016   6336   ??  Ss   12:52PM   0:00.03 /System/Library/PrivateFrameworks/WiFiPolicy.framework/XPCServices/WiFiCloudAssetsXPCService.xpc/Contents/MacOS/WiFiCloudAssetsXPCService
+root               374   0.0  0.1 441982816  17488   ??  Ss   12:52PM   0:03.08 /usr/libexec/wifip2pd
+root               370   0.0  0.0 441942352   6304   ??  S    12:52PM   0:00.09 /usr/sbin/systemstats --logger-helper /private/var/db/systemstats
+root               369   0.0  0.0 441905808   1680   ??  Ss   12:52PM   0:03.42 /usr/libexec/sysmond
+_accessoryupdater   368   0.0  0.0 441910288   2976   ??  Ss   12:52PM   0:00.06 /System/Library/PrivateFrameworks/MobileAccessoryUpdater.framework/XPCServices/ThunderboltAccessoryUpdaterService.xpc/Contents/MacOS/ThunderboltAccessoryUpdaterService
+_accessoryupdater   367   0.0  0.0 441910064   4848   ??  S    12:52PM   0:00.76 /usr/sbin/distnoted agent
+_accessoryupdater   365   0.0  0.0 441910016   6896   ??  Ss   12:52PM   0:00.05 /System/Library/PrivateFrameworks/MobileAccessoryUpdater.framework/XPCServices/UARPUpdaterServiceHID.xpc/Contents/MacOS/UARPUpdaterServiceHID
+_accessoryupdater   364   0.0  0.0 441892912   5984   ??  Ss   12:52PM   0:00.04 /System/Library/PrivateFrameworks/MobileAccessoryUpdater.framework/XPCServices/UARPUpdaterServiceAFU.xpc/Contents/MacOS/UARPUpdaterServiceAFU
+_accessoryupdater   363   0.0  0.0 441929104   6944   ??  Ss   12:52PM   0:00.10 /System/Library/PrivateFrameworks/MobileAccessoryUpdater.framework/XPCServices/UARPUpdaterServiceUSBPD.xpc/Contents/MacOS/UARPUpdaterServiceUSBPD
+_accessoryupdater   366   0.0  0.0 441944608   7488   ??  Ss   12:52PM   0:00.08 /System/Library/PrivateFrameworks/MobileAccessoryUpdater.framework/XPCServices/UARPUpdaterServiceLegacyAudio.xpc/Contents/MacOS/UARPUpdaterServiceLegacyAudio
+_accessoryupdater   362   0.0  0.0 441960208   8096   ??  Ss   12:52PM   0:00.07 /System/Library/PrivateFrameworks/MobileAccessoryUpdater.framework/XPCServices/UARPUpdaterServiceDisplay.xpc/Contents/MacOS/UARPUpdaterServiceDisplay
+root               361   0.0  0.1 441960032  14288   ??  Ss   12:52PM   0:00.23 /usr/sbin/systemsoundserverd
+root               360   0.0  0.0 441947072   3968   ??  Ss   12:52PM   0:00.14 /System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Versions/A/XPCServices/com.apple.MobileSoftwareUpdate.CleanupPreparePathService.xpc/Contents/MacOS/com.apple.MobileSoftwareUpdate.CleanupPreparePathService
+root               357   0.0  0.0 441946224   6416   ??  Ss   12:52PM   0:02.10 /Library/Apple/System/Library/CoreServices/XProtect.app/Contents/XPCServices/XProtectPluginService.xpc/Contents/MacOS/XProtectPluginService
+_ctkd              358   0.0  0.0 441909888   2736   ??  Ss   12:52PM   0:00.04 /System/Library/Frameworks/CryptoTokenKit.framework/ctkd -st
+_spotlight         351   0.0  0.0 441909344   2784   ??  S    12:52PM   0:00.78 /usr/sbin/distnoted agent
+root               352   0.0  0.0 441909536   6688   ??  Ss   12:52PM   0:00.05 /System/Library/Frameworks/CryptoTokenKit.framework/ctkahp.bundle/Contents/MacOS/ctkahp -d
+root               348   0.0  0.1 442054176   9264   ??  S    12:52PM   0:00.09 /System/Library/PrivateFrameworks/ContextKit.framework/Versions/A/XPCServices/ContextService.xpc/Contents/MacOS/ContextService
+root               349   0.0  0.1 441945968  13136   ??  Ss   12:52PM   0:01.05 /System/Library/CoreServices/osanalyticshelper server-init
+_cmiodalassistants   347   0.0  0.1 441944336   8656   ??  S    12:52PM   0:00.05 /usr/libexec/containermanagerd --runmode=agent --user-container-mode=current --bundle-container-mode=proxy --system-container-mode=none
+root               345   0.0  0.1 441955792  13152   ??  Ss   12:52PM   0:01.60 /usr/sbin/filecoordinationd
+root               344   0.0  0.1 441950512  13680   ??  Ss   12:52PM   0:00.13 /System/Library/Frameworks/LocalAuthentication.framework/Support/coreauthd
+root               343   0.0  0.1 441933584  11056   ??  Ss   12:52PM   0:00.07 /System/Library/PrivateFrameworks/CloudTelemetry.framework/Versions/A/XPCServices/CloudTelemetryService.xpc/Contents/MacOS/CloudTelemetryService
+_cmiodalassistants   342   0.0  0.1 441947184  12288   ??  S    12:52PM   0:00.13 /usr/libexec/trustd --agent
+root               341   0.0  0.0 441910752   4960   ??  Ss   12:52PM   0:00.07 /System/Library/PrivateFrameworks/CoreSymbolication.framework/coresymbolicationd
+_cmiodalassistants   340   0.0  0.0 441910224   6048   ??  S    12:52PM   0:00.05 /usr/sbin/cfprefsd agent
+root               338   0.0  0.0 441906288   6576   ??  Ss   12:52PM   0:01.28 /System/Library/PrivateFrameworks/PowerLog.framework/Versions/A/XPCServices/PerfPowerTelemetryClientRegistrationService.xpc/Contents/MacOS/PerfPowerTelemetryClientRegistrationService
+root               337   0.0  0.0 441949664   6496   ??  Ss   12:52PM   0:00.10 /usr/libexec/symptomsd-diag
+_cmiodalassistants   339   0.0  0.0 441955424   7776   ??  S    12:52PM   0:00.05 /usr/libexec/secinitd
+_cmiodalassistants   336   0.0  0.1 441947184  15808   ??  S    12:52PM   0:00.60 /System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod
+_audiomxd          335   0.0  0.0 441909248   4976   ??  S    12:52PM   0:00.75 /usr/sbin/distnoted agent
+_nsurlsessiond     334   0.0  0.0 441909248   3440   ??  S    12:52PM   0:00.79 /usr/sbin/distnoted agent
+_softwareupdate    333   0.0  0.0 441909552   3760   ??  S    12:52PM   0:00.81 /usr/sbin/distnoted agent
+root               330   0.0  0.0 441966768   7824   ??  S    12:52PM   0:00.16 /System/Library/PrivateFrameworks/Categories.framework/Versions/A/XPCServices/CategoriesService.xpc/Contents/MacOS/CategoriesService
+root               331   0.0  0.1 441998304  21664   ??  Ss   12:52PM   0:00.17 /usr/libexec/searchpartyd
+root               329   0.0  0.1 441947840  11536   ??  Ss   12:52PM   0:12.64 /usr/libexec/audioanalyticsd
+_locationd         328   0.0  0.0 441944304   6640   ??  S    12:52PM   0:00.05 /usr/libexec/containermanagerd --runmode=agent --user-container-mode=current --bundle-container-mode=proxy --system-container-mode=none
+root               326   0.0  0.0 441944688   8384   ??  Ss   12:52PM   0:00.08 /usr/libexec/mobileactivationd
+root               324   0.0  0.0 441894432   3760   ??  Ss   12:52PM   0:00.04 /usr/libexec/online-auth-agent
+_neuralengine      322   0.0  0.0 441945008   7616   ??  Ss   12:52PM   0:00.05 /usr/libexec/aneuserd
+root               323   0.0  0.2 442036896  34368   ??  Ss   12:52PM   0:00.34 /usr/libexec/aned
+_locationd         321   0.0  0.1 441947584  11104   ??  S    12:52PM   0:00.25 /usr/libexec/trustd --agent
+_softwareupdate    320   0.0  0.1 441949760  17952   ??  Ss   12:52PM   0:00.42 /System/Library/CoreServices/Software Update.app/Contents/Resources/softwareupdated
+_locationd         319   0.0  0.0 441909888   5632   ??  S    12:52PM   0:00.05 /usr/sbin/cfprefsd agent
+_locationd         316   0.0  0.0 441955552   7920   ??  S    12:52PM   0:00.05 /usr/libexec/secinitd
+_locationd         314   0.0  0.0 441909584   3760   ??  S    12:52PM   0:00.84 /usr/sbin/distnoted agent
+_locationd         311   0.0  0.1 441949104  16656   ??  S    12:52PM   0:01.05 /System/Library/PrivateFrameworks/GeoServices.framework/Versions/A/XPCServices/com.apple.geod.xpc/Contents/MacOS/com.apple.geod
+root               313   0.0  0.1 441946544  14224   ??  Ss   12:52PM   0:01.22 /System/Library/PrivateFrameworks/ModelCatalogRuntime.framework/Versions/A/modelcatalogd
+root               312   0.0  0.0 441905840   5056   ??  Ss   12:52PM   0:00.02 /System/Library/CoreServices/Software Update.app/Contents/Resources/suhelperd
+root               310   0.0  0.0 441909504   6688   ??  Ss   12:52PM   0:00.03 /usr/libexec/bootinstalld
+_cmiodalassistants   309   0.0  0.0 441954000   7696   ??  Ss   12:52PM   0:00.07 /usr/sbin/appleh16camerad
+root               308   0.0  0.1 441945664   8592   ??  Ss   12:52PM   0:00.11 /usr/libexec/countryd
+_coreaudiod        306   0.0  0.0 441944544   5776   ??  Ss   12:52PM   0:00.01 /System/Library/PrivateFrameworks/AppleDeviceQuerySupport.framework/Versions/A/XPCServices/AppleDeviceQueryService.xpc/Contents/MacOS/AppleDeviceQueryService
+_cmiodalassistants   305   0.0  0.1 441945984  11184   ??  Ss   12:52PM   0:00.07 /System/Library/Frameworks/CoreMediaIO.framework/Versions/A/Resources/UVCAssistant.systemextension/Contents/MacOS/UVCAssistant
+_modelmanagerd     304   0.0  0.1 442027584  25024   ??  Ss   12:52PM   0:00.22 /usr/libexec/modelmanagerd
+_cmiodalassistants   303   0.0  0.1 441953824  13744   ??  Ss   12:52PM   0:02.21 /usr/libexec/cameracaptured
+_driverkit         302   0.0  0.0 441545488   4112   ??  Ss   12:52PM   0:00.08 /System/Library/DriverExtensions/com.apple.AppleUserHIDDrivers.dext/com.apple.AppleUserHIDDrivers com.apple.driverkit.AppleUserHIDDrivers 0x100000c02 com.apple.AppleUserHIDDrivers
+root               299   0.0  0.0 441901712   3760   ??  Ss   12:52PM   0:00.02 /System/Library/CoreServices/ReportCrash daemon
+_driverkit         298   0.0  0.0 441541152   3808   ??  Ss   12:52PM   0:00.02 /System/Library/DriverExtensions/com.apple.DriverKit-IOUserDockChannelSerial.dext/com.apple.DriverKit-IOUserDockChannelSerial com.apple.IOUserDockChannelSerial 0x100000bed com.apple.DriverKit-IOUserDockChannelSerial
+_cmiodalassistants   297   0.0  0.0 441942512   7664   ??  Ss   12:52PM   0:00.05 /usr/libexec/com.apple.cmio.videodriverkithostextension.systemextension/Contents/MacOS/com.apple.cmio.videodriverkithostextension
+_mds_stores        296   0.0  0.4 449388800  73024   ??  Ss   12:52PM   0:10.33 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds_stores
+root               186   0.0  0.0 441906288   2016   ??  Ss   12:52PM   0:00.04 /System/Library/CoreServices/liquiddetectiond.app/liquiddetectiond
+root               175   0.0  0.0 441909456   4608   ??  Ss   12:52PM   0:00.31 /System/Library/CoreServices/TimeMachine/backupd-helper -launchd
+root               295   0.0  0.1 441972624  18352   ??  Ss   12:52PM   0:01.18 /usr/libexec/storagekitd
+root               294   0.0  0.1 441946144  16688   ??  Ss   12:52PM   0:01.79 /usr/libexec/triald_system
+_cmiodalassistants   292   0.0  0.0 441909952   4688   ??  S    12:52PM   0:00.84 /usr/sbin/distnoted agent
+_appleevents       290   0.0  0.0 441945920   8288   ??  Ss   12:52PM   0:00.09 /System/Library/CoreServices/appleeventsd --server
+root               289   0.0  0.0 441905776   3904   ??  Ss   12:52PM   0:00.01 /System/Library/PrivateFrameworks/AppleDeviceQuerySupport.framework/Versions/A/XPCServices/AppleDeviceQueryService.xpc/Contents/MacOS/AppleDeviceQueryService
+root               288   0.0  0.0 441903248   6816   ??  Ss   12:52PM   0:18.67 /usr/libexec/audioclocksyncd
+root               287   0.0  0.0 441909344   6640   ??  Ss   12:52PM   0:00.03 /usr/libexec/colorsyncd
+root               286   0.0  0.1 441988528  23344   ??  Ss   12:52PM   0:00.77 /System/Library/PrivateFrameworks/CloudKitDaemon.framework/Support/cloudd --system
+root               285   0.0  0.0 441901136   3088   ??  Ss   12:52PM   0:00.01 /System/Library/Frameworks/ColorSync.framework/Versions/A/XPCServices/com.apple.ColorSyncXPCAgent.xpc/Contents/MacOS/com.apple.ColorSyncXPCAgent
+root               284   0.0  0.0 441966192   8112   ??  Ss   12:52PM   0:00.11 /System/Library/PrivateFrameworks/BackgroundTaskManagement.framework/Resources/backgroundtaskmanagementd -daemon
+root               282   0.0  0.0 441904816   4912   ??  Ss   12:52PM   0:00.02 /usr/libexec/colorsync.displayservices
+_coreaudiod        281   0.0  0.1 442283968  10992   ??  Ss   12:52PM   0:00.02 /System/Library/Frameworks/AudioToolbox.framework/XPCServices/com.apple.audio.SandboxHelper.xpc/Contents/MacOS/com.apple.audio.SandboxHelper
+_iconservices      124   0.0  0.0 442038256   5728   ??  Ss   12:52PM   0:00.23 /System/Library/CoreServices/iconservicesd
+root               280   0.0  0.0 441910544   7584   ??  Ss   12:52PM   0:00.90 /usr/sbin/mDNSResponderHelper
+root               279   0.0  0.0 441946912   7712   ??  Ss   12:52PM   0:00.54 /System/Library/CoreServices/TimeMachine/backupd
+root               278   0.0  0.0 441971840   2912   ??  Ss   12:52PM   0:00.01 /System/Library/Frameworks/NetFS.framework/Versions/A/XPCServices/PlugInLibraryService.xpc/Contents/MacOS/PlugInLibraryService
+root               277   0.0  0.1 441945504   9728   ??  Ss   12:52PM   0:00.13 /usr/libexec/securityd_system
+root               276   0.0  0.1 441945136   9680   ??  Ss   12:52PM   0:00.06 /usr/libexec/findmybeaconingd
+root               273   0.0  0.1 441962544  12176   ??  Ss   12:52PM   0:00.04 /System/Library/PrivateFrameworks/MobileAssetDaemon.framework/Versions/A/XPCServices/com.apple.MobileAsset.DownloadService.Builtin.xpc/Contents/MacOS/com.apple.MobileAsset.DownloadService.Builtin
+root               275   0.0  0.0 441909936   7888   ??  Ss   12:52PM   0:00.04 /System/Library/Frameworks/AudioToolbox.framework/AudioComponentRegistrar -daemon
+_mdnsresponder     274   0.0  0.8 442176672 141328   ??  Ss   12:52PM   0:09.14 /usr/sbin/mDNSResponder
+_audiomxd          272   0.0  0.1 441965712  17456   ??  Ss   12:52PM   0:00.28 /usr/libexec/audiomxd
+root               271   0.0  0.1 441910288   8720   ??  Ss   12:52PM   0:00.22 /System/Library/Frameworks/Security.framework/Versions/A/XPCServices/com.apple.CodeSigningHelper.xpc/Contents/MacOS/com.apple.CodeSigningHelper
+root               270   0.0  0.1 441947328  11184   ??  Ss   12:52PM   0:04.76 /usr/sbin/WirelessRadioManagerd
+_coreaudiod        269   0.0  0.0 441975856   3296   ??  Ss   12:52PM   0:00.01 /System/Library/Frameworks/CoreAudio.framework/Versions/A/XPCServices/com.apple.audio.DriverHelper.xpc/Contents/MacOS/com.apple.audio.DriverHelper
+_coreaudiod        268   0.0  0.1 442281392   9568   ??  Ss   12:52PM   0:00.01 Core Audio Driver (ParrotAudioPlugin.driver)
+root               266   0.0  0.3 441991216  50320   ??  Ss   12:52PM   0:02.12 /usr/libexec/syspolicyd
+_analyticsd        180   0.0  0.2 441955760  27712   ??  Ss   12:52PM   0:03.09 /System/Library/PrivateFrameworks/CoreAnalytics.framework/Support/analyticsd
+_accessoryupdater   104   0.0  0.1 441946800  10368   ??  Ss   12:52PM   0:00.50 /System/Library/PrivateFrameworks/MobileAccessoryUpdater.framework/Support/accessoryupdaterd 120
+_biome             247   0.0  0.1 441945360  17360   ??  Ss   12:52PM   0:01.37 /System/Library/PrivateFrameworks/BiomeStreams.framework/Support/biomed
+root               246   0.0  0.1 441946032   9680   ??  Ss   12:52PM   0:00.06 /System/Library/Frameworks/SystemExtensions.framework/Versions/A/Helpers/sysextd
+root               242   0.0  0.0 441975328   3136   ??  Ss   12:52PM   0:00.01 /System/Library/Frameworks/NetFS.framework/Versions/A/XPCServices/PlugInLibraryService.xpc/Contents/MacOS/PlugInLibraryService
+_windowserver      206   0.0  0.0 441909424   5728   ??  S    12:52PM   0:00.86 /usr/sbin/distnoted agent
+root               208   0.0  0.0 441910176   5168   ??  S    12:52PM   0:00.92 /usr/sbin/distnoted agent
+_coreaudiod        194   0.0  0.0 441910000   5904   ??  S    12:52PM   0:00.88 /usr/sbin/distnoted agent
+root               229   0.0  0.0 441950736   7600   ??  Ss   12:52PM   0:00.03 /usr/libexec/ApplicationFirewall/socketfilterfw
+_networkd          227   0.0  0.1 442004848  17968   ??  Ss   12:52PM   0:06.28 /usr/libexec/symptomsd
+root               207   0.0  0.1 441941472  10240   ??  Ss   12:52PM   0:00.06 /usr/libexec/findmydeviced
+_locationd         142   0.0  0.2 441997232  26688   ??  Ss   12:52PM   0:05.46 /usr/libexec/locationd
+root               201   0.0  0.1 442257360  19904   ??  Ss   12:52PM   0:00.69 /System/Library/Frameworks/Security.framework/Versions/A/XPCServices/authd.xpc/Contents/MacOS/authd
+root               200   0.0  0.1 441956000  10048   ??  Ss   12:52PM   0:00.05 /usr/libexec/secinitd
+_hidd              197   0.0  0.0 441905280   4272   ??  Ss   12:52PM   0:00.01 /usr/libexec/hidd
+root               198   0.0  0.0 441890624   5488   ??  Ss   12:52PM   0:00.03 /usr/libexec/cryptexd
+root               195   0.0  0.1 441950240  12480   ??  Ss   12:52PM   0:01.41 /usr/libexec/eligibilityd
+root               193   0.0  0.0 441909744   5872   ??  Ss   12:52PM   0:00.04 /usr/libexec/logd_helper
+root               192   0.0  0.1 441946592  12736   ??  Ss   12:52PM   0:00.17 /usr/libexec/biometrickitd --launchd
+root               191   0.0  0.1 442024208  15120   ??  Ss   12:52PM   0:00.70 /usr/libexec/nehelper
+root               189   0.0  0.3 442155888  51632   ??  Ss   12:52PM   0:12.66 /usr/libexec/mobileassetd
+_nsurlsessiond     188   0.0  0.1 441978176  15984   ??  Ss   12:52PM   0:00.76 /usr/libexec/nsurlsessiond --privileged
+root               187   0.0  0.1 441914160  11296   ??  Ss   12:52PM   0:13.77 /usr/libexec/apfsd
+root               183   0.0  0.1 441931840   9504   ??  Ss   12:52PM   0:00.06 /System/Library/PrivateFrameworks/SystemStatusServer.framework/Support/systemstatusd
+root               182   0.0  0.2 442039536  41216   ??  Ss   12:52PM   0:52.80 /usr/libexec/airportd
+root               181   0.0  0.1 441955168  19680   ??  Ss   12:52PM   0:01.06 /usr/libexec/lsd runAsRoot
+root               179   0.0  0.0 441945552   8096   ??  Ss   12:52PM   0:00.04 /usr/libexec/trustdFileHelper
+_accessoryupdater   105   0.0  0.0 441910224   2608   ??  Ss   12:52PM   0:00.05 /usr/libexec/uarpassetmanagerd
+_softwareupdate    116   0.0  0.0 441947808   7216   ??  Ss   12:52PM   0:00.12 /System/Library/PrivateFrameworks/MobileSoftwareUpdate.framework/Support/softwareupdated
+root               178   0.0  0.1 441943568   9440   ??  Ss   12:52PM   0:00.07 /usr/libexec/containermanagerd_system --runmode=privileged --user-container-mode=current --bundle-container-mode=global --bundle-container-owner=_appinstalld --system-container-mode=none
+root               176   0.0  0.1 441941152  15056   ??  Ss   12:52PM   0:00.49 /usr/libexec/PowerUIAgent
+_trustd            174   0.0  0.1 441948848  18416   ??  Ss   12:52PM   0:10.67 /usr/libexec/trustd
+root               173   0.0  0.1 441997440  23056   ??  Ss   12:52PM   0:47.03 /usr/libexec/runningboardd
+root               172   0.0  0.1 441935312  16256   ??  Ss   12:52PM   0:00.37 /System/Library/CoreServices/coreservicesd
+root               171   0.0  0.0 441941440   7936   ??  Ss   12:52PM   0:00.21 /usr/libexec/powerexperienced
+root               170   0.0  0.1 442042544  18352   ??  Ss   12:52PM   0:00.08 /usr/libexec/fskitd
+_corespeechd       117   0.0  0.0 441935152   4144   ??  Ss   12:52PM   0:00.03 /System/Library/PrivateFrameworks/CoreSpeech.framework/corespeechd_system
+_distnote          149   0.0  0.0 441909712   7104   ??  Ss   12:52PM   0:05.16 /usr/sbin/distnoted daemon
+_timed             138   0.0  0.0 441941376   7872   ??  Ss   12:52PM   0:00.23 /usr/libexec/timed
+_usbmuxd           139   0.0  0.1 441966256   9600   ??  Ss   12:52PM   0:00.11 /System/Library/PrivateFrameworks/MobileDevice.framework/Versions/A/Resources/usbmuxd -launchd
+jagov              169   0.0  0.9 443016080 152176   ??  Ss   12:52PM   0:41.53 /System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow console
+root               168   0.0  0.1 441910272  10352   ??  Ss   12:52PM   0:07.24 /usr/sbin/cfprefsd daemon
+root               167   0.0  0.1 442025296  21584   ??  Ss   12:52PM   0:02.46 /System/Library/PrivateFrameworks/TCC.framework/Support/tccd system
+root               109   0.0  0.0 441909536   3264   ??  Ss   12:52PM   0:00.02 /usr/libexec/IOMFB_bics_daemon
+root               151   0.0  0.2 442010624  27152   ??  Ss   12:52PM   0:43.40 /usr/libexec/PerfPowerServices
+root                99   0.0  0.1 441986176  18128   ??  Ss   12:52PM   0:01.44 /System/Library/PrivateFrameworks/MediaRemote.framework/Support/mediaremoted
+root               102   0.0  0.1 441986352  12640   ??  Ss   12:52PM   0:02.16 /usr/sbin/systemstats --daemon
+root               143   0.0  0.1 441946656  12528   ??  Ss   12:52PM   0:00.12 /usr/libexec/nesessionmanager
+root               164   0.0  0.1 441947344  24976   ??  Ss   12:52PM   0:00.13 /System/Library/Frameworks/CoreMediaIO.framework/Versions/A/Resources/com.apple.cmio.registerassistantservice
+root               154   0.0  0.0 441945824   5168   ??  Ss   12:52PM   0:00.09 /System/Library/PrivateFrameworks/GenerationalStorage.framework/Versions/A/Support/revisiond
+root               129   0.0  0.2 442068064  33600   ??  Ss   12:52PM   0:01.87 /usr/libexec/coreduetd
+root               157   0.0  0.0 441909568   4928   ??  Ss   12:52PM   0:00.14 /usr/libexec/usermanagerd -t 15
+root               156   0.0  0.0 441885376   2592   ??  Ss   12:52PM   0:00.02 /usr/libexec/peakpowermanagerd
+root                95   0.0  0.0 441901904   2224   ??  Ss   12:52PM   0:00.03 /usr/libexec/smd
+root               165   0.0  0.0 441904912   1728   ??  Ss   12:52PM   0:00.02 aslmanager
+root               137   0.0  0.1 441948192  13104   ??  Ss   12:52PM   0:04.70 /System/Library/CoreServices/launchservicesd
+root               107   0.0  0.0 441940960   5152   ??  Ss   12:52PM   0:00.02 endpointsecurityd
+root               130   0.0  0.0 441905536   2848   ??  Ss   12:52PM   0:00.42 /usr/sbin/syslogd
+root               152   0.0  0.0 441902032   1584   ??  Ss   12:52PM   0:00.11 /usr/libexec/dirhelper
+root               161   0.0  0.0 441942064   6640   ??  Ss   12:52PM   0:00.55 /usr/libexec/sandboxd
+root               153   0.0  0.0 441905040   5872   ??  Ss   12:52PM   0:00.06 /System/Library/CoreServices/logind
+root               115   0.0  0.1 441910288  15968   ??  Ss   12:52PM   0:00.10 /usr/libexec/keybagd -t 15
+root               163   0.0  0.1 441911328  12224   ??  Ss   12:52PM   0:00.12 /usr/libexec/AirPlayXPCHelper
+root               136   0.0  0.4 442174464  71904   ??  Ss   12:52PM   0:01.96 /System/Library/PrivateFrameworks/ApplePushService.framework/apsd
+root               155   0.0  0.0 441902112   2912   ??  Ss   12:52PM   0:00.01 /usr/sbin/KernelEventAgent
+root               140   0.0  0.1 441946560  12176   ??  Ss   12:52PM   0:00.45 /usr/sbin/securityd -i
+root               134   0.0  0.1 442000272  11520   ??  Ss   12:52PM   0:00.11 /usr/libexec/xprotectd
+root               145   0.0  0.0 441905648   3744   ??  Ss   12:52PM   0:00.02 autofsd
+root               126   0.0  0.0 441940864   7504   ??  Ss   12:52PM   0:00.59 /usr/libexec/diskarbitrationd
+root               132   0.0  0.0 441940896   6192   ??  Ss   12:52PM   0:04.31 /usr/libexec/thermalmonitord
+root               159   0.0  0.2 441998000  31296   ??  Ss   12:52PM   0:04.05 /usr/sbin/bluetoothd
+root               135   0.0  0.2 441959232  28496   ??  Ss   12:52PM   0:11.17 /usr/libexec/opendirectoryd
+root               162   0.0  0.1 441949456  19712   ??  Ss   12:52PM   0:41.03 /usr/libexec/corebrightnessd --launchd
+root               150   0.0  0.0 441940928   4880   ??  Ss   12:52PM   0:00.04 /System/Library/PrivateFrameworks/AppleCredentialManager.framework/AppleCredentialManagerDaemon
+root               123   0.0  0.3 442068304  45520   ??  Ss   12:52PM   0:12.53 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds
+root               147   0.0  0.0 441945616   8208   ??  Ss   12:52PM   0:00.06 /usr/libexec/corerepaird
+root               113   0.0  0.0 441944752   6864   ??  Ss   12:52PM   0:00.05 /usr/libexec/remoted
+root                98   0.0  0.1 441915728   9888   ??  Ss   12:52PM   0:12.41 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/FSEvents.framework/Versions/A/Support/fseventsd
+root               106   0.0  0.1 441951792  12864   ??  Ss   12:52PM   0:05.35 /usr/libexec/configd
+root               125   0.0  0.1 441957680  24096   ??  Ss   12:52PM   0:00.83 /usr/libexec/kernelmanagerd
+root               119   0.0  0.0 441905872   4576   ??  Ss   12:52PM   0:00.97 /usr/libexec/watchdogd
+root               111   0.0  0.1 441983792  14752   ??  Ss   12:52PM   0:00.12 /usr/libexec/amfid
+root               108   0.0  0.1 441943120  12864   ??  Ss   12:52PM   0:07.30 /System/Library/CoreServices/powerd.bundle/powerd
+root                96   0.0  0.1 441956704  23360   ??  Ss   12:52PM   0:03.34 /usr/libexec/UserEventAgent (System)
+root              3211   0.0  0.0 441884032   1744 s000  R+    9:44PM   0:00.00 ps aux
+root                 1   0.0  0.2 441917040  30752   ??  Ss   12:52PM   0:52.52 /sbin/launchd
+jagov             3197   0.0  0.2 441977920  25360   ??  S     9:44PM   0:00.09 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared -s mdworker -c MDSImporterWorker -m com.apple.mdworker.shared
+jagov             3196   0.0  0.1 441945552  14464   ??  Ss    9:43PM   0:00.04 /System/Library/Frameworks/Speech.framework/Versions/A/XPCServices/localspeechrecognition.xpc/Contents/MacOS/localspeechrecognition
+jagov             3195   0.0  0.3 442207088  45872   ??  S     9:43PM   0:00.27 /System/Library/Input Methods/DictationIM.app/Contents/MacOS/DictationIM
+jagov             3190   0.0  0.4 445748976  67328   ??  S     9:41PM   0:00.08 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:43955 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {ce70630f-493d-4429-84b3-49bda3e7ab4c} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.155796467 154 tab
+jagov             3188   0.0  0.2 441976976  27296   ??  S     9:41PM   0:00.18 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared -s mdworker -c MDSImporterWorker -m com.apple.mdworker.shared
+jagov             3186   0.0  0.2 442091136  37280   ??  Ss    9:41PM   0:00.09 /System/Library/PrivateFrameworks/SafariPlatformSupport.framework/Versions/A/XPCServices/com.apple.SafariPlatformSupport.Helper.xpc/Contents/MacOS/com.apple.SafariPlatformSupport.Helper
+jagov             3179   0.0  1.1 419082176 179584   ??  S     9:41PM   0:01.07 /Applications/Sublime Text.app/Contents/MacOS/plugin_host-3.8 3171 /Applications/Sublime Text.app/Contents/MacOS/sublime_text  false /Users/jagov/Library/Application Support/Sublime Text /Users/jagov/Library/Caches/Sublime Text /Applications/Sublime Text.app/Contents/MacOS/Packages
+jagov             3178   0.0  0.2 418372656  37632   ??  S     9:41PM   0:00.20 /Applications/Sublime Text.app/Contents/MacOS/plugin_host-3.3 3171 /Applications/Sublime Text.app/Contents/MacOS/sublime_text  /Users/jagov/Library/Application Support/Sublime Text /Users/jagov/Library/Caches/Sublime Text /Applications/Sublime Text.app/Contents/MacOS/Packages
+jagov             3174   0.0  0.1 417797200   9808   ??  S     9:41PM   0:00.01 /Applications/Sublime Text.app/Contents/MacOS/crash_handler --no-rate-limit --database=/Users/jagov/Library/Caches/Sublime Text/Crash Reports --metrics-dir=/Users/jagov/Library/Caches/Sublime Text/Crash Reports --url=https://crash-server.sublimehq.com/api/upload --annotation=hash=15429116980732378458 --annotation=ident=sublime_text_4200 --handshake-fd=6
+jagov             3172   0.0  0.0 441975584   3696   ??  Ss    9:41PM   0:00.02 /System/Library/Frameworks/NetFS.framework/Versions/A/XPCServices/PlugInLibraryService.xpc/Contents/MacOS/PlugInLibraryService
+jagov             3171   0.0  1.7 419969264 276848   ??  S     9:41PM   0:01.67 /Applications/Sublime Text.app/Contents/MacOS/sublime_text
+jagov             3170   0.0  0.0 441967216   3632   ??  Ss    9:41PM   0:00.02 /System/Library/Frameworks/NetFS.framework/Versions/A/XPCServices/PlugInLibraryService.xpc/Contents/MacOS/PlugInLibraryService
+root              3140   0.0  0.1 441941616  10304   ??  Ss    9:39PM   0:00.06 /System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XProtectUpdateService.xpc/Contents/MacOS/XProtectUpdateService
+_netbios          3139   0.0  0.0 441909984   8352   ??  SNs   9:39PM   0:00.05 /usr/sbin/netbiosd
+jagov             3099   0.0  0.4 445756960  67376   ??  S     9:38PM   0:00.11 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:43955 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {c2bad880-7db5-4638-8edc-43d023329e6e} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.191913600 153 tab
+jagov             3098   0.0  0.4 445748032  67344   ??  S     9:38PM   0:00.11 /Applications/Firefox.app/Contents/MacOS/plugin-container.app/Contents/MacOS/plugin-container -isForBrowser -prefsHandle 0:43955 -prefMapHandle 1:282468 -jsInitHandle 2:227672 -sbStartup -sbAppPath /Applications/Firefox.app -sbLevel 3 -parentBuildID 20260309125808 -ipcHandle 0 -initialChannelId {8b03ffc1-e527-42ed-af44-eef5a1326660} -parentPid 773 -crashReporter gecko-crash-server-pipe.773 -crashHelper 1 -greomni /Applications/Firefox.app/Contents/Resources/omni.ja -appomni /Applications/Firefox.app/Contents/Resources/browser/omni.ja -appDir /Applications/Firefox.app/Contents/Resources/browser -profile /Users/jagov/Library/Application Support/Firefox/Profiles/cf8oha1f.default-release org.mozilla.machname.1170212211 152 tab

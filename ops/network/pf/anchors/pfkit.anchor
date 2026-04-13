@@ -8,6 +8,7 @@ __APPLE_LOCAL_RULES__
 table <dns_ok> persist { __DNS_OK__ }
 table <lan_nets> persist { __LAN_NETS__ }
 table <google_endpoints> persist { __GOOGLE_ALLOWED__ }
+__EXTRA_HTTPS_TABLE__
 
 # ------------------------------
 # DNS enforcement

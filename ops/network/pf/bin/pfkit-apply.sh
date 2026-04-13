@@ -12,11 +12,14 @@ if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
 fi
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$ROOT_DIR/../../.." && pwd)"
 ENV_FILE="$ROOT_DIR/config/pfkit.env"
 TEMPLATE="$ROOT_DIR/anchors/pfkit.anchor"
 ANCHOR_DST="/etc/pf.anchors/pfkit.anchor"
 PFCONF="/etc/pf.conf"
 GOOGLE_RANGE_HELPER="$ROOT_DIR/bin/pfkit-google-ranges.py"
+HOST_RESOLVE_HELPER="$ROOT_DIR/bin/pfkit-resolve-hosts.py"
+STATE_DIR="${DEV_LOG_ROOT:-$REPO_ROOT/logs}/pfkit"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "Missing config: $ENV_FILE" >&2
@@ -56,9 +59,12 @@ esac
 LAN_NETS="${ALLOW_LAN_CIDRS:-192.168.0.0/16 10.0.0.0/8 172.16.0.0/12}"
 GOOGLE_ENDPOINT_MODE="${GOOGLE_ENDPOINT_MODE:-official_default_domains}"
 GOOGLE_ALLOWED="${GOOGLE_ALLOWED:-${GGC_ALLOWED:-}}"
+EXTRA_HTTPS_ALLOWED="${EXTRA_HTTPS_ALLOWED:-}"
+EXTRA_HTTPS_ALLOWED_HOSTS="${EXTRA_HTTPS_ALLOWED_HOSTS:-}"
 GOOGLE_ONLY_MODE="${GOOGLE_ONLY_MODE:-0}"
 ALLOW_APPLE_P2P="${ALLOW_APPLE_P2P:-1}"
 BLOCK_UTUN="${BLOCK_UTUN:-0}"
+BASELINE_PROFILE="${BASELINE_PROFILE:-unset}"
 
 case "$GOOGLE_ENDPOINT_MODE" in
   official_default_domains)
@@ -66,7 +72,7 @@ case "$GOOGLE_ENDPOINT_MODE" in
       echo "Missing Google range helper: $GOOGLE_RANGE_HELPER" >&2
       exit 1
     fi
-    GOOGLE_ALLOWED_RENDERED="$(python3 "$GOOGLE_RANGE_HELPER")"
+    GOOGLE_ALLOWED_RENDERED="$(python3 "$GOOGLE_RANGE_HELPER" --state-dir "$STATE_DIR")"
     [[ -n "$GOOGLE_ALLOWED_RENDERED" ]] || {
       echo "Failed to resolve official Google-owned ranges" >&2
       exit 1
@@ -84,6 +90,23 @@ case "$GOOGLE_ENDPOINT_MODE" in
     exit 1
     ;;
 esac
+
+EXTRA_HTTPS_HOSTS_RENDERED=""
+if [[ -n "$EXTRA_HTTPS_ALLOWED_HOSTS" ]]; then
+  if [[ ! -f "$HOST_RESOLVE_HELPER" ]]; then
+    echo "Missing host resolve helper: $HOST_RESOLVE_HELPER" >&2
+    exit 1
+  fi
+  EXTRA_HTTPS_HOSTS_RENDERED="$(python3 "$HOST_RESOLVE_HELPER" --state-dir "$STATE_DIR" $EXTRA_HTTPS_ALLOWED_HOSTS 2>/dev/null || true)"
+fi
+
+EXTRA_HTTPS_ALLOWED_RENDERED="$(printf '%s %s\n' "$EXTRA_HTTPS_ALLOWED" "$EXTRA_HTTPS_HOSTS_RENDERED" | xargs echo 2>/dev/null || true)"
+EXTRA_HTTPS_TABLE="# (No extra HTTPS endpoint exceptions)"
+EXTRA_HTTPS_RULES="# (No extra HTTPS endpoint exceptions)"
+if [[ -n "$EXTRA_HTTPS_ALLOWED_RENDERED" ]]; then
+  EXTRA_HTTPS_TABLE="table <extra_https_endpoints> persist { $EXTRA_HTTPS_ALLOWED_RENDERED }"
+  EXTRA_HTTPS_RULES='pass out quick on __EXT_IF__ inet proto tcp to <extra_https_endpoints> port 443 keep state label "pfkit:extra-https-pass"'
+fi
 
 DOT_RULES="# (DoT disabled)"
 if [[ "${BLOCK_DOT:-0}" == "1" ]]; then
@@ -147,6 +170,7 @@ EGRESS_RULES=$(cat <<EOF
 pass out quick on __EXT_IF__ inet proto icmp all keep state label "pfkit:icmp-pass"
 pass out quick on __EXT_IF__ inet proto { tcp udp } to <lan_nets> keep state label "pfkit:lan-pass"
 pass out quick on __EXT_IF__ inet proto tcp to <google_endpoints> port 443 keep state label "pfkit:google-only-https"
+${EXTRA_HTTPS_RULES}
 block return log quick on __EXT_IF__ inet proto tcp to any port 443 label "pfkit:https-non-google-block"
 pass out quick on __EXT_IF__ inet proto { tcp udp } all keep state label "pfkit:egress-pass-non443"
 EOF
@@ -160,10 +184,11 @@ EOF
 )
 fi
 
-export EXT_IF ROUTER_IP DNS_OK LAN_NETS GOOGLE_ALLOWED_RENDERED APPLE_LOCAL_RULES DOT_RULES QUIC_RULES MDNS_RULES UTUN_RULES EGRESS_RULES
+export EXT_IF ROUTER_IP DNS_OK LAN_NETS GOOGLE_ALLOWED_RENDERED EXTRA_HTTPS_TABLE APPLE_LOCAL_RULES DOT_RULES QUIC_RULES MDNS_RULES UTUN_RULES EGRESS_RULES
 
 rendered=$(perl -pe '
 s/__APPLE_LOCAL_RULES__/$ENV{APPLE_LOCAL_RULES}/g;
+s/__EXTRA_HTTPS_TABLE__/$ENV{EXTRA_HTTPS_TABLE}/g;
 s/__DOT_RULES__/$ENV{DOT_RULES}/g;
 s/__QUIC_RULES__/$ENV{QUIC_RULES}/g;
 s/__MDNS_RULES__/$ENV{MDNS_RULES}/g;
@@ -200,8 +225,10 @@ echo "   ext_if     : $EXT_IF"
 echo "   router_ip  : $ROUTER_IP"
 echo "   dns_mode   : ${DNS_MODE:-router}"
 echo "   dns_ok     : $DNS_OK"
+echo "   baseline   : $BASELINE_PROFILE"
 echo "   google_mode: $GOOGLE_ENDPOINT_MODE"
 echo "   google_only: $GOOGLE_ONLY_MODE"
+echo "   extra_https: ${EXTRA_HTTPS_ALLOWED_HOSTS:-none}"
 echo "   allow_p2p  : $ALLOW_APPLE_P2P"
 echo "   block_mdns : ${BLOCK_MDNS:-0}"
 echo "   block_dot  : ${BLOCK_DOT:-0}"
