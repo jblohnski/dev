@@ -22,6 +22,7 @@ def resolve_host(host: str) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--state-dir")
+    parser.add_argument("--state-name", default="extra-https-hosts.json")
     parser.add_argument("hosts", nargs="*")
     args = parser.parse_args()
 
@@ -52,7 +53,7 @@ def main() -> int:
             "range_count": len(deduped),
             "ranges": deduped,
         }
-        (state_dir / "extra-https-hosts.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        (state_dir / args.state_name).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
     if deduped:
         print(" ".join(deduped))

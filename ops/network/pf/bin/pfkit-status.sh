@@ -38,7 +38,8 @@ LEGACY_LOG_DIR="$(resolve_owner_home)/Library/Logs/pfkit"
 LOG_FILE="$LOG_DIR/blocks.log"
 LOG_PID="$LOG_DIR/blocks.pid"
 LEGACY_LOG_PID="$LEGACY_LOG_DIR/blocks.pid"
-GOOGLE_RANGES_FILE="$LOG_DIR/google-ranges.json"
+GOOGLE_HOSTS_FILE="$LOG_DIR/google-hosts.json"
+LEGACY_GOOGLE_RANGES_FILE="$LOG_DIR/google-ranges.json"
 EXTRA_HTTPS_FILE="$LOG_DIR/extra-https-hosts.json"
 LOG_LINES="${PFKIT_STATUS_LOG_LINES:-200}"
 
@@ -51,9 +52,29 @@ EXT_IF_RESOLVED="${EXT_IF:-$(route -n get default 2>/dev/null | awk '/interface:
 ROUTER_IP_RESOLVED="$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}')"
 
 TAIL_MODE=0
-if [[ "${1:-}" == "--tail" ]]; then
-  TAIL_MODE=1
-fi
+SHOW_CIDRS=0
+TAIL_LINES=50
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tail)
+      TAIL_MODE=1
+      if [[ "${2:-}" =~ ^[0-9]+$ ]]; then
+        TAIL_LINES="$2"
+        shift 2
+      else
+        shift
+      fi
+      ;;
+    --cidrs)
+      SHOW_CIDRS=1
+      shift
+      ;;
+    *)
+      echo "pfkit-status: unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+done
 
 status_line="$(pfctl -q -s info | sed -n '/^Status:/p')"
 pfkit_rules="$(pfctl -q -a pfkit -sr || true)"
@@ -94,12 +115,12 @@ if [[ "$TAIL_MODE" == "1" ]]; then
   elif [[ ! -s "$LOG_FILE" ]]; then
     echo "(empty)"
   else
-    tail -n "${2:-50}" "$LOG_FILE"
+    tail -n "$TAIL_LINES" "$LOG_FILE"
   fi
   exit 0
 fi
 
-python3 - "$status_line" "$pfkit_rules" "$LOG_FILE" "$GOOGLE_RANGES_FILE" "$EXTRA_HTTPS_FILE" "$logger_status" "$overall_status" "$EXT_IF_RESOLVED" "$ROUTER_IP_RESOLVED" "${DNS_MODE:-router}" "${DNS_ALLOWED:-}" "${BASELINE_PROFILE:-unset}" "${GOOGLE_ONLY_MODE:-0}" "${ALLOW_APPLE_P2P:-0}" "${BLOCK_MDNS:-1}" "${BLOCK_UTUN:-1}" "${BLOCK_QUIC:-1}" "${BLOCK_DOT:-1}" "${EXTRA_HTTPS_ALLOWED_HOSTS:-}" "$LOG_LINES" <<'PY'
+python3 - "$status_line" "$pfkit_rules" "$LOG_FILE" "$GOOGLE_HOSTS_FILE" "$LEGACY_GOOGLE_RANGES_FILE" "$EXTRA_HTTPS_FILE" "$logger_status" "$overall_status" "$EXT_IF_RESOLVED" "$ROUTER_IP_RESOLVED" "${DNS_MODE:-router}" "${DNS_ALLOWED:-}" "${BASELINE_PROFILE:-unset}" "${GOOGLE_ONLY_MODE:-0}" "${ALLOW_APPLE_P2P:-0}" "${BLOCK_MDNS:-1}" "${BLOCK_UTUN:-1}" "${BLOCK_QUIC:-1}" "${BLOCK_DOT:-1}" "${GOOGLE_ENDPOINT_MODE:-hosts}" "${GOOGLE_ALLOWED_HOSTS:-}" "${EXTRA_HTTPS_ALLOWED_HOSTS:-}" "$SHOW_CIDRS" "$LOG_LINES" <<'PY'
 from __future__ import annotations
 
 import json
@@ -113,7 +134,8 @@ from pathlib import Path
     status_line,
     pfkit_rules,
     log_file,
-    google_ranges_file,
+    google_hosts_file,
+    legacy_google_ranges_file,
     extra_https_file,
     logger_status,
     overall_status,
@@ -128,12 +150,15 @@ from pathlib import Path
     block_utun,
     block_quic,
     block_dot,
+    google_endpoint_mode,
+    google_allowed_hosts,
     extra_https_allowed_hosts,
+    show_cidrs,
     log_lines,
 ) = sys.argv[1:]
 
 log_path = Path(log_file)
-google_path = Path(google_ranges_file)
+google_path = Path(google_hosts_file if Path(google_hosts_file).is_file() else legacy_google_ranges_file)
 extra_https_path = Path(extra_https_file)
 recent = []
 if log_path.is_file():
@@ -191,10 +216,18 @@ if extra_https_path.is_file():
 
 ranges = google_meta.get("ranges", [])
 range_count = google_meta.get("range_count", len(ranges))
-goog_created = google_meta.get("goog_creation_time", "")
-google_ranges_text = " ".join(ranges) if ranges else "(missing)"
+google_hosts = google_meta.get("hosts") or google_allowed_hosts.split()
+google_ranges_text = " ".join(ranges)
 extra_ranges = extra_https_meta.get("ranges", [])
-extra_ranges_text = " ".join(extra_ranges) if extra_ranges else "(missing)"
+extra_ranges_text = " ".join(extra_ranges)
+
+def print_wrapped(label: str, text: str) -> None:
+    if not text:
+        print(f"{label}(none)")
+        return
+    for idx, line in enumerate(textwrap.wrap(text, width=100, break_long_words=False), start=1):
+        current = label if idx == 1 else " " * len(label)
+        print(f"{current}{line}")
 
 print("PF")
 print(f"  status   : {overall_status}")
@@ -208,15 +241,15 @@ print(
     f"google_only={google_only_mode} apple_p2p={allow_apple_p2p} "
     f"mdns={block_mdns} utun={block_utun} quic={block_quic} dot={block_dot}"
 )
-print(f"  extra    : {extra_https_allowed_hosts or 'none'}")
-print(f"  extra_ip : {len(extra_ranges)} CIDRs")
-for idx, line in enumerate(textwrap.wrap(extra_ranges_text, width=100, break_long_words=False), start=1):
-    label = "  extraidr : " if idx == 1 else "            "
-    print(f"{label}{line}")
-print(f"  google   : {range_count} CIDRs" + (f" (goog.json {goog_created})" if goog_created else ""))
-for idx, line in enumerate(textwrap.wrap(google_ranges_text, width=100, break_long_words=False), start=1):
-    label = "  cidrs    : " if idx == 1 else "            "
-    print(f"{label}{line}")
+print(f"  google_m : {google_endpoint_mode}")
+print(f"  google   : {len(google_hosts)} hosts / {range_count} IPs")
+print_wrapped("  ghosts   : ", " ".join(google_hosts))
+print(f"  extra    : {len((extra_https_allowed_hosts or '').split())} hosts / {len(extra_ranges)} IPs")
+if extra_https_allowed_hosts:
+    print_wrapped("  ehosts   : ", extra_https_allowed_hosts)
+if show_cidrs == "1":
+    print_wrapped("  gip      : ", google_ranges_text)
+    print_wrapped("  eip      : ", extra_ranges_text)
 print(f"  log      : {log_file}")
 print()
 print("Recent Blocks")

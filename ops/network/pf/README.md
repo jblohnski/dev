@@ -2,7 +2,7 @@
 
 # pfkit (macOS)
 
-PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, and can restrict HTTPS to Google-owned endpoints by loading a single anchor.
+PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, and can optionally restrict HTTPS to a tight Google sign-in hostname set via a single anchor.
 
 ## Layout
 
@@ -46,8 +46,9 @@ Why `pfk` is not `pfctl -d`:
 - `BLOCK_UTUN` — block `utun*` interfaces instead of passing them (default 1).
 - `BLOCK_DOT` — block DoT/DoQ on 853 (default 1).
 - `BLOCK_QUIC` — block QUIC/HTTP3 on UDP 443 (default 1).
-- `GOOGLE_ENDPOINT_MODE` — `official_default_domains` or `manual`.
+- `GOOGLE_ENDPOINT_MODE` — `hosts` or `manual`.
 - `GOOGLE_ALLOWED` — manual space-delimited Google IPv4 CIDRs when `GOOGLE_ENDPOINT_MODE=manual`.
+- `GOOGLE_ALLOWED_HOSTS` — hostname allowlist resolved to `/32` IPv4 entries for Google sign-in lockdown mode.
 - `EXTRA_HTTPS_ALLOWED` — manual extra HTTPS CIDRs to allow alongside Google.
 - `EXTRA_HTTPS_ALLOWED_HOSTS` — narrow hostname exceptions resolved to `/32` CIDRs at apply time.
 
@@ -57,27 +58,18 @@ Why `pfk` is not `pfctl -d`:
 - Blocks outbound UDP/TCP 53 except allowed DNS targets.
 - Blocks mDNS by default for a tighter host posture.
 - Blocks `utun*` by default and keeps AWDL / llw disabled unless you explicitly allow them.
-- Uses Google's official published `goog.json - cloud.json` dataset for Google-only HTTPS mode and caches the resolved CIDRs for `pfs`.
+- Resolves a small Google sign-in hostname set into `/32`s for Google-only HTTPS mode and caches the results for `pfs`.
 - Allows a narrow hostname-based HTTPS exception list for sites that must work without opening the broader web.
 - Blocks DoT/DoQ on 853 when enabled.
 - Blocks QUIC/HTTP3 on UDP 443 when enabled so browsers stay on TCP 443.
-- Can restrict HTTPS to Google-owned default-domain/service ranges computed from Google's official published IP datasets.
+- Can restrict HTTPS to the configured Google hostname set without dumping a huge CIDR inventory in `pfs`.
 - Logs every explicit block rule in the anchor.
 - Logs allowed DNS with `log (all)` so `pflog0` shows the PF decision path for approved resolvers.
 - Adds `pfkit:` rule labels so `pfctl -s labels` exposes per-rule counters even when live capture is quiet.
 - Background block logging writes text logs under `~/dev/logs/pfkit/`, and `pfs` tails that file directly.
 
-## Uninstall
-
-```bash
-sudo ./bin/pfkit-uninstall.sh
-```
-
-## Live monitoring
+## Status
 
 - Live PF status: `sudo pfs`
 - Raw block-log tail: `sudo pfs --tail`
-- Unified control entrypoint: `sudo ./bin/pfkit.sh help`
-- DNS-only watch (PF decisions on `pflog0`): `sudo ./bin/pfkit-watch-dns.sh`
-- DNS-only watch (raw interface traffic): `sudo ./bin/pfkit-watch-dns.sh --iface en0`
-- PF block tail (`pflog0` lines containing `block`): `sudo ./bin/pfkit-watch-blocks.sh`
+- Optional raw CIDR dump: `sudo pfs --cidrs`

@@ -17,7 +17,6 @@ ENV_FILE="$ROOT_DIR/config/pfkit.env"
 TEMPLATE="$ROOT_DIR/anchors/pfkit.anchor"
 ANCHOR_DST="/etc/pf.anchors/pfkit.anchor"
 PFCONF="/etc/pf.conf"
-GOOGLE_RANGE_HELPER="$ROOT_DIR/bin/pfkit-google-ranges.py"
 HOST_RESOLVE_HELPER="$ROOT_DIR/bin/pfkit-resolve-hosts.py"
 STATE_DIR="${DEV_LOG_ROOT:-$REPO_ROOT/logs}/pfkit"
 
@@ -57,8 +56,10 @@ case "${DNS_MODE:-router}" in
 esac
 
 LAN_NETS="${ALLOW_LAN_CIDRS:-192.168.0.0/16 10.0.0.0/8 172.16.0.0/12}"
-GOOGLE_ENDPOINT_MODE="${GOOGLE_ENDPOINT_MODE:-official_default_domains}"
+DEFAULT_GOOGLE_ALLOWED_HOSTS="accounts.google.com ssl.gstatic.com www.gstatic.com"
+GOOGLE_ENDPOINT_MODE="${GOOGLE_ENDPOINT_MODE:-hosts}"
 GOOGLE_ALLOWED="${GOOGLE_ALLOWED:-${GGC_ALLOWED:-}}"
+GOOGLE_ALLOWED_HOSTS="${GOOGLE_ALLOWED_HOSTS:-$DEFAULT_GOOGLE_ALLOWED_HOSTS}"
 EXTRA_HTTPS_ALLOWED="${EXTRA_HTTPS_ALLOWED:-}"
 EXTRA_HTTPS_ALLOWED_HOSTS="${EXTRA_HTTPS_ALLOWED_HOSTS:-}"
 GOOGLE_ONLY_MODE="${GOOGLE_ONLY_MODE:-0}"
@@ -66,38 +67,41 @@ ALLOW_APPLE_P2P="${ALLOW_APPLE_P2P:-1}"
 BLOCK_UTUN="${BLOCK_UTUN:-0}"
 BASELINE_PROFILE="${BASELINE_PROFILE:-unset}"
 
-case "$GOOGLE_ENDPOINT_MODE" in
-  official_default_domains)
-    if [[ ! -f "$GOOGLE_RANGE_HELPER" ]]; then
-      echo "Missing Google range helper: $GOOGLE_RANGE_HELPER" >&2
+GOOGLE_ALLOWED_RENDERED="127.0.0.1/32"
+EXTRA_HTTPS_HOSTS_RENDERED=""
+if [[ "$GOOGLE_ONLY_MODE" == "1" ]]; then
+  case "$GOOGLE_ENDPOINT_MODE" in
+    official_default_domains|hosts)
+      if [[ ! -f "$HOST_RESOLVE_HELPER" ]]; then
+        echo "Missing host resolve helper: $HOST_RESOLVE_HELPER" >&2
+        exit 1
+      fi
+      GOOGLE_ALLOWED_RENDERED="$(python3 "$HOST_RESOLVE_HELPER" --state-dir "$STATE_DIR" --state-name google-hosts.json $GOOGLE_ALLOWED_HOSTS)"
+      [[ -n "$GOOGLE_ALLOWED_RENDERED" ]] || {
+        echo "GOOGLE_ENDPOINT_MODE=$GOOGLE_ENDPOINT_MODE requires resolvable GOOGLE_ALLOWED_HOSTS" >&2
+        exit 1
+      }
+      ;;
+    manual)
+      GOOGLE_ALLOWED_RENDERED="$GOOGLE_ALLOWED"
+      [[ -n "$GOOGLE_ALLOWED_RENDERED" ]] || {
+        echo "GOOGLE_ENDPOINT_MODE=manual requires GOOGLE_ALLOWED" >&2
+        exit 1
+      }
+      ;;
+    *)
+      echo "Invalid GOOGLE_ENDPOINT_MODE: $GOOGLE_ENDPOINT_MODE" >&2
+      exit 1
+      ;;
+  esac
+
+  if [[ -n "$EXTRA_HTTPS_ALLOWED_HOSTS" ]]; then
+    if [[ ! -f "$HOST_RESOLVE_HELPER" ]]; then
+      echo "Missing host resolve helper: $HOST_RESOLVE_HELPER" >&2
       exit 1
     fi
-    GOOGLE_ALLOWED_RENDERED="$(python3 "$GOOGLE_RANGE_HELPER" --state-dir "$STATE_DIR")"
-    [[ -n "$GOOGLE_ALLOWED_RENDERED" ]] || {
-      echo "Failed to resolve official Google-owned ranges" >&2
-      exit 1
-    }
-    ;;
-  manual)
-    GOOGLE_ALLOWED_RENDERED="$GOOGLE_ALLOWED"
-    [[ -n "$GOOGLE_ALLOWED_RENDERED" ]] || {
-      echo "GOOGLE_ENDPOINT_MODE=manual requires GOOGLE_ALLOWED" >&2
-      exit 1
-    }
-    ;;
-  *)
-    echo "Invalid GOOGLE_ENDPOINT_MODE: $GOOGLE_ENDPOINT_MODE" >&2
-    exit 1
-    ;;
-esac
-
-EXTRA_HTTPS_HOSTS_RENDERED=""
-if [[ -n "$EXTRA_HTTPS_ALLOWED_HOSTS" ]]; then
-  if [[ ! -f "$HOST_RESOLVE_HELPER" ]]; then
-    echo "Missing host resolve helper: $HOST_RESOLVE_HELPER" >&2
-    exit 1
+    EXTRA_HTTPS_HOSTS_RENDERED="$(python3 "$HOST_RESOLVE_HELPER" --state-dir "$STATE_DIR" --state-name extra-https-hosts.json $EXTRA_HTTPS_ALLOWED_HOSTS 2>/dev/null || true)"
   fi
-  EXTRA_HTTPS_HOSTS_RENDERED="$(python3 "$HOST_RESOLVE_HELPER" --state-dir "$STATE_DIR" $EXTRA_HTTPS_ALLOWED_HOSTS 2>/dev/null || true)"
 fi
 
 EXTRA_HTTPS_ALLOWED_RENDERED="$(printf '%s %s\n' "$EXTRA_HTTPS_ALLOWED" "$EXTRA_HTTPS_HOSTS_RENDERED" | xargs echo 2>/dev/null || true)"
