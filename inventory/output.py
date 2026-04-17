@@ -4,7 +4,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from inventory.commands import command_path, valid_commands
+from inventory.commands import command_object, command_path, public_command_records
 from inventory.discovery import (
     build_dir_lookup,
     catalog_item_for_cmd,
@@ -12,9 +12,8 @@ from inventory.discovery import (
     collect_manifest_index,
     display_command_name,
     display_records,
-    is_legend_eligible,
 )
-from inventory.shared import SCHEMA_VERSION, Style, group_key, matches_filters, order_key
+from inventory.shared import SCHEMA_VERSION, Style, group_key, matches_filters, node_key, order_key
 
 
 def render_command_group(commands: list[dict[str, str]], show_paths: bool, style: Style, indent: str = "    ") -> None:
@@ -63,15 +62,7 @@ def print_summary(dir_records: list[dict[str, str]], cmd_records: list[dict[str,
     for record in subcomponents:
         subcomponents_by_parent.setdefault(record["parent"], []).append(record)
 
-    selected = [record for record in display_records(cmd_records) if is_legend_eligible(record) and matches_filters(record, filters)]
-    valid_aliases = {cmd["alias"] for cmd in valid_commands(selected)}
-    filtered_records: list[dict[str, str]] = []
-    for record in selected:
-        if display_command_name(record) not in valid_aliases:
-            continue
-        filtered_records.append(record)
-
-    grouped = group_commands(filtered_records)
+    grouped = group_commands(public_command_records(cmd_records, filters))
     for group in sorted(grouped, key=group_key):
         print(style.wrap(group, style.bold, style.hdr))
         cmds_by_component: dict[str, list[dict[str, str]]] = {}
@@ -115,15 +106,7 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
     style = Style(color)
     print(style.wrap("commands", style.hdr))
     print()
-    selected = [record for record in display_records(cmd_records) if is_legend_eligible(record) and matches_filters(record, filters)]
-    valid_aliases = {cmd["alias"] for cmd in valid_commands(selected)}
-    filtered_records: list[dict[str, str]] = []
-    for record in selected:
-        if display_command_name(record) not in valid_aliases:
-            continue
-        filtered_records.append(record)
-
-    grouped = group_commands(filtered_records)
+    grouped = group_commands(public_command_records(cmd_records, filters))
     for group in sorted(grouped, key=group_key):
         print(style.wrap(group, style.bold, style.hdr))
         commands = sorted(
@@ -135,29 +118,15 @@ def print_legend(cmd_records: list[dict[str, str]], show_paths: bool, color: boo
 
 
 def print_index(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
-    records = []
-    for record in display_records(cmd_records):
-        if not matches_filters(record, filters):
-            continue
-        records.extend(valid_commands([record]))
+    records = [command_object(record) for record in public_command_records(cmd_records, filters)]
     print(json.dumps({"commands": records}, indent=2))
 
 
 def print_shell(cmd_records: list[dict[str, str]], filters: list[str]) -> None:
-    seen_aliases: set[str] = set()
-    selected = sorted(
-        cmd_records,
-        key=lambda x: (group_key(x["group"]), order_key(x.get("sort_component", x["component"])), display_command_name(x)),
-    )
-    for record in selected:
+    for record in public_command_records(cmd_records, filters):
         if record.get("source") != "script":
             continue
-        if not is_legend_eligible(record) or not matches_filters(record, filters):
-            continue
         alias = display_command_name(record)
-        if not alias or alias in seen_aliases:
-            continue
-        seen_aliases.add(alias)
         print(f"{alias}\t{record['path']}\t{record.get('run', 'user')}")
 
 
@@ -170,6 +139,9 @@ def print_manifest(
     filters: list[str],
 ) -> None:
     by_rel, explicit_paths = build_dir_lookup(dir_records)
+    public_records = public_command_records(cmd_records, filters)
+    public_keys = {node_key(record) for record in public_records}
+    public_order = {node_key(record): index for index, record in enumerate(public_records, start=1)}
     emitted_cmd_records = [record for record in display_records(cmd_records) if matches_filters(record, filters)]
     items: list[dict[str, object]] = []
 
@@ -179,7 +151,16 @@ def print_manifest(
         items.append(catalog_item_for_dir(record, by_rel))
 
     for record in emitted_cmd_records:
-        items.append(catalog_item_for_cmd(record, by_rel, explicit_paths))
+        key = node_key(record)
+        items.append(
+            catalog_item_for_cmd(
+                record,
+                by_rel,
+                explicit_paths,
+                legend_visible=key in public_keys,
+                display_order=public_order.get(key),
+            )
+        )
 
     items.sort(key=lambda item: (str(item["taxonomy_key"]), str(item["path_key"])))
 
@@ -187,7 +168,15 @@ def print_manifest(
         "schema_version": SCHEMA_VERSION,
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "root": str(root),
-        "index": collect_manifest_index(root, dir_records, script_records, shell_records, emitted_cmd_records, len(items)),
+        "index": collect_manifest_index(
+            root,
+            dir_records,
+            script_records,
+            shell_records,
+            emitted_cmd_records,
+            len(public_records),
+            len(items),
+        ),
         "items": items,
     }
     print(json.dumps(payload, indent=2))

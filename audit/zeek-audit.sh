@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=za name="Zeek Report" group=audit run=user desc="Run Zeek correlation report generation"
+# dev-cmd: alias=za name="Zeek Report" group=audit run=user legend=hide desc="Run Zeek correlation report generation"
 
 set -euo pipefail
 

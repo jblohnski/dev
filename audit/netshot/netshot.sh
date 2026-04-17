@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=netshot name=Netshot group=audit run=sudo desc="Capture a short packet trace, run Zeek, and summarize the result"
+# dev-cmd: alias=netshot name=Netshot group=audit run=sudo legend=hide desc="Capture a short packet trace, run Zeek, and summarize the result"
 
 set -euo pipefail
 

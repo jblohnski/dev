@@ -47,7 +47,7 @@ selected = []
 for item in items:
     if item.get("record_type") != "cmd":
         continue
-    if item.get("source") != "script":
+    if not item.get("legend_visible"):
         continue
     alias = item.get("alias") or item.get("cmd") or ""
     path = item.get("path") or ""
@@ -55,25 +55,27 @@ for item in items:
         continue
     selected.append(
         (
+            item.get("display_order"),
             item.get("group", ""),
             alias,
             item.get("name", "") or alias,
             item.get("desc", ""),
             item.get("run", "user") or "user",
+            item.get("source", ""),
             path,
         )
     )
 
-selected.sort(key=lambda row: (group_order.get(row[0], 99), row[1]))
+selected.sort(key=lambda row: (row[0] is None, row[0] or 0, group_order.get(row[1], 99), row[2]))
 
 for row in selected:
-    print("\t".join(row))
+    print("\t".join("" if value is None else str(value) for value in row))
 PY
 
 i=1
 current_group=""
 
-while IFS=$'\t' read -r group alias name desc run cmd_path; do
+while IFS=$'\t' read -r display_order group alias name desc run source cmd_path; do
   [[ -n "$alias" ]] || continue
 
   if [[ "$group" != "$current_group" ]]; then
@@ -92,7 +94,7 @@ while IFS=$'\t' read -r group alias name desc run cmd_path; do
   if [[ -n "$name" && "$name_fold" != "$alias_fold" ]]; then
     printf "%s     %s%s%s\n" "${DIM:-}" "${MUTED:-}" "$name" "$RESET"
   fi
-  printf "%s|%s|%s|%s\n" "$i" "$ROOT/$cmd_path" "$run" "$alias" >> "$RUN_TMP"
+  printf "%s|%s|%s|%s|%s\n" "$i" "$ROOT/$cmd_path" "$run" "$alias" "$source" >> "$RUN_TMP"
   i=$((i + 1))
 done < "$TMP"
 
@@ -113,6 +115,7 @@ fi
 cmd_path="$(printf "%s" "$entry" | cut -d'|' -f2)"
 runmode="$(printf "%s" "$entry" | cut -d'|' -f3)"
 shell_cmd="$(printf "%s" "$entry" | cut -d'|' -f4)"
+source_kind="$(printf "%s" "$entry" | cut -d'|' -f5)"
 
 printf "\n%s→ Running %s%s\n\n" "$BOLD" "${shell_cmd:-$(basename "$cmd_path")}" "$RESET"
 
@@ -131,6 +134,11 @@ if [[ "$shell_cmd" =~ ^[A-Za-z0-9_.-]+$ ]]; then
   if [[ "$status" -ne 127 ]]; then
     exit "$status"
   fi
+fi
+
+if [[ "$source_kind" == "shell" ]]; then
+  printf "%sCommand is shell-backed and could not be resolved through the dev shell loader.%s\n" "${WARN:-}" "$RESET"
+  exit 127
 fi
 
 if [[ "$runmode" == "sudo" ]]; then

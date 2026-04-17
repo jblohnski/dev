@@ -1,8 +1,15 @@
-<!-- dev-component: id=audit kind=component group=audit desc="Quick macOS audit and Zeek analysis pipeline" -->
+<!-- dev-component: id=audit kind=component group=audit desc="System audit, trust summary, and monitoring/report pipeline" -->
 
-# audit — quick macOS snapshot
+# audit
 
-This is a lightweight, glanceable audit for macOS with a network/process-first view.
+The public audit surface is intentionally small:
+
+- `audit`: run the core system scan and emit the trust-oriented summary
+- `audit.monitor`: manage capture, logs, and focused deep-dive monitors
+- `audit.status`: check monitor state and latest artifact readiness
+- `audit.report`: read the latest output and refresh Zeek report material
+
+The scripts in this directory are implementation detail for that public surface.
 
 ## What it does
 
@@ -11,14 +18,20 @@ This is a lightweight, glanceable audit for macOS with a network/process-first v
 - Prints a short color summary in stdout
 - Highlights essential anomalies only
 - Tracks lightweight network delta between runs
+- Produces a trust summary artifact tied to the same run
 
-## Usage
+## Public Usage
 
 ```bash
-./audit.sh
+audit
+audit.status
+audit.report
+audit.monitor status
+audit.monitor start en0
+audit.monitor logs --last 30m --top 5
 ```
 
-Optional:
+Direct script usage remains available for internals and one-off deep work:
 
 ```bash
 ./audit.sh --out /tmp/my_snapshot.json
@@ -83,6 +96,7 @@ Artifacts are written under `audit/report/`:
 - `zeek/zeek-<id>.summary.txt`
 - `zeek/zeek-<id>.md`
 - `zeek/zeek-<id>.graph.dot` (and PNG if Graphviz `dot` exists)
+- `trust/trust-<id>/trust_summary.txt`
 
 Related tooling:
 

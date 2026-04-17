@@ -1,5 +1,5 @@
 #!/bin/zsh
-# dev-cmd: alias=macsm-anlyz name=macsm-anlyz group=audit run=user desc="Analyze macsm watch run artifacts and summarize diffs"
+# dev-cmd: alias=macsm-anlyz name=macsm-anlyz group=audit run=user legend=hide desc="Analyze macsm watch run artifacts and summarize diffs"
 
 # macsm_analyze.sh
 # Analyze a macsm.sh run directory and summarize:

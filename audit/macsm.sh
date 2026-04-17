@@ -1,5 +1,5 @@
 #!/bin/zsh
-# dev-cmd: alias=macsm name=macsm group=audit run=user desc="Watch macOS accessibility/audio preference changes"
+# dev-cmd: alias=macsm name=macsm group=audit run=user legend=hide desc="Watch macOS accessibility/audio preference changes"
 
 # macsm.sh
 # macOS (zsh) watcher for:

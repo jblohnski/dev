@@ -20,8 +20,7 @@ under `$HOME`.
 
 ## Entry Points
 
-- `./install.sh`: sync tracked bootstrap files into home targets
-- `bi`: shell wrapper for `./install.sh`
+- `bootstrap.install`: discovered public command for `./install.sh`
 - `pz`: link `bootstrap/.zshrc` into `~/.zshrc` and reload
 - `pzcp`: copy `bootstrap/.zshrc` into `~/.zshrc` and reload
 

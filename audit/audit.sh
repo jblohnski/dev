@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=aud name="Audit Snapshot" group=audit run=user desc="Quick macOS audit with network/process focus + lightweight delta"
+# dev-cmd: alias=aud name="Audit Snapshot" group=audit run=user legend=hide desc="Quick macOS audit with network/process focus + lightweight delta"
 
 set -euo pipefail
 
@@ -17,6 +17,8 @@ NET_STATE_FILE="$ROOT_DIR/state/net-last.json"
 ZEEK_MODE=1
 ZEEK_DIR=""
 ZEEK_IPINFO=0
+TRUST_COLLECTOR="$ROOT_DIR/collectors/trust.sh"
+TRUST_REPORT_DIR="$ROOT_DIR/report/trust"
 
 usage() {
   cat <<EOF
@@ -216,6 +218,11 @@ ZEEK_REPORT_BULLETS="$ZEEK_REPORT_DIR/zeek-${RUN_ID}.summary.txt"
 ZEEK_REPORT_MD="$ZEEK_REPORT_DIR/zeek-${RUN_ID}.md"
 ZEEK_REPORT_DOT="$ZEEK_REPORT_DIR/zeek-${RUN_ID}.graph.dot"
 ZEEK_SUMMARY_HEADLINE=""
+TRUST_RUN_DIR=""
+TRUST_SUMMARY_FILE=""
+TRUST_STATUS="unavailable"
+TRUST_ISSUES=0
+TRUST_SUMMARY_HEADLINE=""
 
 if [[ "$ZEEK_MODE" -eq 1 && -f "$ZEEK_ANALYZER" ]]; then
   ZEEK_LOG_DIR_RESOLVED="$(resolve_zeek_log_dir "$ZEEK_DIR")"
@@ -234,6 +241,26 @@ if [[ "$ZEEK_MODE" -eq 1 && -f "$ZEEK_ANALYZER" ]]; then
         ZEEK_SUMMARY_HEADLINE="$(head -n 1 "$ZEEK_REPORT_BULLETS" | sed 's/^- //')"
       fi
     fi
+  fi
+fi
+
+if [[ -f "$TRUST_COLLECTOR" ]]; then
+  TRUST_RUN_DIR="$TRUST_REPORT_DIR/trust-${RUN_ID}"
+  TRUST_SUMMARY_FILE="$TRUST_RUN_DIR/trust_summary.txt"
+  mkdir -p "$TRUST_RUN_DIR"
+  TRUST_STDOUT="$(bash "$TRUST_COLLECTOR" "$TRUST_RUN_DIR" 2>/dev/null || true)"
+  if [[ -f "$TRUST_SUMMARY_FILE" ]]; then
+    TRUST_ISSUES="$(grep -c '^\[sus\]' "$TRUST_SUMMARY_FILE" 2>/dev/null || true)"
+  fi
+  if [[ "$TRUST_ISSUES" -gt 0 ]]; then
+    TRUST_STATUS="issues"
+  else
+    TRUST_STATUS="ok"
+  fi
+  if [[ -n "$TRUST_STDOUT" ]]; then
+    TRUST_SUMMARY_HEADLINE="$TRUST_STDOUT"
+  elif [[ -f "$TRUST_SUMMARY_FILE" ]]; then
+    TRUST_SUMMARY_HEADLINE="trust summary ready"
   fi
 fi
 
@@ -256,13 +283,14 @@ PY
 [[ -n "$DEFAULT_GW" ]] || add_anomaly "medium" "network" "No default gateway detected."
 (( ROOT_USED_PCT < 85 )) || add_anomaly "medium" "disk" "Root disk usage is ${ROOT_USED_PCT}%."
 
-export TS HOST MACOS_VERSION MACOS_BUILD MODEL UPTIME_HUMAN RUN_ID NET_STATE_FILE
+export TS HOST MACOS_VERSION MACOS_BUILD MODEL UPTIME_HUMAN RUN_ID NET_STATE_FILE OUT_JSON
 export SIP_ENABLED FIREWALL_ENABLED GATEKEEPER_ENABLED FILEVAULT_ON
 export DEFAULT_GW DEFAULT_IFACE DNS_SERVERS_RAW LISTENING_TCP_COUNT ESTABLISHED_TCP_COUNT
 export ACTIVE_IFACES_RAW DHCP_IP DHCP_SERVER DHCP_LEASE
 export TOP_REMOTE_RAW TOP_PROC_RAW TOP_CPU_RAW
 export ROOT_USED_PCT ROOT_FREE_HUMAN USER_LAUNCH_AGENTS SYS_LAUNCH_AGENTS SYS_LAUNCH_DAEMONS LOGIN_ITEMS_COUNT
 export ZEEK_MODE ZEEK_DIR ZEEK_LOG_DIR_RESOLVED ZEEK_REPORT_DIR ZEEK_REPORT_JSON ZEEK_REPORT_BULLETS ZEEK_REPORT_MD ZEEK_REPORT_DOT ZEEK_SUMMARY_HEADLINE
+export TRUST_RUN_DIR TRUST_SUMMARY_FILE TRUST_STATUS TRUST_ISSUES TRUST_SUMMARY_HEADLINE
 export anomalies_json
 
 JSON_DOC="$(python3 - <<'PY'
@@ -281,6 +309,15 @@ def to_bool(name):
 
 def lines(name):
     return [x.strip() for x in os.environ.get(name, "").splitlines() if x.strip()]
+
+def file_lines(name):
+    raw = os.environ.get(name, "").strip()
+    if not raw:
+        return []
+    path = Path(raw)
+    if not path.is_file():
+        return []
+    return [line.strip() for line in path.read_text().splitlines() if line.strip()]
 
 def iface_names(entries):
     out = []
@@ -373,6 +410,23 @@ doc = {
     "system_launch_daemons_count": to_int("SYS_LAUNCH_DAEMONS"),
     "login_items_count": to_int("LOGIN_ITEMS_COUNT"),
   },
+  "trust": {
+    "status": os.environ.get("TRUST_STATUS", "unavailable"),
+    "issues": to_int("TRUST_ISSUES"),
+    "summary": os.environ.get("TRUST_SUMMARY_HEADLINE", ""),
+    "summary_path": os.environ.get("TRUST_SUMMARY_FILE", ""),
+    "report_dir": os.environ.get("TRUST_RUN_DIR", ""),
+    "items": file_lines("TRUST_SUMMARY_FILE"),
+  },
+  "artifacts": {
+    "audit_json": os.environ.get("OUT_JSON", ""),
+    "trust_summary": os.environ.get("TRUST_SUMMARY_FILE", ""),
+    "trust_report_dir": os.environ.get("TRUST_RUN_DIR", ""),
+    "zeek_json": os.environ.get("ZEEK_REPORT_JSON", "") if Path(os.environ.get("ZEEK_REPORT_JSON", "")).is_file() else "",
+    "zeek_bullets": os.environ.get("ZEEK_REPORT_BULLETS", "") if Path(os.environ.get("ZEEK_REPORT_BULLETS", "")).is_file() else "",
+    "zeek_markdown": os.environ.get("ZEEK_REPORT_MD", "") if Path(os.environ.get("ZEEK_REPORT_MD", "")).is_file() else "",
+    "zeek_graph": os.environ.get("ZEEK_REPORT_DOT", "") if Path(os.environ.get("ZEEK_REPORT_DOT", "")).is_file() else "",
+  },
   "findings": json.loads(os.environ.get("anomalies_json", "[]")),
 }
 
@@ -427,6 +481,7 @@ printf "%sINFO%s  ifaces=%s\n" "$DIM" "$RST" "${ifaces_show:-unknown}"
 printf "%sINFO%s  dhcp iface=%s ip=%s server=%s lease=%s\n" "$DIM" "$RST" "${DEFAULT_IFACE:-unknown}" "${DHCP_IP:-}" "${DHCP_SERVER:-}" "${DHCP_LEASE:-}"
 printf "%sINFO%s  proc(top-net)=%s\n" "$DIM" "$RST" "${top_proc_show:-none}"
 printf "%sINFO%s  net-delta=%s\n" "$DIM" "$RST" "$delta_show"
+printf "%sINFO%s  trust=%s issues=%s %s\n" "$DIM" "$RST" "$TRUST_STATUS" "$TRUST_ISSUES" "${TRUST_SUMMARY_HEADLINE:-}"
 if [[ -f "$ZEEK_REPORT_JSON" ]]; then
   printf "%sINFO%s  zeek=%s (%s)\n" "$DIM" "$RST" "${ZEEK_LOG_DIR_RESOLVED:-unknown}" "${ZEEK_SUMMARY_HEADLINE:-snapshot ready}"
 else
@@ -446,6 +501,9 @@ else
 fi
 
 printf "%sJSON:%s %s\n" "$DIM" "$RST" "$OUT_JSON"
+if [[ -f "$TRUST_SUMMARY_FILE" ]]; then
+  printf "%sTRUST:%s %s\n" "$DIM" "$RST" "$TRUST_SUMMARY_FILE"
+fi
 if [[ -f "$ZEEK_REPORT_JSON" ]]; then
   printf "%sZEEK:%s %s\n" "$DIM" "$RST" "$ZEEK_REPORT_JSON"
   printf "%sZEEK:%s %s\n" "$DIM" "$RST" "$ZEEK_REPORT_BULLETS"

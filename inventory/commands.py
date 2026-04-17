@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Any
 
 from command_contract import is_valid
-from inventory.discovery import display_command_name
+from inventory.discovery import display_command_name, is_legend_eligible
+from inventory.shared import group_key, matches_filters, order_key
 
 
 def command_path(record: dict[str, str]) -> str:
@@ -36,15 +37,28 @@ def command_object(record: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def valid_commands(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    commands: list[dict[str, Any]] = []
+def command_sort_key(record: dict[str, Any]) -> tuple[tuple[int, str], tuple[int, str], str]:
+    return (
+        group_key(record.get("group", "")),
+        order_key(record.get("sort_component", record.get("component", ""))),
+        display_command_name(record),
+    )
+
+
+def public_command_records(records: list[dict[str, Any]], filters: list[str] | None = None) -> list[dict[str, Any]]:
+    selected: list[dict[str, Any]] = []
     seen_aliases: set[str] = set()
-    for record in records:
-        cmd = command_object(record)
-        if not is_valid(cmd):
+    active_filters = filters or []
+    for record in sorted(records, key=command_sort_key):
+        alias = (record.get("alias") or "").strip()
+        if not alias or alias in seen_aliases:
             continue
-        if cmd["alias"] in seen_aliases:
+        if not is_legend_eligible(record):
             continue
-        seen_aliases.add(cmd["alias"])
-        commands.append(cmd)
-    return commands
+        if not matches_filters(record, active_filters):
+            continue
+        if not is_valid(command_object(record)):
+            continue
+        seen_aliases.add(alias)
+        selected.append(record)
+    return selected

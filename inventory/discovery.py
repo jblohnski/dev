@@ -306,19 +306,18 @@ def build_shell_records(root: Path, by_rel: dict[str, dict[str, str]]) -> list[d
 
 def display_records(cmd_records: list[dict[str, str]]) -> list[dict[str, str]]:
     selected: list[dict[str, str]] = []
-    seen: dict[tuple[str, str, str, str], int] = {}
+    seen_aliases: set[str] = set()
     for record in sorted(
         cmd_records,
         key=lambda x: (order_key(x.get("sort_component", x["component"])), x["group"], x["source"], display_command_name(x)),
     ):
         if is_shorthand_alias(record):
             continue
-        key = (record["component"], record["group"], record["desc"], record["run"])
-        current = seen.get(key)
-        if current is None:
-            seen[key] = len(selected)
-            selected.append(record)
+        alias = (record.get("alias") or "").strip()
+        if not alias or alias in seen_aliases:
             continue
+        seen_aliases.add(alias)
+        selected.append(record)
     return selected
 
 
@@ -390,7 +389,12 @@ def catalog_item_for_dir(record: dict[str, str], by_rel: dict[str, dict[str, str
 
 
 def catalog_item_for_cmd(
-    record: dict[str, str], by_rel: dict[str, dict[str, str]], explicit_paths: dict[str, str]
+    record: dict[str, str],
+    by_rel: dict[str, dict[str, str]],
+    explicit_paths: dict[str, str],
+    *,
+    legend_visible: bool,
+    display_order: int | None,
 ) -> dict[str, object]:
     cmd = record.get("cmd", record.get("alias") or record.get("name") or "")
     owner_rel = explicit_paths.get(record.get("component", ""), ".")
@@ -418,6 +422,8 @@ def catalog_item_for_cmd(
         "desc": record["desc"],
         "keywords": split_keywords(record.get("keywords", "")),
         "alias": record.get("alias") or None,
+        "legend_visible": legend_visible,
+        "display_order": display_order,
         "declared_taxonomy": declared_taxonomy,
         "taxonomy_source": "explicit" if declared_taxonomy else "derived",
         "taxonomy_key": "/".join(taxon),
@@ -431,6 +437,7 @@ def collect_manifest_index(
     script_records: list[dict[str, str]],
     shell_records: list[dict[str, str]],
     emitted_cmd_records: list[dict[str, str]],
+    public_cmd_records_count: int,
     emitted_items_count: int,
 ) -> dict[str, object]:
     eligible_dirs: list[str] = []
@@ -503,6 +510,7 @@ def collect_manifest_index(
             "shell_files_seen": shell_files_seen,
             "shell_records": len(shell_records),
             "command_records_manifest": len(emitted_cmd_records),
+            "command_records_public": public_cmd_records_count,
             "items_emitted": emitted_items_count,
         },
         "skipped": dict(sorted(skipped_counts.items())),

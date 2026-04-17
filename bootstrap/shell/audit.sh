@@ -1,92 +1,305 @@
 ## audit
 
-export AUDIT_DIR="$HOME/dev/audit"
+export AUDIT_DIR="${AUDIT_DIR:-$HOME/dev/audit}"
 export ZEEK_LOG_DIR="${ZEEK_LOG_DIR:-${DEV_LOG_ROOT:-$HOME/dev/logs}/zeek}"
 
-# dev-cmd: alias=a name=Audit group=audit run=user desc="Run the main audit entrypoint"
-a() {
+# dev-cmd: alias=audit name="Audit Scan" group=audit run=user desc="Run the system audit and emit the core trust-oriented summary"
+audit() {
   "$AUDIT_DIR/audit.sh" "$@"
 }
 
-# dev-cmd: alias=az name="Zeek Workflow" group=audit run=user desc="Run Zeek capture and report workflow subcommands"
-az() {
-  local cmd="${1:-run}"
+# dev-cmd: alias=audit.monitor name="Audit Monitor" group=audit run=user desc="Manage audit logging capture, monitor traces, and focused deep-dive helpers"
+alias audit.monitor='audit_monitor'
+audit_monitor() {
+  local cmd="${1:-status}"
   [[ $# -gt 0 ]] && shift
 
   case "$cmd" in
-    run)
-      "$AUDIT_DIR/zeek-audit.sh" "$ZEEK_LOG_DIR" "$@"
-      ;;
     start)
       local iface="${1:-${ZEEK_CAPTURE_IFACE:-en0}}"
-      [[ $# -gt 0 ]] && shift
+      if [[ $# -gt 0 && "${1:-}" != "--" ]]; then
+        shift
+      fi
       "$AUDIT_DIR/zeek-capture.sh" start "$iface" "$@"
       ;;
     stop)
       "$AUDIT_DIR/zeek-capture.sh" stop
       ;;
-    stat|status)
+    status|stat)
       "$AUDIT_DIR/zeek-capture.sh" status
       ;;
     merge)
-      "$AUDIT_DIR/zeek-logsync.sh"
+      "$AUDIT_DIR/zeek-logsync.sh" "$@"
       ;;
-    uid)
-      local uid="${1:?uid required}"
-      "$AUDIT_DIR/zeek-audit.sh" "$ZEEK_LOG_DIR" "uid-$(date +%Y%m%d-%H%M%S)" -- --uid "$uid"
+    logs)
+      "$DEV_ROOT/ops/diagnostics/logsum.sh" "$@"
       ;;
-    tuple)
-      local src="${1:?src_ip required}"
-      local dst="${2:?dst_ip required}"
-      local port="${3:?dst_port required}"
-      local ts="${4:?timestamp required}"
-      local run="${5:-tuple-$(date +%Y%m%d-%H%M%S)}"
-      "$AUDIT_DIR/zeek-audit.sh" "$ZEEK_LOG_DIR" "$run" -- \
-        --src-ip "$src" --dst-ip "$dst" --dst-port "$port" --ts "$ts"
+    ui|windowserver)
+      "$DEV_ROOT/ops/diagnostics/wstrace.sh" "$@"
+      ;;
+    netshot)
+      "$AUDIT_DIR/netshot/netshot.sh" "$@"
+      ;;
+    prefs-watch)
+      "$AUDIT_DIR/macsm.sh" "$@"
+      ;;
+    prefs-report)
+      "$AUDIT_DIR/macsm-anlyz.sh" "$@"
+      ;;
+    help|-h|--help|"")
+      cat <<'EOF'
+Usage:
+  audit.monitor status
+  audit.monitor start [iface] [-- zeek args...]
+  audit.monitor stop
+  audit.monitor merge [source_dir] [target_dir]
+  audit.monitor logs [logsum args...]
+  audit.monitor ui [range]
+  audit.monitor netshot [seconds]
+  audit.monitor prefs-watch
+  audit.monitor prefs-report <run_dir>
+EOF
       ;;
     *)
-      echo "az commands: run start stop stat merge uid tuple"
+      echo "audit.monitor commands: start stop status merge logs ui netshot prefs-watch prefs-report"
       return 1
       ;;
   esac
 }
 
-alias az.run='az run'
-alias az.start='az start'
-alias az.stop='az stop'
-alias az.stat='az stat'
-alias az.merge='az merge'
-alias az.uid='az uid'
-alias az.tuple='az tuple'
+audit_latest_json() {
+  setopt local_options null_glob
+  local -a matches
+  matches=("$AUDIT_DIR"/audit-*.json)
+  (( ${#matches[@]} )) || return 0
+  command ls -1t -- "${matches[@]}" 2>/dev/null | head -n 1 || true
+}
 
-# dev-cmd: alias=arpt name="Audit Report" group=audit run=user desc="Print latest Zeek markdown report path"
+audit_json_artifact() {
+  local key="$1"
+  local audit_json
+  audit_json="$(audit_latest_json)"
+  [[ -f "$audit_json" ]] || return 0
+  python3 - "$audit_json" "$key" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    doc = json.load(handle)
+
+print(doc.get("artifacts", {}).get(sys.argv[2], ""))
+PY
+}
+
+audit_latest_zeek_json() {
+  local audit_json
+  audit_json="$(audit_latest_json)"
+  if [[ -f "$audit_json" ]]; then
+    audit_json_artifact zeek_json
+    return 0
+  fi
+  setopt local_options null_glob
+  local -a matches
+  matches=("$AUDIT_DIR"/report/zeek/zeek-*.json)
+  (( ${#matches[@]} )) || return 0
+  command ls -1t -- "${matches[@]}" 2>/dev/null | head -n 1 || true
+}
+
+audit_latest_zeek_bullets() {
+  local audit_json
+  audit_json="$(audit_latest_json)"
+  if [[ -f "$audit_json" ]]; then
+    audit_json_artifact zeek_bullets
+    return 0
+  fi
+  setopt local_options null_glob
+  local -a matches
+  matches=("$AUDIT_DIR"/report/zeek/zeek-*.summary.txt)
+  (( ${#matches[@]} )) || return 0
+  command ls -1t -- "${matches[@]}" 2>/dev/null | head -n 1 || true
+}
+
+audit_latest_zeek_md() {
+  local audit_json
+  audit_json="$(audit_latest_json)"
+  if [[ -f "$audit_json" ]]; then
+    audit_json_artifact zeek_markdown
+    return 0
+  fi
+  setopt local_options null_glob
+  local -a matches
+  matches=("$AUDIT_DIR"/report/zeek/zeek-*.md)
+  (( ${#matches[@]} )) || return 0
+  command ls -1t -- "${matches[@]}" 2>/dev/null | head -n 1 || true
+}
+
+audit_latest_trust_summary() {
+  local audit_json
+  audit_json="$(audit_latest_json)"
+  if [[ -f "$audit_json" ]]; then
+    audit_json_artifact trust_summary
+    return 0
+  fi
+  setopt local_options null_glob
+  local -a matches
+  matches=("$AUDIT_DIR"/report/trust/trust-*/trust_summary.txt)
+  (( ${#matches[@]} )) || return 0
+  command ls -1t -- "${matches[@]}" 2>/dev/null | head -n 1 || true
+}
+
+audit_print_paths() {
+  local audit_json zeek_json zeek_bullets zeek_md trust_summary
+  audit_json="$(audit_latest_json)"
+  zeek_json="$(audit_latest_zeek_json)"
+  zeek_bullets="$(audit_latest_zeek_bullets)"
+  zeek_md="$(audit_latest_zeek_md)"
+  trust_summary="$(audit_latest_trust_summary)"
+
+  print "audit_json=${audit_json:-missing}"
+  print "zeek_json=${zeek_json:-missing}"
+  print "zeek_bullets=${zeek_bullets:-missing}"
+  print "zeek_markdown=${zeek_md:-missing}"
+  print "trust_summary=${trust_summary:-missing}"
+}
+
+# dev-cmd: alias=audit.status name="Audit Status" group=audit run=user desc="Show audit subsystem state, latest artifacts, and trust/report readiness"
+alias audit.status='audit_status'
+audit_status() {
+  local audit_json
+  audit_json="$(audit_latest_json)"
+
+  print "== audit monitor =="
+  "$AUDIT_DIR/zeek-capture.sh" status 2>/dev/null || print "status=unavailable"
+  print ""
+
+  print "== latest artifacts =="
+  audit_print_paths
+
+  if [[ -f "$audit_json" ]]; then
+    print ""
+    print "== latest audit snapshot =="
+    python3 - "$audit_json" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    doc = json.load(handle)
+
+trust = doc.get("trust", {})
+sec = doc.get("sec", {})
+net = doc.get("net", {})
+delta = net.get("delta", {})
+
+print(f"id={doc.get('id', '')}")
+print(f"ts={doc.get('ts', '')}")
+print(f"findings={len(doc.get('findings', []))}")
+print(
+    "security="
+    f"sip={sec.get('sip_enabled')} firewall={sec.get('firewall_enabled')} "
+    f"gatekeeper={sec.get('gatekeeper_enabled')} filevault={sec.get('filevault_on')}"
+)
+print(
+    "network="
+    f"iface={net.get('default_iface', '') or 'unknown'} "
+    f"gw={net.get('default_gateway', '') or 'unknown'} "
+    f"baseline={delta.get('baseline')}"
+)
+print(
+    "trust="
+    f"status={trust.get('status', 'unavailable')} "
+    f"issues={trust.get('issues', 0)} "
+    f"summary={trust.get('summary', '')}"
+)
+PY
+  fi
+}
+
+# dev-cmd: alias=audit.report name="Audit Report" group=audit run=user desc="Show the latest audit output, trust summary, and Zeek report material"
+alias audit.report='audit_report'
+audit_report() {
+  local cmd="${1:-show}"
+  [[ $# -gt 0 ]] && shift
+
+  case "$cmd" in
+    show|latest)
+      local audit_json zeek_bullets zeek_md trust_summary
+      audit_json="$(audit_latest_json)"
+      zeek_bullets="$(audit_latest_zeek_bullets)"
+      zeek_md="$(audit_latest_zeek_md)"
+      trust_summary="$(audit_latest_trust_summary)"
+
+      audit_print_paths
+
+      if [[ -f "$audit_json" ]]; then
+        print ""
+        print "== audit summary =="
+        python3 - "$audit_json" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    doc = json.load(handle)
+
+print(f"run={doc.get('id', '')} ts={doc.get('ts', '')}")
+for finding in doc.get("findings", [])[:10]:
+    print(f"- [{finding.get('severity', 'info')}] {finding.get('category', 'general')}: {finding.get('message', '')}")
+if not doc.get("findings"):
+    print("- no findings")
+trust = doc.get("trust", {})
+print(f"trust: {trust.get('status', 'unavailable')} issues={trust.get('issues', 0)} {trust.get('summary', '')}")
+PY
+      fi
+
+      if [[ -f "$trust_summary" ]]; then
+        print ""
+        print "== trust summary =="
+        sed -n '1,20p' "$trust_summary"
+      fi
+
+      if [[ -f "$zeek_bullets" ]]; then
+        print ""
+        print "== zeek summary =="
+        sed -n '1,20p' "$zeek_bullets"
+      elif [[ -f "$zeek_md" ]]; then
+        print ""
+        print "zeek_markdown=$zeek_md"
+      fi
+      ;;
+    paths|path)
+      audit_print_paths
+      ;;
+    refresh)
+      local run_id
+      run_id="${1:-$(date +%Y%m%d-%H%M%S)}"
+      if [[ $# -gt 0 && "${1:-}" != "--" ]]; then
+        shift
+      fi
+      "$AUDIT_DIR/zeek-audit.sh" "$ZEEK_LOG_DIR" "$run_id" "$@"
+      ;;
+    help|-h|--help|"")
+      cat <<'EOF'
+Usage:
+  audit.report
+  audit.report show
+  audit.report paths
+  audit.report refresh [run_id] [-- analyzer args...]
+EOF
+      ;;
+    *)
+      echo "audit.report commands: show paths refresh"
+      return 1
+      ;;
+  esac
+}
+
+a() {
+  audit "$@"
+}
+
+az() {
+  audit_monitor "$@"
+}
+
 arpt() {
-  local f
-  f="$(command ls -1t "$AUDIT_DIR"/report/zeek/zeek-*.md 2>/dev/null | head -n 1 || true)"
-  [[ -n "$f" ]] && print "$f" || print "no zeek markdown report found"
+  audit_report paths
 }
-
-# dev-cmd: alias=azip name="Audit Zip" group=audit run=user desc="Zip up audit project code only"
-azip() {
-  zip -r audit.zip audit \
-    -x "audit/.git/*" \
-    -x "audit/archives/*" \
-    -x "audit/__pycache__/*" \
-    -x "audit/*/__pycache__/*" \
-    -x "audit/*.pyc" \
-    -x "audit/*.pyo" \
-    -x "audit/baseline/*" \
-    -x "audit/current/*" \
-    -x "audit/report/*" \
-    -x "audit/state/*" \
-    -x "audit/*.log" \
-    -x "audit/*.pcap*" \
-    -x "audit/.DS_Store" \
-    -x "audit/*/.DS_Store" \
-    -x "audit/._*"
-}
-
-# @component: ops
-alias logsum.live='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 15m --top 3'
-alias logsum.wide='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 1h --top 5'
-alias logsum.counts='"$DEV_ROOT/ops/diagnostics/logsum.sh" --last 30m --top 5 --counts'

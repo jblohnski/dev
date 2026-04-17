@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=logsum name=logsum group=audit run=user desc="Summarize macOS unified logs for hangs/beachballs (system + Firefox)"
+# dev-cmd: alias=logsum name=logsum group=audit run=user legend=hide desc="Summarize macOS unified logs for hangs/beachballs (system + Firefox)"
 
 set -euo pipefail
 

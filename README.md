@@ -90,6 +90,7 @@ python3 ./component-scan.sh manifest
 ```
 
 The dashboard now consumes `manifest` directly instead of stitching together multiple inventory modes.
+Its command list should match the public legend set one-for-one.
 
 Keep the contract small:
 
@@ -132,10 +133,11 @@ Reports are written under `audit/report/zeek/`.
 Useful entrypoints:
 
 ```bash
-./audit/audit.sh
-./audit/zeek-capture.sh start en0
-./audit/zeek-audit.sh
-./audit/netshot/netshot.sh
+audit
+audit.status
+audit.report
+audit.monitor start en0
+audit.monitor logs --last 30m --top 5
 ```
 
 ## Conventions

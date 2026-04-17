@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=wstrace name=wstrace group=audit run=user desc="Trace WindowServer-related faults/errors for UI stutter and beachballs"
+# dev-cmd: alias=wstrace name=wstrace group=audit run=user legend=hide desc="Trace WindowServer-related faults/errors for UI stutter and beachballs"
 
 set -euo pipefail
 

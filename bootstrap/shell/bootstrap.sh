@@ -5,11 +5,6 @@ export DEV_SHELL_DIR="${DEV_SHELL_DIR:-$DEV_BOOTSTRAP_DIR/shell}"
 export DEV_ZSHRC_SRC="${DEV_ZSHRC_SRC:-$DEV_BOOTSTRAP_DIR/.zshrc}"
 export DEV_BOOTSTRAP_INSTALL="${DEV_BOOTSTRAP_INSTALL:-$DEV_BOOTSTRAP_DIR/install.sh}"
 
-# dev-cmd: alias=bi name="Bootstrap Install" group=sys run=user desc="Sync tracked bootstrap files into their live system counterparts"
-bi() {
-  "$DEV_BOOTSTRAP_INSTALL" "$@"
-}
-
 # dev-cmd: alias=pz name="Publish Zsh Link" group=sys run=user desc="Link tracked zsh config into home and reload current shell"
 pz() {
   [[ -f "$DEV_ZSHRC_SRC" ]] || { echo "pz: source not found: $DEV_ZSHRC_SRC"; return 1; }
