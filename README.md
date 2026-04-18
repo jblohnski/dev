@@ -24,6 +24,7 @@ Rule of thumb:
 - put self-contained utilities under the owning component tree
 - keep shell wrappers thin in `bootstrap/shell/`
 - keep runtime artifacts and generated reports out of tracked source, under `logs/` when they need a repo-local home
+- keep unowned personal convenience commands out of the public command surface
 
 ## Working Model
 
@@ -31,7 +32,7 @@ The repo is a recursive component tree with one shared command stream.
 
 - directories declare identity through `README.md` metadata
 - executable scripts and shell wrappers declare commands through `dev-cmd` metadata
-- `summary`, `legend`, `validate`, `manifest`, and `devdash` all derive from the same inventory walk
+- `summary`, `legend`, `validate`, and `manifest` derive from the same inventory walk
 - components and subcomponents may own commands
 - support directories stay documented but should not become a second command layer
 
@@ -62,6 +63,7 @@ Rules:
 - commands attach to the nearest explicit `component` or `subcomponent`
 - groups are fixed and explicit: `sys`, `audit`, `net`
 - if a discovered record does not resolve to a real alias, it does not belong in `legend`
+- if a command is just an ad hoc launcher for something outside this repo, it does not belong in `legend`
 - deeper tree structure is allowed, but human views stay group-first and shallow
 
 ## Inventory
@@ -89,14 +91,14 @@ python3 ./component-scan.sh validate
 python3 ./component-scan.sh manifest
 ```
 
-The dashboard now consumes `manifest` directly instead of stitching together multiple inventory modes.
-Its command list should match the public legend set one-for-one.
+`devdash` is now a machine-status dashboard, not a command browser.
 
 Keep the contract small:
 
 - human-facing command identity is `alias`, `name`, `desc`, `group`
 - shell publishing should come from scan output, not handwritten alias duplication
 - inventory is there to describe the tree, not create a second bureaucracy around it
+- public commands should express durable repo-owned capability, not personal one-off launch shortcuts
 
 ## Shell
 
@@ -115,7 +117,7 @@ Main helpers:
 - `ds`: summary
 - `dl`: legend
 - `dv`: validate
-- `dd`: dashboard
+- `dd`: machine status dashboard
 
 Publish shell changes with:
 

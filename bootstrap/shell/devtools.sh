@@ -28,22 +28,3 @@ devzip() {
 alias dz='devzip'
 
 alias ed='subl'
-
-# dev-cmd: alias=gorilla name=Gorilla group=sys run=user desc="Run the local gorilla entrypoint when installed"
-gorilla() {
-  local bin=""
-  bin="$(whence -p gorilla 2>/dev/null || true)"
-  if [[ -n "$bin" ]]; then
-    "$bin" "$@"
-    return $?
-  fi
-
-  bin="$(whence -p gorilla-cli 2>/dev/null || true)"
-  if [[ -n "$bin" ]]; then
-    "$bin" "$@"
-    return $?
-  fi
-
-  print "gorilla: no executable found in PATH (checked: gorilla, gorilla-cli)"
-  return 127
-}

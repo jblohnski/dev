@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=devdash name=Devdash group=sys run=user legend=hide desc="Show the dev component and command inventory dashboard"
+# dev-cmd: alias=devdash name=Devdash group=sys run=user legend=hide desc="Show system status metrics for the dev machine and latest audit state"
 
 set -euo pipefail
 
 ROOT="${DEV_ROOT:-$HOME/dev}"
-SCAN="${ROOT}/component-scan.sh"
+AUDIT_DIR="$ROOT/audit"
 
 : "${TERM:=xterm-256color}"
 
@@ -12,137 +12,269 @@ BOLD="$(printf '\033[1m')"
 DIM="$(printf '\033[2m')"
 RESET="$(printf '\033[0m')"
 HDR="$(printf '\033[38;5;110m')"
+NAME="$(printf '\033[38;5;114m')"
 MUTED="$(printf '\033[38;5;244m')"
-WARN="$(printf '\033[38;5;179m')"
+GOOD="$(printf '\033[38;5;108m')"
 
-if [[ ! -f "$SCAN" ]]; then
-  echo "error: component scanner not found: $SCAN" >&2
-  exit 1
+safe_cmd() {
+  "$@" 2>/dev/null || true
+}
+
+latest_audit_json() {
+  local -a matches
+  matches=("$AUDIT_DIR"/audit-*.json)
+  (( ${#matches[@]} )) || return 0
+  command ls -1t -- "${matches[@]}" 2>/dev/null | head -n 1 || true
+}
+
+audit_json="$(latest_audit_json)"
+
+host="$(hostname -s 2>/dev/null || hostname)"
+macos_version="$(safe_cmd sw_vers -productVersion)"
+macos_build="$(safe_cmd sw_vers -buildVersion)"
+model="$(safe_cmd sysctl -n hw.model)"
+uptime_human="$(uptime 2>/dev/null | sed -E 's/^.*up ([^,]+),.*$/\1/' || true)"
+load_avg="$(uptime 2>/dev/null | awk -F'load averages?: ' 'NF>1 {print $2}' || true)"
+cpu_brand="$(safe_cmd sysctl -n machdep.cpu.brand_string)"
+cpu_cores="$(safe_cmd sysctl -n hw.ncpu)"
+
+mem_stats="$(python3 - <<'PY'
+import os
+import re
+import subprocess
+
+def run(*cmd: str) -> str:
+    try:
+        return subprocess.check_output(cmd, text=True, stderr=subprocess.DEVNULL)
+    except Exception:
+        return ""
+
+def human_bytes(value: int) -> str:
+    units = ["B", "KiB", "MiB", "GiB", "TiB"]
+    size = float(value)
+    unit = units[0]
+    for candidate in units:
+        unit = candidate
+        if size < 1024 or candidate == units[-1]:
+            break
+        size /= 1024
+    if unit == "B":
+        return f"{int(size)}{unit}"
+    return f"{size:.1f}{unit}"
+
+pages_out = run("vm_stat")
+page_size = 4096
+match = re.search(r"page size of (\d+) bytes", pages_out)
+if match:
+    page_size = int(match.group(1))
+
+stats = {}
+for line in pages_out.splitlines():
+    if ":" not in line:
+        continue
+    key, value = line.split(":", 1)
+    value = value.strip().rstrip(".").replace(".", "")
+    value = value.replace(",", "")
+    if value.isdigit():
+        stats[key.strip()] = int(value)
+
+total_mem_raw = run("sysctl", "-n", "hw.memsize").strip()
+total_mem = int(total_mem_raw) if total_mem_raw.isdigit() else 0
+free_pages = stats.get("Pages free", 0) + stats.get("Pages speculative", 0)
+active_pages = stats.get("Pages active", 0)
+inactive_pages = stats.get("Pages inactive", 0)
+wired_pages = stats.get("Pages wired down", 0) + stats.get("Pages occupied by compressor", 0)
+used_bytes = (active_pages + inactive_pages + wired_pages) * page_size
+free_bytes = free_pages * page_size
+if total_mem and used_bytes > total_mem:
+    used_bytes = total_mem
+if total_mem and free_bytes > total_mem:
+    free_bytes = total_mem
+pressure = run("memory_pressure").splitlines()
+pressure_line = ""
+for line in pressure:
+    if "System-wide memory free percentage" in line:
+        pressure_line = line.split(":", 1)[1].strip()
+        break
+
+print(f"total={human_bytes(total_mem)}")
+print(f"used={human_bytes(used_bytes)}")
+print(f"free={human_bytes(free_bytes)}")
+print(f"pressure={pressure_line or 'unknown'}")
+PY
+)"
+
+disk_stats="$(python3 - <<'PY'
+import shutil
+usage = shutil.disk_usage("/")
+used_pct = int((usage.used / usage.total) * 100) if usage.total else 0
+def human_bytes(value: int) -> str:
+    units = ["B", "KiB", "MiB", "GiB", "TiB"]
+    size = float(value)
+    unit = units[0]
+    for candidate in units:
+        unit = candidate
+        if size < 1024 or candidate == units[-1]:
+            break
+        size /= 1024
+    if unit == "B":
+        return f"{int(size)}{unit}"
+    return f"{size:.1f}{unit}"
+print(f"used_pct={used_pct}")
+print(f"free={human_bytes(usage.free)}")
+print(f"total={human_bytes(usage.total)}")
+PY
+)"
+
+default_iface="$(route -n get default 2>/dev/null | awk '/interface:/{print $2; exit}' || true)"
+default_gw="$(route -n get default 2>/dev/null | awk '/gateway:/{print $2; exit}' || true)"
+default_ip=""
+if [[ -n "$default_iface" ]]; then
+  default_ip="$(ipconfig getifaddr "$default_iface" 2>/dev/null || true)"
+fi
+dns_servers="$(scutil --dns 2>/dev/null | awk '/nameserver\[[0-9]+\]/{print $3}' | awk '!seen[$0]++' | paste -sd ', ' - || true)"
+wifi_summary="$(python3 - <<'PY'
+import subprocess
+
+def run(*cmd: str) -> str:
+    try:
+        return subprocess.check_output(cmd, text=True, stderr=subprocess.DEVNULL)
+    except Exception:
+        return ""
+
+airport = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport"
+output = run(airport, "-I")
+fields = {}
+for raw in output.splitlines():
+    if ":" not in raw:
+        continue
+    key, value = raw.split(":", 1)
+    fields[key.strip()] = value.strip()
+ssid = fields.get("SSID", "")
+bssid = fields.get("BSSID", "")
+rssi = fields.get("agrCtlRSSI", "")
+channel = fields.get("channel", "")
+if not ssid:
+    print("unavailable")
+else:
+    parts = [ssid]
+    if channel:
+        parts.append(f"ch {channel}")
+    if rssi:
+        parts.append(f"{rssi} dBm")
+    if bssid:
+        parts.append(bssid)
+    print(" | ".join(parts))
+PY
+)"
+battery="$(pmset -g batt 2>/dev/null | tail -n +2 | paste -sd ' ' - || true)"
+[[ -n "$battery" ]] || battery="unavailable"
+
+pf_status="$(sudo -n "$ROOT/ops/network/pf/bin/pfs.sh" 2>/dev/null | awk 'NF {print; exit}' || true)"
+[[ -n "$pf_status" ]] || pf_status="unavailable"
+
+repo_state="$(git -C "$ROOT" status --short 2>/dev/null || true)"
+branch="$(git -C "$ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+head_sha="$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || true)"
+repo_dirty="clean"
+if [[ -n "$repo_state" ]]; then
+  repo_dirty="dirty"
 fi
 
-clear
-printf "%sDEV DASHBOARD%s\n" "$BOLD" "$RESET"
-printf "%sInventory-first command view of %s%s\n\n" "${DIM:-}" "$ROOT" "$RESET"
-
-TMP="$(mktemp -t devdash.XXXXXX)"
-RUN_TMP="$(mktemp -t devdash.run.XXXXXX)"
-MANIFEST_TMP="$(mktemp -t devdash.manifest.XXXXXX)"
-cleanup() {
-  rm -f "$TMP" "$RUN_TMP" "$MANIFEST_TMP"
-}
-trap cleanup EXIT
-
-python3 "$SCAN" "$ROOT" manifest > "$MANIFEST_TMP"
-python3 - "$MANIFEST_TMP" > "$TMP" <<'PY'
+audit_summary=""
+if [[ -f "$audit_json" ]]; then
+  audit_summary="$(python3 - "$audit_json" <<'PY'
 import json
 import sys
 
-manifest_path = sys.argv[1]
+with open(sys.argv[1], encoding="utf-8") as handle:
+    doc = json.load(handle)
 
-with open(manifest_path, encoding="utf-8") as handle:
-    items = json.load(handle).get("items", [])
+sec = doc.get("sec", {})
+trust = doc.get("trust", {})
+artifacts = doc.get("artifacts", {})
+net = doc.get("net", {})
+delta = net.get("delta", {})
 
-group_order = {"sys": 0, "audit": 1, "net": 2}
-selected = []
-for item in items:
-    if item.get("record_type") != "cmd":
-        continue
-    if not item.get("legend_visible"):
-        continue
-    alias = item.get("alias") or item.get("cmd") or ""
-    path = item.get("path") or ""
-    if not alias or not path:
-        continue
-    selected.append(
-        (
-            item.get("display_order"),
-            item.get("group", ""),
-            alias,
-            item.get("name", "") or alias,
-            item.get("desc", ""),
-            item.get("run", "user") or "user",
-            item.get("source", ""),
-            path,
-        )
-    )
-
-selected.sort(key=lambda row: (row[0] is None, row[0] or 0, group_order.get(row[1], 99), row[2]))
-
-for row in selected:
-    print("\t".join("" if value is None else str(value) for value in row))
+print(f"id={doc.get('id', '')}")
+print(f"ts={doc.get('ts', '')}")
+print(f"findings={len(doc.get('findings', []))}")
+print(f"security=sip:{sec.get('sip_enabled')} fw:{sec.get('firewall_enabled')} gk:{sec.get('gatekeeper_enabled')} fv:{sec.get('filevault_on')}")
+print(f"network=iface:{net.get('default_iface', '') or 'unknown'} gw:{net.get('default_gateway', '') or 'unknown'} baseline:{delta.get('baseline')}")
+print(f"trust=status:{trust.get('status', 'unavailable')} issues:{trust.get('issues', 0)} summary:{trust.get('summary', '')}")
+print(f"artifacts=trust:{bool(artifacts.get('trust_summary'))} zeek:{bool(artifacts.get('zeek_json'))}")
 PY
-
-i=1
-current_group=""
-
-while IFS=$'\t' read -r display_order group alias name desc run source cmd_path; do
-  [[ -n "$alias" ]] || continue
-
-  if [[ "$group" != "$current_group" ]]; then
-    group_label="$(printf "%s" "$group" | tr '[:lower:]' '[:upper:]')"
-    printf "\n%s%s%s\n" "$BOLD$HDR" "$group_label" "$RESET"
-    current_group="$group"
-  fi
-
-  printf "%s%2d%s  %-18s  %s%s\n" \
-    "$BOLD" "$i" "$RESET" \
-    "$alias" \
-    "$desc" \
-    ""
-  name_fold="$(printf "%s" "$name" | tr '[:upper:]' '[:lower:]')"
-  alias_fold="$(printf "%s" "$alias" | tr '[:upper:]' '[:lower:]')"
-  if [[ -n "$name" && "$name_fold" != "$alias_fold" ]]; then
-    printf "%s     %s%s%s\n" "${DIM:-}" "${MUTED:-}" "$name" "$RESET"
-  fi
-  printf "%s|%s|%s|%s|%s\n" "$i" "$ROOT/$cmd_path" "$run" "$alias" "$source" >> "$RUN_TMP"
-  i=$((i + 1))
-done < "$TMP"
-
-printf "\n%sSelect number to run (Enter = quit)%s\n" "${DIM:-}" "$RESET"
-read -r choice
-
-if [[ -z "${choice:-}" ]]; then
-  exit 0
+)"
 fi
 
-entry="$(grep -E "^${choice}\|" "$RUN_TMP" || true)"
+print_kv() {
+  local key="$1"
+  local value="$2"
+  printf "%s%-14s%s %s\n" "$NAME" "$key" "$RESET" "$value"
+}
 
-if [[ -z "$entry" ]]; then
-  printf "%sInvalid selection.%s\n" "${WARN:-}" "$RESET"
-  exit 1
+section() {
+  printf "\n%s%s%s\n" "$BOLD$HDR" "$1" "$RESET"
+}
+
+if [[ -t 1 ]]; then
+  clear
 fi
+printf "%sSYSTEM STATUS%s\n" "$BOLD" "$RESET"
+printf "%sHost-level snapshot for %s%s\n" "$DIM" "$ROOT" "$RESET"
 
-cmd_path="$(printf "%s" "$entry" | cut -d'|' -f2)"
-runmode="$(printf "%s" "$entry" | cut -d'|' -f3)"
-shell_cmd="$(printf "%s" "$entry" | cut -d'|' -f4)"
-source_kind="$(printf "%s" "$entry" | cut -d'|' -f5)"
+section "Host"
+print_kv "host" "${host:-unknown}"
+print_kv "macOS" "${macos_version:-unknown} (${macos_build:-unknown})"
+print_kv "model" "${model:-unknown}"
+print_kv "uptime" "${uptime_human:-unknown}"
+print_kv "load" "${load_avg:-unknown}"
+print_kv "cpu" "${cpu_brand:-unknown}"
+print_kv "cores" "${cpu_cores:-unknown}"
 
-printf "\n%s→ Running %s%s\n\n" "$BOLD" "${shell_cmd:-$(basename "$cmd_path")}" "$RESET"
+section "Memory"
+while IFS='=' read -r key value; do
+  [[ -n "$key" ]] || continue
+  print_kv "$key" "$value"
+done <<< "$mem_stats"
 
-if [[ "$shell_cmd" =~ ^[A-Za-z0-9_.-]+$ ]]; then
-  if DEV_ROOT="$ROOT" DEV_DASH_CMD="$shell_cmd" zsh -ic '
-    source "$DEV_ROOT/bootstrap/shell/dev.sh" >/dev/null 2>&1 || exit 1
-    if whence -w "$DEV_DASH_CMD" >/dev/null 2>&1; then
-      eval "$DEV_DASH_CMD"
-    else
-      exit 127
-    fi
-  '; then
-    exit 0
-  fi
-  status=$?
-  if [[ "$status" -ne 127 ]]; then
-    exit "$status"
-  fi
-fi
+section "Disk"
+while IFS='=' read -r key value; do
+  [[ -n "$key" ]] || continue
+  print_kv "$key" "$value"
+done <<< "$disk_stats"
 
-if [[ "$source_kind" == "shell" ]]; then
-  printf "%sCommand is shell-backed and could not be resolved through the dev shell loader.%s\n" "${WARN:-}" "$RESET"
-  exit 127
-fi
+section "Network"
+print_kv "iface" "${default_iface:-unknown}"
+print_kv "ip" "${default_ip:-unknown}"
+print_kv "gateway" "${default_gw:-unknown}"
+print_kv "dns" "${dns_servers:-unknown}"
+print_kv "wifi" "${wifi_summary:-unavailable}"
+print_kv "pf" "${pf_status:-unavailable}"
 
-if [[ "$runmode" == "sudo" ]]; then
-  sudo "$cmd_path"
+section "Power"
+print_kv "battery" "$battery"
+
+section "Audit"
+if [[ -n "$audit_summary" ]]; then
+  while IFS='=' read -r key value; do
+    [[ -n "$key" ]] || continue
+    print_kv "$key" "$value"
+  done <<< "$audit_summary"
 else
-  "$cmd_path"
+  print_kv "snapshot" "missing"
 fi
+
+section "Repo"
+print_kv "branch" "${branch:-unknown}"
+print_kv "head" "${head_sha:-unknown}"
+print_kv "state" "$repo_dirty"
+if [[ -n "$repo_state" ]]; then
+  printf "%sworking tree%s\n" "$MUTED" "$RESET"
+  printf "%s\n" "$repo_state" | sed 's/^/  /'
+fi
+
+printf "\n%sShortcuts%s\n" "$BOLD$HDR" "$RESET"
+printf "  %saudit.status%s   latest audit subsystem state\n" "$GOOD" "$RESET"
+printf "  %saudit.report%s   latest audit output summary\n" "$GOOD" "$RESET"
+printf "  %scomp legend%s    public command surface\n" "$GOOD" "$RESET"

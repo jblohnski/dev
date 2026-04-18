@@ -30,11 +30,11 @@ Shell bootstrap logic lives in `bootstrap/shell/` and is split by concern:
 
 - `dev.sh`: top-level loader sourced by `bootstrap/.zshrc`
 - `base.sh`: colors, prompt, shell environment, shared helpers
-- `inventory.sh`: summary, legend, validate, manifest, dashboard wrappers, and discovered script alias publication
+- `inventory.sh`: summary, legend, validate, manifest, status-dashboard wrappers, and discovered script alias publication
 - `bootstrap.sh`: bootstrap install/sync commands
 - `audit.sh`: audit and Zeek shell wrappers
 - `system.sh`: nav, git, network, dns, and general shell helpers
-- `devtools.sh`: dev-only helpers such as `devzip`, `ed`, and `gorilla`
+- `devtools.sh`: dev-only helpers such as `devzip` and editor shortcuts
 
 ## Notes
 
