@@ -118,6 +118,7 @@ Main helpers:
 - `dl`: legend
 - `dv`: validate
 - `dd`: machine status dashboard
+- `am`, `as`, `ar`: compact audit monitor/status/report aliases
 
 Publish shell changes with:
 
@@ -136,12 +137,13 @@ Useful entrypoints:
 
 ```bash
 audit
-audit.status
-audit.monitor current
-audit.report
-audit.monitor zeek --top 10
-audit.monitor start en0
-audit.monitor logs --last 30m --top 5
+as
+am current
+ar
+am zeek --top 10
+am start en0
+am logs --last 30m --top 5
+sysclean --yes
 ```
 
 ## Conventions

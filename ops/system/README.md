@@ -5,3 +5,4 @@
 System hardening operations.
 
 - `harden.sh`: applies host-level hardening and checks.
+- `sysclean.sh`: aggressively clears macOS caches, temp files, cookies, and local browser state.

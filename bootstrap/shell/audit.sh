@@ -8,8 +8,11 @@ audit() {
   "$AUDIT_DIR/audit.sh" "$@"
 }
 
-# dev-cmd: alias=audit.monitor name="Audit Monitor" group=audit run=user desc="Manage audit logging capture, monitor traces, and focused deep-dive helpers"
+# dev-cmd: alias=audit.monitor name="Audit Monitor" group=audit run=user legend=hide desc="Manage audit logging capture, monitor traces, and focused deep-dive helpers"
 alias audit.monitor='audit_monitor'
+
+# dev-cmd: alias=am name="Audit Monitor" group=audit run=user desc="Manage audit logging capture, monitor traces, and focused deep-dive helpers"
+alias am='audit_monitor'
 audit_monitor() {
   local cmd="${1:-status}"
   [[ $# -gt 0 ]] && shift
@@ -55,21 +58,21 @@ audit_monitor() {
     help|-h|--help|"")
       cat <<'EOF'
 Usage:
-  audit.monitor status
-  audit.monitor current [logsum args...]
-  audit.monitor start [iface] [-- zeek args...]
-  audit.monitor stop
-  audit.monitor merge [source_dir] [target_dir]
-  audit.monitor logs [logsum args...]
-  audit.monitor zeek [--lnav] [--top N] [log_dir]
-  audit.monitor ui [range]
-  audit.monitor netshot [seconds]
-  audit.monitor prefs-watch
-  audit.monitor prefs-report <run_dir>
+  am status
+  am current [logsum args...]
+  am start [iface] [-- zeek args...]
+  am stop
+  am merge [source_dir] [target_dir]
+  am logs [logsum args...]
+  am zeek [--lnav] [--top N] [log_dir]
+  am ui [range]
+  am netshot [seconds]
+  am prefs-watch
+  am prefs-report <run_dir>
 EOF
       ;;
     *)
-      echo "audit.monitor commands: start stop status current merge logs zeek ui netshot prefs-watch prefs-report"
+      echo "am commands: start stop status current merge logs zeek ui netshot prefs-watch prefs-report"
       return 1
       ;;
   esac
@@ -173,15 +176,15 @@ audit_print_paths() {
 audit_status_usage() {
   cat <<'EOF'
 Usage:
-  audit.status [logsum args...]
-  audit.status --no-logs
-  audit.status paths
+  as [logsum args...]
+  as --no-logs
+  as paths
 
 Examples:
-  audit.status
-  audit.status --last 2h --top 1
-  audit.status --no-logs
-  audit.status paths
+  as
+  as --last 2h --top 1
+  as --no-logs
+  as paths
 EOF
 }
 
@@ -252,8 +255,11 @@ audit_print_zeek_excerpt() {
   fi
 }
 
-# dev-cmd: alias=audit.status name="Audit Status" group=audit run=user desc="Show current audit state with monitor, latest artifacts, system logs, and Zeek summary"
+# dev-cmd: alias=audit.status name="Audit Status" group=audit run=user legend=hide desc="Show current audit state with monitor, latest artifacts, system logs, and Zeek summary"
 alias audit.status='audit_status'
+
+# dev-cmd: alias=as name="Audit Status" group=audit run=user desc="Show current audit state with monitor, latest artifacts, system logs, and Zeek summary"
+alias as='audit_status'
 audit_status() {
   local audit_json
   local include_logs=1
@@ -312,8 +318,11 @@ audit_current() {
   audit_status "$@"
 }
 
-# dev-cmd: alias=audit.report name="Audit Report" group=audit run=user desc="Show the latest audit output, trust summary, and Zeek report material"
+# dev-cmd: alias=audit.report name="Audit Report" group=audit run=user legend=hide desc="Show the latest audit output, trust summary, and Zeek report material"
 alias audit.report='audit_report'
+
+# dev-cmd: alias=ar name="Audit Report" group=audit run=user desc="Show the latest audit output, trust summary, and Zeek report material"
+alias ar='audit_report'
 audit_report() {
   local cmd="${1:-show}"
   [[ $# -gt 0 ]] && shift
@@ -377,14 +386,14 @@ PY
     help|-h|--help|"")
       cat <<'EOF'
 Usage:
-  audit.report
-  audit.report show
-  audit.report paths
-  audit.report refresh [run_id] [-- analyzer args...]
+  ar
+  ar show
+  ar paths
+  ar refresh [run_id] [-- analyzer args...]
 EOF
       ;;
     *)
-      echo "audit.report commands: show paths refresh"
+      echo "ar commands: show paths refresh"
       return 1
       ;;
   esac

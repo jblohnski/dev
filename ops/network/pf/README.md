@@ -42,7 +42,7 @@ Why `pfk` is not `pfctl -d`:
 - `ALLOW_LAN_CIDRS` — LAN ranges allowed.
 - `BASELINE_PROFILE` — terse statement of the intended egress posture shown in `pfs`.
 - `BLOCK_MDNS` — block mDNS on the primary interface (default 1).
-- `ALLOW_APPLE_P2P` — allow AWDL / llw continuity traffic (default 0).
+- `BLOCK_APPLE_P2P` — block AWDL / llw continuity traffic (default 1).
 - `BLOCK_UTUN` — block `utun*` interfaces instead of passing them (default 1).
 - `BLOCK_DOT` — block DoT/DoQ on 853 (default 1).
 - `BLOCK_QUIC` — block QUIC/HTTP3 on UDP 443 (default 1).
@@ -51,13 +51,16 @@ Why `pfk` is not `pfctl -d`:
 - `GOOGLE_ALLOWED_HOSTS` — hostname allowlist resolved to `/32` IPv4 entries for Google sign-in lockdown mode.
 - `EXTRA_HTTPS_ALLOWED` — manual extra HTTPS CIDRs to allow alongside Google.
 - `EXTRA_HTTPS_ALLOWED_HOSTS` — narrow hostname exceptions resolved to `/32` CIDRs at apply time.
+- `BLACKLIST_IN_CIDRS` — space-delimited source IPs/CIDRs to drop inbound on `EXT_IF`.
+- `BLACKLIST_OUT_CIDRS` — space-delimited destination IPs/CIDRs to block outbound on `EXT_IF`.
 
 ## Behaviors
 
 - Keeps Apple default inbound posture (no blanket `pass in all`).
 - Blocks outbound UDP/TCP 53 except allowed DNS targets.
 - Blocks mDNS by default for a tighter host posture.
-- Blocks `utun*` by default and keeps AWDL / llw disabled unless you explicitly allow them.
+- Blocks `utun*` by default and keeps AWDL / llw disabled unless you explicitly unblock them.
+- Supports separate inbound and outbound IP/CIDR blacklists ahead of the main policy.
 - Resolves a small Google sign-in hostname set into `/32`s for Google-only HTTPS mode and caches the results for `pfs`.
 - Allows a narrow hostname-based HTTPS exception list for sites that must work without opening the broader web.
 - Blocks DoT/DoQ on 853 when enabled.
@@ -73,3 +76,16 @@ Why `pfk` is not `pfctl -d`:
 - Live PF status: `sudo pfs`
 - Raw block-log tail: `sudo pfs --tail`
 - Optional raw CIDR dump: `sudo pfs --cidrs`
+
+## Blacklist examples
+
+```bash
+BLACKLIST_IN_CIDRS="198.51.100.7 203.0.113.0/24"
+BLACKLIST_OUT_CIDRS="198.51.100.7 203.0.113.0/24"
+```
+
+Apply after editing:
+
+```bash
+sudo pfo
+```

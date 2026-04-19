@@ -62,10 +62,23 @@ GOOGLE_ALLOWED="${GOOGLE_ALLOWED:-${GGC_ALLOWED:-}}"
 GOOGLE_ALLOWED_HOSTS="${GOOGLE_ALLOWED_HOSTS:-$DEFAULT_GOOGLE_ALLOWED_HOSTS}"
 EXTRA_HTTPS_ALLOWED="${EXTRA_HTTPS_ALLOWED:-}"
 EXTRA_HTTPS_ALLOWED_HOSTS="${EXTRA_HTTPS_ALLOWED_HOSTS:-}"
+BLACKLIST_IN_CIDRS="${BLACKLIST_IN_CIDRS:-}"
+BLACKLIST_OUT_CIDRS="${BLACKLIST_OUT_CIDRS:-}"
 GOOGLE_ONLY_MODE="${GOOGLE_ONLY_MODE:-0}"
-ALLOW_APPLE_P2P="${ALLOW_APPLE_P2P:-1}"
 BLOCK_UTUN="${BLOCK_UTUN:-0}"
 BASELINE_PROFILE="${BASELINE_PROFILE:-unset}"
+
+if [[ -n "${BLOCK_APPLE_P2P+x}" ]]; then
+  BLOCK_APPLE_P2P="${BLOCK_APPLE_P2P}"
+elif [[ -n "${ALLOW_APPLE_P2P+x}" ]]; then
+  if [[ "${ALLOW_APPLE_P2P}" == "1" ]]; then
+    BLOCK_APPLE_P2P="0"
+  else
+    BLOCK_APPLE_P2P="1"
+  fi
+else
+  BLOCK_APPLE_P2P="1"
+fi
 
 GOOGLE_ALLOWED_RENDERED="127.0.0.1/32"
 EXTRA_HTTPS_HOSTS_RENDERED=""
@@ -112,6 +125,23 @@ if [[ -n "$EXTRA_HTTPS_ALLOWED_RENDERED" ]]; then
   EXTRA_HTTPS_RULES='pass out quick on __EXT_IF__ inet proto tcp to <extra_https_endpoints> port 443 keep state label "pfkit:extra-https-pass"'
 fi
 
+BLACKLIST_TABLES="# (No blacklist tables)"
+BLACKLIST_RULES="# (No blacklist rules)"
+if [[ -n "$BLACKLIST_IN_CIDRS" || -n "$BLACKLIST_OUT_CIDRS" ]]; then
+  blacklist_tables=()
+  blacklist_rules=()
+  if [[ -n "$BLACKLIST_IN_CIDRS" ]]; then
+    blacklist_tables+=("table <blacklist_in> persist { $BLACKLIST_IN_CIDRS }")
+    blacklist_rules+=('block drop log quick on __EXT_IF__ from <blacklist_in> to any label "pfkit:blacklist-in"')
+  fi
+  if [[ -n "$BLACKLIST_OUT_CIDRS" ]]; then
+    blacklist_tables+=("table <blacklist_out> persist { $BLACKLIST_OUT_CIDRS }")
+    blacklist_rules+=('block return log quick on __EXT_IF__ from any to <blacklist_out> label "pfkit:blacklist-out"')
+  fi
+  BLACKLIST_TABLES="$(printf '%s\n' "${blacklist_tables[@]}")"
+  BLACKLIST_RULES="$(printf '%s\n' "${blacklist_rules[@]}")"
+fi
+
 DOT_RULES="# (DoT disabled)"
 if [[ "${BLOCK_DOT:-0}" == "1" ]]; then
 DOT_RULES=$(cat <<EOF
@@ -130,7 +160,7 @@ EOF
 fi
 
 APPLE_LOCAL_RULES="# (Apple peer / continuity interfaces use default policy)"
-if [[ "$ALLOW_APPLE_P2P" == "1" ]]; then
+if [[ "$BLOCK_APPLE_P2P" != "1" ]]; then
 APPLE_LOCAL_RULES=$(cat <<EOF
 pass quick on awdl0 all label "pfkit:awdl-pass"
 pass quick on llw0 all label "pfkit:llw-pass"
@@ -188,11 +218,13 @@ EOF
 )
 fi
 
-export EXT_IF ROUTER_IP DNS_OK LAN_NETS GOOGLE_ALLOWED_RENDERED EXTRA_HTTPS_TABLE APPLE_LOCAL_RULES DOT_RULES QUIC_RULES MDNS_RULES UTUN_RULES EGRESS_RULES
+export EXT_IF ROUTER_IP DNS_OK LAN_NETS GOOGLE_ALLOWED_RENDERED EXTRA_HTTPS_TABLE BLACKLIST_TABLES BLACKLIST_RULES APPLE_LOCAL_RULES DOT_RULES QUIC_RULES MDNS_RULES UTUN_RULES EGRESS_RULES
 
 rendered=$(perl -pe '
 s/__APPLE_LOCAL_RULES__/$ENV{APPLE_LOCAL_RULES}/g;
 s/__EXTRA_HTTPS_TABLE__/$ENV{EXTRA_HTTPS_TABLE}/g;
+s/__BLACKLIST_TABLES__/$ENV{BLACKLIST_TABLES}/g;
+s/__BLACKLIST_RULES__/$ENV{BLACKLIST_RULES}/g;
 s/__DOT_RULES__/$ENV{DOT_RULES}/g;
 s/__QUIC_RULES__/$ENV{QUIC_RULES}/g;
 s/__MDNS_RULES__/$ENV{MDNS_RULES}/g;
@@ -233,7 +265,9 @@ echo "   baseline   : $BASELINE_PROFILE"
 echo "   google_mode: $GOOGLE_ENDPOINT_MODE"
 echo "   google_only: $GOOGLE_ONLY_MODE"
 echo "   extra_https: ${EXTRA_HTTPS_ALLOWED_HOSTS:-none}"
-echo "   allow_p2p  : $ALLOW_APPLE_P2P"
+echo "   bl_in      : ${BLACKLIST_IN_CIDRS:-none}"
+echo "   bl_out     : ${BLACKLIST_OUT_CIDRS:-none}"
+echo "   block_p2p  : $BLOCK_APPLE_P2P"
 echo "   block_mdns : ${BLOCK_MDNS:-0}"
 echo "   block_dot  : ${BLOCK_DOT:-0}"
 echo "   block_quic : ${BLOCK_QUIC:-1}"

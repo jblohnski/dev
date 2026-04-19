@@ -120,7 +120,19 @@ if [[ "$TAIL_MODE" == "1" ]]; then
   exit 0
 fi
 
-python3 - "$status_line" "$pfkit_rules" "$LOG_FILE" "$GOOGLE_HOSTS_FILE" "$LEGACY_GOOGLE_RANGES_FILE" "$EXTRA_HTTPS_FILE" "$logger_status" "$overall_status" "$EXT_IF_RESOLVED" "$ROUTER_IP_RESOLVED" "${DNS_MODE:-router}" "${DNS_ALLOWED:-}" "${BASELINE_PROFILE:-unset}" "${GOOGLE_ONLY_MODE:-0}" "${ALLOW_APPLE_P2P:-0}" "${BLOCK_MDNS:-1}" "${BLOCK_UTUN:-1}" "${BLOCK_QUIC:-1}" "${BLOCK_DOT:-1}" "${GOOGLE_ENDPOINT_MODE:-hosts}" "${GOOGLE_ALLOWED_HOSTS:-}" "${EXTRA_HTTPS_ALLOWED_HOSTS:-}" "$SHOW_CIDRS" "$LOG_LINES" <<'PY'
+if [[ -n "${BLOCK_APPLE_P2P+x}" ]]; then
+  BLOCK_APPLE_P2P_RESOLVED="${BLOCK_APPLE_P2P}"
+elif [[ -n "${ALLOW_APPLE_P2P+x}" ]]; then
+  if [[ "${ALLOW_APPLE_P2P}" == "1" ]]; then
+    BLOCK_APPLE_P2P_RESOLVED="0"
+  else
+    BLOCK_APPLE_P2P_RESOLVED="1"
+  fi
+else
+  BLOCK_APPLE_P2P_RESOLVED="1"
+fi
+
+python3 - "$status_line" "$pfkit_rules" "$LOG_FILE" "$GOOGLE_HOSTS_FILE" "$LEGACY_GOOGLE_RANGES_FILE" "$EXTRA_HTTPS_FILE" "$logger_status" "$overall_status" "$EXT_IF_RESOLVED" "$ROUTER_IP_RESOLVED" "${DNS_MODE:-router}" "${DNS_ALLOWED:-}" "${BASELINE_PROFILE:-unset}" "${GOOGLE_ONLY_MODE:-0}" "${BLOCK_APPLE_P2P_RESOLVED}" "${BLOCK_MDNS:-1}" "${BLOCK_UTUN:-1}" "${BLOCK_QUIC:-1}" "${BLOCK_DOT:-1}" "${GOOGLE_ENDPOINT_MODE:-hosts}" "${GOOGLE_ALLOWED_HOSTS:-}" "${EXTRA_HTTPS_ALLOWED_HOSTS:-}" "${BLACKLIST_IN_CIDRS:-}" "${BLACKLIST_OUT_CIDRS:-}" "$SHOW_CIDRS" "$LOG_LINES" <<'PY'
 from __future__ import annotations
 
 import json
@@ -145,7 +157,7 @@ from pathlib import Path
     dns_allowed,
     baseline_profile,
     google_only_mode,
-    allow_apple_p2p,
+    block_apple_p2p,
     block_mdns,
     block_utun,
     block_quic,
@@ -153,6 +165,8 @@ from pathlib import Path
     google_endpoint_mode,
     google_allowed_hosts,
     extra_https_allowed_hosts,
+    blacklist_in_cidrs,
+    blacklist_out_cidrs,
     show_cidrs,
     log_lines,
 ) = sys.argv[1:]
@@ -238,7 +252,7 @@ print(f"  dns      : {dns_mode} {dns_allowed}".rstrip())
 print(f"  baseline : {baseline_profile}")
 print(
     "  profile  : "
-    f"google_only={google_only_mode} apple_p2p={allow_apple_p2p} "
+    f"google_only={google_only_mode} block_p2p={block_apple_p2p} "
     f"mdns={block_mdns} utun={block_utun} quic={block_quic} dot={block_dot}"
 )
 print(f"  google_m : {google_endpoint_mode}")
@@ -247,6 +261,12 @@ print_wrapped("  ghosts   : ", " ".join(google_hosts))
 print(f"  extra    : {len((extra_https_allowed_hosts or '').split())} hosts / {len(extra_ranges)} IPs")
 if extra_https_allowed_hosts:
     print_wrapped("  ehosts   : ", extra_https_allowed_hosts)
+print(f"  bl_in    : {len((blacklist_in_cidrs or '').split())} entries")
+if blacklist_in_cidrs:
+    print_wrapped("  blin_ip  : ", blacklist_in_cidrs)
+print(f"  bl_out   : {len((blacklist_out_cidrs or '').split())} entries")
+if blacklist_out_cidrs:
+    print_wrapped("  blout_ip : ", blacklist_out_cidrs)
 if show_cidrs == "1":
     print_wrapped("  gip      : ", google_ranges_text)
     print_wrapped("  eip      : ", extra_ranges_text)

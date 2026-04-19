@@ -5,9 +5,11 @@
 The public audit surface is intentionally small:
 
 - `audit`: run the core system scan and emit the trust-oriented summary
-- `audit.monitor`: manage capture, logs, and focused deep-dive monitors
-- `audit.status`: show the current audit view with monitor, artifacts, logs, and Zeek summary
-- `audit.report`: read the latest output and refresh Zeek report material
+- `am`: manage capture, logs, and focused deep-dive monitors
+- `as`: show the current audit view with monitor, artifacts, logs, and Zeek summary
+- `ar`: read the latest output and refresh Zeek report material
+
+Legacy aliases `audit.monitor`, `audit.status`, and `audit.report` still work, but the compact names are the preferred public surface.
 
 The scripts in this directory are implementation detail for that public surface.
 
@@ -24,13 +26,13 @@ The scripts in this directory are implementation detail for that public surface.
 
 ```bash
 audit
-audit.status
-audit.monitor current
-audit.report
-audit.monitor status
-audit.monitor zeek --top 10
-audit.monitor start en0
-audit.monitor logs --last 30m --top 5
+as
+am current
+ar
+am status
+am zeek --top 10
+am start en0
+am logs --last 30m --top 5
 ```
 
 Direct script usage remains available for internals and one-off deep work:
