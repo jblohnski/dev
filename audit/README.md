@@ -6,7 +6,7 @@ The public audit surface is intentionally small:
 
 - `audit`: run the core system scan and emit the trust-oriented summary
 - `audit.monitor`: manage capture, logs, and focused deep-dive monitors
-- `audit.status`: check monitor state and latest artifact readiness
+- `audit.status`: show the current audit view with monitor, artifacts, logs, and Zeek summary
 - `audit.report`: read the latest output and refresh Zeek report material
 
 The scripts in this directory are implementation detail for that public surface.
@@ -25,8 +25,10 @@ The scripts in this directory are implementation detail for that public surface.
 ```bash
 audit
 audit.status
+audit.monitor current
 audit.report
 audit.monitor status
+audit.monitor zeek --top 10
 audit.monitor start en0
 audit.monitor logs --last 30m --top 5
 ```
@@ -79,6 +81,8 @@ Useful variants:
 ZEEK_LOG_DIR=../logs/zeek ./zeek-capture.sh start en0
 ./zeek-capture.sh start en0 -- Site::local_nets+=192.168.1.0/24
 ./zeek-logsync.sh
+./zeek-summary.sh --top 15
+./zeek-summary.sh --lnav
 ```
 
 Standalone Zeek report command:

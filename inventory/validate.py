@@ -12,6 +12,13 @@ INTERNAL_SCRIPT_PREFIXES = (
     "ops/network/pf/bin/pfkit",
 )
 
+ROOT_SCRIPT_ALLOWLIST = {
+    "component-scan.sh",
+    "devdash",
+}
+
+SCRIPT_LIKE_SUFFIXES = {".sh", ".zsh"}
+
 
 def validate(root: Path, dir_records: list[dict[str, str]], script_records: list[dict[str, str]], shell_records: list[dict[str, str]]) -> int:
     warnings: list[str] = []
@@ -98,6 +105,18 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
     for candidate in command_candidates:
         if not is_valid(command_object(candidate)):
             errors.append(f"{candidate['path']}: discovered command record did not produce a valid command object")
+
+    for entry in sorted(root.iterdir()):
+        if not entry.is_file() or entry.name.startswith("."):
+            continue
+        rel = rel_str(entry, root)
+        is_script_like = entry.suffix in SCRIPT_LIKE_SUFFIXES or (os.access(entry, os.X_OK) and not entry.suffix)
+        if not is_script_like or rel in ROOT_SCRIPT_ALLOWLIST:
+            continue
+        warnings.append(
+            f"{rel}: top-level script-like file is outside the canonical public/internal roots; "
+            "move it under an owning component or remove it"
+        )
 
     for message in errors:
         print(f"ERROR {message}")

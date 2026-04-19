@@ -77,11 +77,13 @@ collect_logs() {
   local predicate="$1"
   local outfile="$2"
 
-  log show "${RANGE[@]}" \
+  if ! log show "${RANGE[@]}" \
     --info --debug \
     --predicate "$predicate" \
     --style syslog 2>/dev/null \
-    | awk '$0 !~ /^Timestamp[[:space:]]+\(process\)\[PID\][[:space:]]*$/ && $0 != ""' > "$outfile"
+    | awk '$0 !~ /^Timestamp[[:space:]]+\(process\)\[PID\][[:space:]]*$/ && $0 != ""' > "$outfile"; then
+    : > "$outfile"
+  fi
 }
 
 print_section() {
