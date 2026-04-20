@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# dev-cmd: alias=pfkit.status name="pfkit status" group=net run=sudo legend=hide desc="Show PF, pfkit, and logger state plus recent blocked flows"
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
@@ -132,7 +133,7 @@ else
   BLOCK_APPLE_P2P_RESOLVED="1"
 fi
 
-python3 - "$status_line" "$pfkit_rules" "$LOG_FILE" "$GOOGLE_HOSTS_FILE" "$LEGACY_GOOGLE_RANGES_FILE" "$EXTRA_HTTPS_FILE" "$logger_status" "$overall_status" "$EXT_IF_RESOLVED" "$ROUTER_IP_RESOLVED" "${DNS_MODE:-router}" "${DNS_ALLOWED:-}" "${BASELINE_PROFILE:-unset}" "${GOOGLE_ONLY_MODE:-0}" "${BLOCK_APPLE_P2P_RESOLVED}" "${BLOCK_MDNS:-1}" "${BLOCK_UTUN:-1}" "${BLOCK_QUIC:-1}" "${BLOCK_DOT:-1}" "${GOOGLE_ENDPOINT_MODE:-hosts}" "${GOOGLE_ALLOWED_HOSTS:-}" "${EXTRA_HTTPS_ALLOWED_HOSTS:-}" "${BLACKLIST_IN_CIDRS:-}" "${BLACKLIST_OUT_CIDRS:-}" "$SHOW_CIDRS" "$LOG_LINES" <<'PY'
+python3 - "$status_line" "$pfkit_rules" "$LOG_FILE" "$GOOGLE_HOSTS_FILE" "$LEGACY_GOOGLE_RANGES_FILE" "$EXTRA_HTTPS_FILE" "$logger_status" "$overall_status" "$EXT_IF_RESOLVED" "$ROUTER_IP_RESOLVED" "${DNS_MODE:-router}" "${DNS_ALLOWED:-}" "${BASELINE_PROFILE:-unset}" "${GOOGLE_ONLY_MODE:-0}" "${BLOCK_APPLE_P2P_RESOLVED}" "${BLOCK_MDNS:-1}" "${BLOCK_UTUN:-1}" "${BLOCK_QUIC:-1}" "${BLOCK_DOT:-1}" "${GOOGLE_ENDPOINT_MODE:-hosts}" "${GOOGLE_ALLOWED_HOSTS:-}" "${EXTRA_HTTPS_ALLOWED_HOSTS:-}" "${BLACKLIST_IN_CIDRS:-}" "${BLACKLIST_OUT_CIDRS:-}" "${ALLOW_TCP_PORTS:-22 80 443}" "${ALLOW_UDP_PORTS:-}" "${BLOCK_ARBITRARY_UDP:-1}" "$SHOW_CIDRS" "$LOG_LINES" <<'PY'
 from __future__ import annotations
 
 import json
@@ -167,6 +168,9 @@ from pathlib import Path
     extra_https_allowed_hosts,
     blacklist_in_cidrs,
     blacklist_out_cidrs,
+    allow_tcp_ports,
+    allow_udp_ports,
+    block_arbitrary_udp,
     show_cidrs,
     log_lines,
 ) = sys.argv[1:]
@@ -253,8 +257,11 @@ print(f"  baseline : {baseline_profile}")
 print(
     "  profile  : "
     f"google_only={google_only_mode} block_p2p={block_apple_p2p} "
-    f"mdns={block_mdns} utun={block_utun} quic={block_quic} dot={block_dot}"
+    f"mdns={block_mdns} utun={block_utun} quic={block_quic} "
+    f"dot={block_dot} udp_block={block_arbitrary_udp}"
 )
+print_wrapped("  tcp      : ", allow_tcp_ports)
+print_wrapped("  udp      : ", allow_udp_ports if allow_udp_ports else "dns-only")
 print(f"  google_m : {google_endpoint_mode}")
 print(f"  google   : {len(google_hosts)} hosts / {range_count} IPs")
 print_wrapped("  ghosts   : ", " ".join(google_hosts))

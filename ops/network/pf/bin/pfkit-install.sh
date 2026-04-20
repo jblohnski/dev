@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# dev-cmd: alias=pfkit.install name="pfkit install" group=net run=sudo legend=hide desc="Install pfkit anchor wiring into /etc/pf.conf and the pf anchors directory"
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then

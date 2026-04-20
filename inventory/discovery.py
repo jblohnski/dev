@@ -172,7 +172,7 @@ def build_script_records(root: Path, dir_records: list[dict[str, str]]) -> list[
     records: list[dict[str, str]] = []
     by_rel, explicit_paths = build_dir_lookup(dir_records)
     for script in sorted(root.rglob("*")):
-        if not script.is_file() or script.suffix not in {".sh", ".zsh"}:
+        if not script.is_file() or script.suffix not in {".sh", ".zsh", ".py"}:
             continue
         if is_excluded(script, root) or not os.access(script, os.X_OK):
             continue

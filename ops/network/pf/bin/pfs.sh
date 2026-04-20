@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfs name="PF Status" group=net run=sudo desc="Show PF on/off status and recent log output"
+# dev-cmd: alias=pfs name="PF Status" group=net run=sudo desc="Show PF global status, pfkit status, and recent log output"
 
 set -euo pipefail
 

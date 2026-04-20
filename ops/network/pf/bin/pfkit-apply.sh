@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# dev-cmd: alias=pfkit.apply name="pfkit apply" group=net run=sudo legend=hide desc="Render the tracked pfkit anchor from config and load it into PF"
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
@@ -64,7 +65,10 @@ EXTRA_HTTPS_ALLOWED="${EXTRA_HTTPS_ALLOWED:-}"
 EXTRA_HTTPS_ALLOWED_HOSTS="${EXTRA_HTTPS_ALLOWED_HOSTS:-}"
 BLACKLIST_IN_CIDRS="${BLACKLIST_IN_CIDRS:-}"
 BLACKLIST_OUT_CIDRS="${BLACKLIST_OUT_CIDRS:-}"
+ALLOW_TCP_PORTS_RAW="${ALLOW_TCP_PORTS:-22 80 443}"
+ALLOW_UDP_PORTS_RAW="${ALLOW_UDP_PORTS:-}"
 GOOGLE_ONLY_MODE="${GOOGLE_ONLY_MODE:-0}"
+BLOCK_ARBITRARY_UDP="${BLOCK_ARBITRARY_UDP:-1}"
 BLOCK_UTUN="${BLOCK_UTUN:-0}"
 BASELINE_PROFILE="${BASELINE_PROFILE:-unset}"
 
@@ -118,11 +122,44 @@ if [[ "$GOOGLE_ONLY_MODE" == "1" ]]; then
 fi
 
 EXTRA_HTTPS_ALLOWED_RENDERED="$(printf '%s %s\n' "$EXTRA_HTTPS_ALLOWED" "$EXTRA_HTTPS_HOSTS_RENDERED" | xargs echo 2>/dev/null || true)"
+ALLOW_TCP_PORTS_RENDERED="$(printf '%s\n' "$ALLOW_TCP_PORTS_RAW" | xargs echo 2>/dev/null || true)"
+ALLOW_UDP_PORTS_RENDERED="$(printf '%s\n' "$ALLOW_UDP_PORTS_RAW" | xargs echo 2>/dev/null || true)"
+TCP_NON_HTTPS_ALLOWED_PORTS=""
+for port in $ALLOW_TCP_PORTS_RENDERED; do
+  [[ "$port" == "443" ]] && continue
+  TCP_NON_HTTPS_ALLOWED_PORTS="${TCP_NON_HTTPS_ALLOWED_PORTS:+$TCP_NON_HTTPS_ALLOWED_PORTS }$port"
+done
+
 EXTRA_HTTPS_TABLE="# (No extra HTTPS endpoint exceptions)"
 EXTRA_HTTPS_RULES="# (No extra HTTPS endpoint exceptions)"
 if [[ -n "$EXTRA_HTTPS_ALLOWED_RENDERED" ]]; then
   EXTRA_HTTPS_TABLE="table <extra_https_endpoints> persist { $EXTRA_HTTPS_ALLOWED_RENDERED }"
   EXTRA_HTTPS_RULES='pass out quick on __EXT_IF__ inet proto tcp to <extra_https_endpoints> port 443 keep state label "pfkit:extra-https-pass"'
+fi
+
+TCP_EGRESS_RULES="# (No general TCP egress ports configured)"
+if [[ -n "$ALLOW_TCP_PORTS_RENDERED" ]]; then
+  TCP_EGRESS_RULES="pass out quick on __EXT_IF__ inet proto tcp to any port { $ALLOW_TCP_PORTS_RENDERED } keep state label \"pfkit:tcp-egress-pass\""
+fi
+
+TCP_NON_HTTPS_EGRESS_RULES="# (No non-HTTPS TCP egress ports configured)"
+if [[ -n "$TCP_NON_HTTPS_ALLOWED_PORTS" ]]; then
+  TCP_NON_HTTPS_EGRESS_RULES="pass out quick on __EXT_IF__ inet proto tcp to any port { $TCP_NON_HTTPS_ALLOWED_PORTS } keep state label \"pfkit:tcp-nonhttps-pass\""
+fi
+
+UDP_EGRESS_RULES="# (Arbitrary UDP blocked)"
+if [[ "$BLOCK_ARBITRARY_UDP" == "1" ]]; then
+  if [[ -n "$ALLOW_UDP_PORTS_RENDERED" ]]; then
+    UDP_EGRESS_RULES="$(cat <<EOF
+pass out quick on __EXT_IF__ inet proto udp to any port { $ALLOW_UDP_PORTS_RENDERED } keep state label "pfkit:udp-port-pass"
+block return log quick on __EXT_IF__ inet proto udp to any label "pfkit:udp-egress-block"
+EOF
+)"
+  else
+    UDP_EGRESS_RULES='block return log quick on __EXT_IF__ inet proto udp to any label "pfkit:udp-egress-block"'
+  fi
+else
+  UDP_EGRESS_RULES='pass out quick on __EXT_IF__ inet proto udp all keep state label "pfkit:udp-egress-pass"'
 fi
 
 BLACKLIST_TABLES="# (No blacklist tables)"
@@ -206,14 +243,17 @@ pass out quick on __EXT_IF__ inet proto { tcp udp } to <lan_nets> keep state lab
 pass out quick on __EXT_IF__ inet proto tcp to <google_endpoints> port 443 keep state label "pfkit:google-only-https"
 ${EXTRA_HTTPS_RULES}
 block return log quick on __EXT_IF__ inet proto tcp to any port 443 label "pfkit:https-non-google-block"
-pass out quick on __EXT_IF__ inet proto { tcp udp } all keep state label "pfkit:egress-pass-non443"
+${TCP_NON_HTTPS_EGRESS_RULES}
+${UDP_EGRESS_RULES}
 EOF
 )
 else
 EGRESS_RULES=$(cat <<EOF
-# Normal browsing mode
+# Strict egress mode
 pass out quick on __EXT_IF__ inet proto icmp all keep state label "pfkit:icmp-pass"
-pass out quick on __EXT_IF__ inet proto { tcp udp } all keep state label "pfkit:egress-pass"
+pass out quick on __EXT_IF__ inet proto { tcp udp } to <lan_nets> keep state label "pfkit:lan-pass"
+${TCP_EGRESS_RULES}
+${UDP_EGRESS_RULES}
 EOF
 )
 fi
@@ -267,6 +307,9 @@ echo "   google_only: $GOOGLE_ONLY_MODE"
 echo "   extra_https: ${EXTRA_HTTPS_ALLOWED_HOSTS:-none}"
 echo "   bl_in      : ${BLACKLIST_IN_CIDRS:-none}"
 echo "   bl_out     : ${BLACKLIST_OUT_CIDRS:-none}"
+echo "   tcp_ports  : ${ALLOW_TCP_PORTS_RENDERED:-none}"
+echo "   udp_ports  : ${ALLOW_UDP_PORTS_RENDERED:-none}"
+echo "   block_udp  : $BLOCK_ARBITRARY_UDP"
 echo "   block_p2p  : $BLOCK_APPLE_P2P"
 echo "   block_mdns : ${BLOCK_MDNS:-0}"
 echo "   block_dot  : ${BLOCK_DOT:-0}"

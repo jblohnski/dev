@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# dev-cmd: alias=pfkit.log name="pfkit log" group=net run=sudo legend=hide desc="Manage the pfkit block-log capture process and retained log files"
 # Helper for pfkit log capture lifecycle. Intended to be driven by pfkit.sh.
 
 set -euo pipefail

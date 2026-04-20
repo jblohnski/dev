@@ -2,13 +2,16 @@
 
 # pfkit (macOS)
 
-PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, and can optionally restrict HTTPS to a tight Google sign-in hostname set via a single anchor.
+PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, blocks arbitrary UDP by default, and can optionally restrict HTTPS to a tight Google sign-in hostname set via a single anchor.
 
 ## Layout
 
 - `bin/`: public entrypoints (`pfo`, `pfs`, `pfk`) plus internal helpers used by those wrappers.
 - `anchors/`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`.
 - `config/`: environment inputs (`pfkit.env`) used by render/apply.
+
+Internal helpers under `bin/` are intentionally tracked as hidden component commands.
+They validate through inventory/manifest, but do not appear in public `legend`.
 
 ## Quick start
 
@@ -26,13 +29,13 @@ sudo pfs
 
 - `pfo` — install wiring if needed, apply the tracked pfkit rules, and start block logging
 - `pfs` — show concise PF on/off state plus recent block-log output
-- `pfk` — empty the `pfkit` anchor and stop block logging without disabling PF globally
+- `pfk` — stop block logging, unload the `pfkit` anchor, and disable PF globally
 
-Why `pfk` is not `pfctl -d`:
+Why `pfk` now maps to a real PF shutdown:
 
-- `pfctl -d` disables the packet filter globally, which is wider than “stop pfkit”.
-- `pfk` only unloads the `pfkit` anchor so Apple/system PF usage outside this anchor is left alone.
-- Existing states may still flow until they expire; `pfk` is a rules unload, not a global state purge.
+- `pfk` now does call `pfctl -d` after stopping pfkit logging and clearing the `pfkit` anchor.
+- This is intentionally wider than “stop pfkit”: the packet filter is turned off for the host.
+- `pfo` is the path that brings PF back up and reapplies the tracked anchor.
 
 ## Config knobs (`config/pfkit.env`)
 
@@ -41,6 +44,9 @@ Why `pfk` is not `pfctl -d`:
 - `DNS_ALLOWED` — space-delimited IPs when `DNS_MODE=direct`.
 - `ALLOW_LAN_CIDRS` — LAN ranges allowed.
 - `BASELINE_PROFILE` — terse statement of the intended egress posture shown in `pfs`.
+- `ALLOW_TCP_PORTS` — space-delimited outbound TCP ports allowed in normal mode.
+- `ALLOW_UDP_PORTS` — optional extra outbound UDP ports allowed in addition to DNS.
+- `BLOCK_ARBITRARY_UDP` — block outbound UDP except DNS and `ALLOW_UDP_PORTS` (default 1).
 - `BLOCK_MDNS` — block mDNS on the primary interface (default 1).
 - `BLOCK_APPLE_P2P` — block AWDL / llw continuity traffic (default 1).
 - `BLOCK_UTUN` — block `utun*` interfaces instead of passing them (default 1).
@@ -58,6 +64,8 @@ Why `pfk` is not `pfctl -d`:
 
 - Keeps Apple default inbound posture (no blanket `pass in all`).
 - Blocks outbound UDP/TCP 53 except allowed DNS targets.
+- Restricts normal-mode TCP egress to configured ports instead of allowing the full web by default.
+- Blocks arbitrary outbound UDP by default, leaving DNS as the primary UDP exception.
 - Blocks mDNS by default for a tighter host posture.
 - Blocks `utun*` by default and keeps AWDL / llw disabled unless you explicitly unblock them.
 - Supports separate inbound and outbound IP/CIDR blacklists ahead of the main policy.
@@ -70,6 +78,12 @@ Why `pfk` is not `pfctl -d`:
 - Logs allowed DNS with `log (all)` so `pflog0` shows the PF decision path for approved resolvers.
 - Adds `pfkit:` rule labels so `pfctl -s labels` exposes per-rule counters even when live capture is quiet.
 - Background block logging writes text logs under `~/dev/logs/pfkit/`, and `pfs` tails that file directly.
+
+## Policy Notes
+
+- The shared traffic review behind this update pointed to policy looseness, not compromise.
+- `pfkit` is still host-level PF policy, not per-process containment for Firefox.
+- The default normal-mode posture is now surgical: DNS only to approved resolvers, TCP only to `ALLOW_TCP_PORTS`, and UDP blocked unless explicitly excepted.
 
 ## Status
 

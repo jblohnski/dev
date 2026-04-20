@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# dev-cmd: alias=pfkit name=pfkit group=net run=sudo legend=hide desc="Dispatch pfkit lifecycle commands for apply, status, and global PF shutdown"
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
@@ -22,12 +23,12 @@ usage: pfo | pfs | pfk | pf <command>
 Short commands (recommended):
   pfo   → apply rules and start logging
   pfs   → show status
-  pfk   → kill / unload rules
+  pfk   → disable PF globally and stop logging
 
 Legacy commands (still work):
   pf start|on     → apply
   pf status       → status
-  pf stop|kill    → unload
+  pf stop|kill    → disable PF globally
 EOF
 }
 
@@ -47,19 +48,20 @@ start_pfkit() {
 }
 
 stop_pfkit() {
-  if ! ensure_wired; then
-    echo "pfkit stop: pfkit is not installed in /etc/pf.conf" >&2
-    exit 1
+  "$BIN_DIR/pfkit-log.sh" stop
+
+  if ensure_wired; then
+    printf '%s\n' '# pfkit stopped' > "$ANCHOR_DST"
+    chmod 644 "$ANCHOR_DST"
+    pfctl -a pfkit -nf "$ANCHOR_DST"
+    pfctl -a pfkit -f "$ANCHOR_DST"
   fi
 
-  printf '%s\n' '# pfkit stopped' > "$ANCHOR_DST"
-  chmod 644 "$ANCHOR_DST"
-  pfctl -a pfkit -nf "$ANCHOR_DST"
-  pfctl -a pfkit -f "$ANCHOR_DST"
-  "$BIN_DIR/pfkit-log.sh" stop
-  echo ">> pfkit stopped (PF policy rules unloaded)"
+  pfctl -d
+
+  echo ">> pfkit stopped (PF disabled globally)"
   echo "   anchor: $ANCHOR_DST"
-  echo "   note  : existing states may continue until they expire"
+  echo "   note  : packet filter is now disabled, not just the pfkit anchor"
 }
 
 status_pfkit() {
