@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=firefox-harden name="Firefox Harden" group=sys run=user legend=hide desc="Apply hardened Firefox and LibreWolf profile overrides"
+# dev-cmd: alias=firefox-harden name="Firefox Harden" group=sys run=user legend=hide desc="Apply hardened Firefox profile overrides"
 
 # firefox.sh
 #
@@ -24,29 +24,51 @@ set -euo pipefail
 die() { echo "ERROR: $*" >&2; exit 1; }
 warn() { echo "WARN:  $*" >&2; }
 
-# Detect platform + browser profile roots
+usage() {
+  cat <<'EOF'
+Usage: firefox-harden.sh
+
+Options:
+  -h, --help       Show this help text
+EOF
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown argument: $1"
+      ;;
+  esac
+done
+
+firefox_running() {
+  pgrep -x "firefox" >/dev/null 2>&1 || pgrep -x "Firefox" >/dev/null 2>&1
+}
+
+# Detect platform + Firefox profile root
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
-PROFILE_ROOTS=()
+PROFILE_ROOT=""
 case "$OS" in
   darwin)
-    [ -d "$HOME/Library/Application Support/Firefox" ] && PROFILE_ROOTS+=("Firefox:$HOME/Library/Application Support/Firefox")
-    [ -d "$HOME/Library/Application Support/librewolf" ] && PROFILE_ROOTS+=("LibreWolf:$HOME/Library/Application Support/librewolf")
+    PROFILE_ROOT="$HOME/Library/Application Support/Firefox"
     ;;
   linux)
-    [ -d "$HOME/.mozilla/firefox" ] && PROFILE_ROOTS+=("Firefox:$HOME/.mozilla/firefox")
-    [ -d "$HOME/.librewolf" ] && PROFILE_ROOTS+=("LibreWolf:$HOME/.librewolf")
+    PROFILE_ROOT="$HOME/.mozilla/firefox"
     ;;
   *)
     die "Unsupported OS for this script: $OS"
     ;;
 esac
 
-[ "${#PROFILE_ROOTS[@]}" -gt 0 ] || die "No Firefox or LibreWolf profile roots found"
+[ -d "$PROFILE_ROOT" ] || die "Firefox profile root not found: $PROFILE_ROOT"
 
-# Make sure browsers are not running (best-effort)
-if pgrep -x "firefox" >/dev/null 2>&1 || pgrep -x "Firefox" >/dev/null 2>&1 || \
-   pgrep -x "librewolf" >/dev/null 2>&1 || pgrep -x "LibreWolf" >/dev/null 2>&1; then
-  die "Firefox or LibreWolf appears to be running. Quit the browser fully, then re-run."
+# Make sure Firefox is not running (best-effort)
+if firefox_running; then
+  die "Firefox appears to be running. Quit Firefox fully, then re-run."
 fi
 
 TS="$(date +%Y%m%d_%H%M%S)"
@@ -1403,13 +1425,10 @@ PY
     sqlite3 "$db" <<SQL
 BEGIN;
 CREATE TABLE IF NOT EXISTS moz_perms (id INTEGER PRIMARY KEY, origin TEXT, type TEXT, permission INTEGER, expireType INTEGER, expireTime INTEGER, modificationTime INTEGER);
+DELETE FROM moz_perms
+WHERE origin='$origin' AND type='cookie';
 INSERT INTO moz_perms(origin,type,permission,expireType,expireTime,modificationTime)
-VALUES('$origin','cookie',1,0,0,$now_us)
-ON CONFLICT(origin,type) DO UPDATE SET
-  permission=excluded.permission,
-  expireType=excluded.expireType,
-  expireTime=excluded.expireTime,
-  modificationTime=excluded.modificationTime;
+VALUES('$origin','cookie',1,0,0,$now_us);
 COMMIT;
 SQL
   else
@@ -1417,13 +1436,10 @@ SQL
     sqlite3 "$db" <<SQL
 BEGIN;
 CREATE TABLE IF NOT EXISTS moz_hosts (id INTEGER PRIMARY KEY, host TEXT, type TEXT, permission INTEGER, expireType INTEGER, expireTime INTEGER, modificationTime INTEGER);
+DELETE FROM moz_hosts
+WHERE host='$origin' AND type='cookie';
 INSERT INTO moz_hosts(host,type,permission,expireType,expireTime,modificationTime)
-VALUES('$origin','cookie',1,0,0,$now_us)
-ON CONFLICT(host,type) DO UPDATE SET
-  permission=excluded.permission,
-  expireType=excluded.expireType,
-  expireTime=excluded.expireTime,
-  modificationTime=excluded.modificationTime;
+VALUES('$origin','cookie',1,0,0,$now_us);
 COMMIT;
 SQL
   fi
@@ -1462,11 +1478,9 @@ apply_profile() {
   echo "   Wrote: $prof_dir/user.js"
 }
 
-apply_browser_root() {
-  local browser_name="$1"
-  local profile_root="$2"
-  local profiles_dir="$profile_root/Profiles"
-  local backup_dir="$profile_root/arkenfox_backup_$TS"
+apply_firefox_root() {
+  local profiles_dir="$PROFILE_ROOT/Profiles"
+  local backup_dir="$PROFILE_ROOT/arkenfox_backup_$TS"
   local found=0
 
   [ -d "$profiles_dir" ] || die "Profiles directory not found: $profiles_dir"
@@ -1476,35 +1490,31 @@ apply_browser_root() {
     [ -d "$d" ] || continue
     case "$(basename "$d")" in
       *.default*|*.default-release*|*.default-esr*|*-release|*-esr|*.profile)
-        apply_profile "$d" "$backup_dir" "$browser_name"
+        apply_profile "$d" "$backup_dir" "Firefox"
         found=1
         ;;
       *)
         if [ -f "$d/prefs.js" ]; then
-          apply_profile "$d" "$backup_dir" "$browser_name"
+          apply_profile "$d" "$backup_dir" "Firefox"
           found=1
         fi
         ;;
     esac
   done
 
-  [ "$found" -eq 1 ] || die "No $browser_name profiles found under: $profiles_dir"
+  [ "$found" -eq 1 ] || die "No Firefox profiles found under: $profiles_dir"
 
   echo
-  echo "$browser_name backups saved to: $backup_dir"
+  echo "Firefox backups saved to: $backup_dir"
 }
 
-for entry in "${PROFILE_ROOTS[@]}"; do
-  browser_name="${entry%%:*}"
-  profile_root="${entry#*:}"
-  apply_browser_root "$browser_name" "$profile_root"
-done
+apply_firefox_root
 
 echo
 echo "Done."
 echo
 echo "Next:"
-echo "  1) Start Firefox or LibreWolf."
+echo "  1) Start Firefox."
 echo "  2) Visit about:config and confirm:"
 echo "       - network.trr.mode = 5"
 echo "       - network.http.http3.enable = false"
