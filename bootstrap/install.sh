@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=init name="Bootstrap Install" group=sys run=user desc="Sync tracked bootstrap files into their live system counterparts"
+# dev-cmd: alias=init name="Bootstrap Install (init)" group=sys run=user desc="Sync tracked bootstrap files into their live system counterparts"
 
 set -euo pipefail
 

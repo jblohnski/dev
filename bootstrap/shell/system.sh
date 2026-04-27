@@ -47,33 +47,33 @@ alias gc='git diff --cached'
 
 ## network
 
-# dev-cmd: alias=ips name=IPs group=net run=user desc="List local IPv4 addresses"
+# dev-cmd: alias=ips name="IPs (ips)" group=net run=user desc="List local IPv4 addresses"
 alias ips="ifconfig | awk 'BEGIN{printf \"${ANSI_BOLD}${ANSI_HDR}%-12s %s${ANSI_RESET}\\n\",\"INTERFACE\",\"IPv4\"} /^[a-zA-Z0-9]/{iface=\$1} /inet /{printf \"${ANSI_CYAN}%-12s${ANSI_RESET} ${ANSI_GREEN}%s${ANSI_RESET}\\n\", substr(iface,1,12), \$2}' "
 
-# dev-cmd: alias=nc name=Connections group=net run=user desc="Show network connections"
+# dev-cmd: alias=nc name="Connections (nc)" group=net run=user desc="Show network connections"
 alias nc="lsof -nP -i | awk 'NR==1{printf \"${ANSI_BOLD}${ANSI_HDR}%-18s %-7s %-12s %-6s %s${ANSI_RESET}\\n\",\"COMMAND\",\"PID\",\"USER\",\"NODE\",\"NAME\";next}/TCP|UDP/{name=substr(\$0,index(\$0,\$8)+length(\$8)+1);if(\$8==\"TCP\"){printf \"%-18s %-7s %-12s ${ANSI_GREEN}%-6s${ANSI_RESET} %s\\n\",\$1,\$2,\$3,\$8,name}else if(\$8==\"UDP\"){printf \"%-18s %-7s %-12s ${ANSI_BLUE}%-6s${ANSI_RESET} %s\\n\",\$1,\$2,\$3,\$8,name}else{printf \"%-18s %-7s %-12s %-6s %s\\n\",\$1,\$2,\$3,\$8,name}}' "
 
-# dev-cmd: alias=po name=Ports group=net run=user desc="Show listening ports"
+# dev-cmd: alias=po name="Ports (po)" group=net run=user desc="Show listening ports"
 alias po="lsof -nP -i -sTCP:LISTEN | awk 'NR==1{printf \"${ANSI_BOLD}${ANSI_HDR}%-18s %-7s %-12s %-6s %s${ANSI_RESET}\\n\",\"COMMAND\",\"PID\",\"USER\",\"PROTO\",\"NAME\";next}{name=substr(\$0,index(\$0,\$8)+length(\$8)+1); printf \"%-18s %-7s %-12s ${ANSI_GREEN}%-6s${ANSI_RESET} %s\\n\",\$1,\$2,\$3,\$8,name}' "
 
-# dev-cmd: alias=routes name=Routes group=net run=user desc="Show routes"
+# dev-cmd: alias=routes name="Routes (routes)" group=net run=user desc="Show routes"
 alias routes="netstat -rn | column -t | sed -E '1,3s/(.*)/${ANSI_BOLD}${ANSI_HDR}\1${ANSI_RESET}/' "
 
-# dev-cmd: alias=utuns name=UTUNs group=net run=user desc="Show utun interfaces"
+# dev-cmd: alias=utuns name="UTUNs (utuns)" group=net run=user desc="Show utun interfaces"
 alias utuns="ifconfig | awk '/^utun[0-9]*:/ {print \"${ANSI_BOLD}${ANSI_CYAN}\" \$0 \"${ANSI_RESET}\"; in_utun=1; next} /^\s+inet / && in_utun {printf \"    ${ANSI_GREEN}%s${ANSI_RESET}\\n\", \$2; next} /^\S/ && !/^utun[0-9]*:/ {in_utun=0}' "
 
 ## dns
 
-# dev-cmd: alias=flushdns name="Flush DNS" group=net run=user desc="Flush DNS caches"
+# dev-cmd: alias=flushdns name="Flush DNS (flushdns)" group=net run=user desc="Flush DNS caches"
 alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
-# dev-cmd: alias=dnscheck name="DNS Check" group=net run=user desc="List DNS resolvers"
+# dev-cmd: alias=dnscheck name="DNS Check (dnscheck)" group=net run=user desc="List DNS resolvers"
 alias dnscheck='scutil --dns | sed -n "/resolver #1/,/}/p"'
 
-# dev-cmd: alias=sniffdns name="DNS Sniff" group=net run=user desc="Capture DNS traffic"
+# dev-cmd: alias=sniffdns name="DNS Sniff (sniffdns)" group=net run=user desc="Capture DNS traffic"
 alias sniffdns='sudo tcpdump -n -i en0 port 53 or port 5353'
 
-# dev-cmd: alias=snihttp name="HTTP Sniff" group=net run=user desc="Capture HTTP and HTTPS traffic"
+# dev-cmd: alias=snihttp name="HTTP Sniff (snihttp)" group=net run=user desc="Capture HTTP and HTTPS traffic"
 alias snihttp='sudo tcpdump -n -i en0 port 443 or port 80'
 
 ## util

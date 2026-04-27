@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# dev-cmd: alias=pfkit.resolve-hosts name="pfkit resolve hosts" group=net run=user legend=hide desc="Resolve configured HTTPS allowlist hostnames into IPv4 /32 CIDRs for pfkit state"
+# Internal helper: resolve configured HTTPS allowlist hostnames into IPv4 /32 CIDRs for pfkit state.
 from __future__ import annotations
 
 import argparse

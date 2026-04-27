@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit.apply name="pfkit apply" group=net run=sudo legend=hide desc="Render the tracked pfkit anchor from config and load it into PF"
+# Internal helper: render the tracked pfkit anchor from config and load it into PF.
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then

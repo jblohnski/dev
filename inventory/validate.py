@@ -5,6 +5,7 @@ from pathlib import Path
 
 from command_contract import is_valid
 from inventory.commands import command_object
+from inventory.discovery import is_legend_eligible
 from inventory.shared import SECTION_RE, SHELL_SECTION_OWNER, VALID_GROUPS, VALID_KINDS, VALID_RUN, is_excluded, parse_md_meta, parse_sh_meta, rel_str
 
 
@@ -95,6 +96,8 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
             errors.append(f"{record['path']}: discovered command record has invalid group '{group}'")
         if not desc:
             errors.append(f"{record['path']}: discovered command record missing desc")
+        if is_legend_eligible(record) and alias and name and alias not in name:
+            errors.append(f"{record['path']}: public command name must contain alias '{alias}'")
         existing_path = alias_paths.get(alias)
         if alias and existing_path and existing_path != record["path"]:
             errors.append(f"duplicate command alias '{alias}' in {record['path']} and {existing_path}")

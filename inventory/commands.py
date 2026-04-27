@@ -12,26 +12,13 @@ def command_path(record: dict[str, str]) -> str:
     return f"{record.get('path', '')}#{alias}"
 
 
-def runtime_command_object(record: dict[str, Any]) -> dict[str, Any]:
-    alias = display_command_name(record)
-    return {
-        "path": command_path(record),
-        "source_path": record.get("path", ""),
-        "component": record.get("component", ""),
-        "group": record.get("group"),
-        "alias": alias,
-        "name": record.get("name", "") or alias,
-        "desc": record.get("desc", ""),
-        "run": record.get("run"),
-        "source": record.get("source"),
-    }
-
-
 def command_object(record: dict[str, Any]) -> dict[str, Any]:
     alias = display_command_name(record)
     return {
         "alias": alias,
         "name": record.get("name", "") or alias,
+        "path": record.get("path", ""),
+        "run": record.get("run", "user"),
         "desc": record.get("desc", ""),
         "group": record.get("group"),
     }

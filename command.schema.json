@@ -5,13 +5,15 @@
   "required": {
     "alias": "string; canonical invocation token shown in human-facing views",
     "name": "string; human-facing label",
+    "path": "string; repo-relative implementation location",
+    "run": "user|sudo; execution privilege expectation",
     "desc": "string; concise summary",
     "group": "sys|audit|net; fixed simple command category"
   },
   "rules": [
     "commands are the invokable subset of discovered records",
     "alias is required for human-facing command views",
-    "public command objects only expose alias, name, desc, and group",
+    "public command objects expose alias, name, path, run, desc, and group",
     "group must be one of sys, audit, or net"
   ]
 }

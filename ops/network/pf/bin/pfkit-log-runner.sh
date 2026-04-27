@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit.log-runner name="pfkit log runner" group=net run=sudo legend=hide desc="Stream blocked PF log lines from pflog0 and fold consecutive duplicates"
+# Internal helper: stream blocked PF log lines from pflog0 and fold consecutive duplicates.
 # Background block-log capture for pfkit.
 
 set -euo pipefail

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=sysclean name="System Clean" group=sys run=sudo desc="Aggressively clear macOS caches, browser cookies, temp files, and local web state"
+# dev-cmd: alias=sysclean name="System Clean (sysclean)" group=sys run=sudo desc="Aggressively clear macOS caches, browser cookies, temp files, and local web state"
 
 set -euo pipefail
 

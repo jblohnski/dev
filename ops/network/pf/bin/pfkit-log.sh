@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit.log name="pfkit log" group=net run=sudo legend=hide desc="Manage the pfkit block-log capture process and retained log files"
+# Internal helper: manage retained PFKit block logs and logger lifecycle.
 # Helper for pfkit log capture lifecycle. Intended to be driven by pfkit.sh.
 
 set -euo pipefail
@@ -160,13 +160,13 @@ start_logger() {
 
   if ! ensure_pflog_interface; then
     log_notice "pfkit logger unavailable: pflog0 missing; block capture not started"
-    echo ">> pfkit block logger unavailable (pflog0 missing)"
-    echo "   log: $(log_file)"
-    return
+    echo "pfkit-log: failed to create or find pflog0; block capture not started" >&2
+    echo "   log: $(log_file)" >&2
+    exit 1
   fi
 
   ensure_state_dir
-  nohup "$RUNNER" >>"$(log_file)" 2>>"$(stderr_file)" </dev/null &
+  nohup bash "$RUNNER" >>"$(log_file)" 2>>"$(stderr_file)" </dev/null &
   echo "$!" > "$(pid_file)"
   sleep 1
   if running_pid >/dev/null 2>&1; then
@@ -195,20 +195,6 @@ stop_logger() {
   echo ">> pfkit block logger stopped"
 }
 
-status_logger() {
-  ensure_state_dir
-  echo "PF Log Capture"
-  if running_pid_from "$(pid_file)" >/dev/null 2>&1; then
-    echo "  logger: running (pid $(running_pid_from "$(pid_file)"))"
-  elif running_pid_from "$(legacy_pid_file)" >/dev/null 2>&1; then
-    echo "  logger: running (legacy pid $(running_pid_from "$(legacy_pid_file)"))"
-  else
-    echo "  logger: stopped"
-  fi
-  echo "  log file: $(log_file)"
-  echo "  err file: $(stderr_file)"
-}
-
 tail_logger() {
   ensure_state_dir
   tail -n "${1:-50}" "$(log_file)"
@@ -217,6 +203,283 @@ tail_logger() {
 cat_logger() {
   ensure_state_dir
   cat "$(log_file)"
+}
+
+report_logger() {
+  ensure_state_dir
+  python3 - "$(state_dir)" "$(log_file)" "$(stderr_file)" "$(pid_file)" "$(legacy_pid_file)" <<'PY'
+from __future__ import annotations
+
+import re
+import sys
+from collections import Counter
+from pathlib import Path
+
+state_dir, log_file, stderr_file, pid_file, legacy_pid_file = map(Path, sys.argv[1:])
+
+block_paths = [log_file, *(state_dir / f"blocks.log.{index}" for index in range(1, 4))]
+error_paths = [stderr_file, *(state_dir / f"blocks.stderr.log.{index}" for index in range(1, 4))]
+
+
+def read_lines(paths: list[Path]) -> list[str]:
+    lines: list[str] = []
+    for path in paths:
+        if not path.is_file():
+            continue
+        try:
+            lines.extend(path.read_text(errors="ignore").splitlines())
+        except OSError:
+            continue
+    return lines
+
+
+def running_pid(path: Path) -> str:
+    try:
+        pid = path.read_text().strip()
+    except OSError:
+        return ""
+    if not pid:
+        return ""
+    proc = Path("/proc") / pid
+    if proc.exists():
+        return pid
+    return pid
+
+
+def expand_count(line: str) -> int:
+    match = re.search(r"\s+\[x(\d+)\]\s*$", line)
+    if match:
+        return int(match.group(1))
+    return 1
+
+
+def clean_line(line: str) -> str:
+    return re.sub(r"\s+\[x\d+\]\s*$", "", line.strip())
+
+
+def first_timestamp(line: str) -> str:
+    match = re.match(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", line)
+    return match.group(1) if match else ""
+
+
+def parse_block(line: str) -> dict[str, str] | None:
+    line = clean_line(line)
+    if " block " not in f" {line.lower()} " and ": block " not in line.lower():
+        return None
+
+    direction = "unknown"
+    interface = "unknown"
+    match = re.search(r": block\s+(in|out)\s+on\s+([^: ]+):\s+", line)
+    if match:
+        direction = match.group(1)
+        interface = match.group(2)
+
+    source = "unknown"
+    dest = "unknown"
+    flow = re.search(r":\s+([^ ]+)\s+>\s+([^:]+):", line)
+    if flow:
+        source = normalize_endpoint(flow.group(1))
+        dest = normalize_endpoint(flow.group(2))
+
+    lowered = line.lower()
+    proto = "other"
+    if " udp," in lowered:
+        proto = "udp"
+    elif " flags [" in lowered:
+        proto = "tcp"
+    elif " icmp6" in lowered:
+        proto = "icmp6"
+    elif " icmp" in lowered:
+        proto = "icmp"
+
+    reason = "default"
+    dest_port = dest.rsplit(":", 1)[1] if ":" in dest and dest.rsplit(":", 1)[1].isdigit() else ""
+    if proto == "udp" and dest_port == "443":
+        reason = "quic"
+    elif dest_port == "853":
+        reason = "dot"
+    elif dest_port == "5353":
+        reason = "mdns"
+    elif interface.startswith("utun"):
+        reason = "utun"
+    elif dest_port == "53":
+        reason = "dns"
+    elif proto == "udp":
+        reason = "udp"
+    elif proto == "tcp":
+        reason = "tcp"
+
+    return {
+        "direction": direction,
+        "interface": interface,
+        "source": source,
+        "dest": dest,
+        "proto": proto,
+        "reason": reason,
+        "timestamp": first_timestamp(line),
+        "line": line,
+    }
+
+
+def normalize_endpoint(endpoint: str) -> str:
+    endpoint = endpoint.rstrip(":")
+    if endpoint.count(".") >= 4:
+        host, port = endpoint.rsplit(".", 1)
+        if port.isdigit():
+            return f"{host}:{port}"
+    return endpoint
+
+
+def print_top(title: str, counter: Counter[str], limit: int = 8) -> None:
+    print(section(title))
+    if not counter:
+        print(dim("  (none)"))
+        return
+    for value, count in counter.most_common(limit):
+        print(f"  {accent(f'{count:>6}')}  {value}")
+
+
+env = __import__("os").environ
+use_color = bool(env.get("FORCE_COLOR")) or (sys.stdout.isatty() and not bool(env.get("NO_COLOR")))
+
+
+def paint(code: str, text: str) -> str:
+    if not use_color:
+        return text
+    return f"\033[{code}m{text}\033[0m"
+
+
+def title(text: str) -> str:
+    return paint("1;36", text)
+
+
+def section(text: str) -> str:
+    return paint("1;34", text)
+
+
+def accent(text: str) -> str:
+    return paint("1;33", text)
+
+
+def good(text: str) -> str:
+    return paint("1;32", text)
+
+
+def warn(text: str) -> str:
+    return paint("1;31", text)
+
+
+def dim(text: str) -> str:
+    return paint("2", text)
+
+
+block_lines = read_lines(block_paths)
+error_lines = read_lines(error_paths)
+
+events: list[tuple[dict[str, str], int]] = []
+for raw in block_lines:
+    parsed = parse_block(raw)
+    if parsed is None:
+        continue
+    events.append((parsed, expand_count(raw)))
+
+total_blocks = sum(count for _, count in events)
+unique_flows = Counter()
+by_reason = Counter()
+by_proto = Counter()
+by_direction = Counter()
+by_interface = Counter()
+by_dest = Counter()
+by_source = Counter()
+first_seen = ""
+last_seen = ""
+
+for event, count in events:
+    unique_flows[f"{event['proto']} {event['source']} -> {event['dest']}"] += count
+    by_reason[event["reason"]] += count
+    by_proto[event["proto"]] += count
+    by_direction[event["direction"]] += count
+    by_interface[event["interface"]] += count
+    by_dest[event["dest"]] += count
+    by_source[event["source"]] += count
+    if event["timestamp"]:
+        if not first_seen or event["timestamp"] < first_seen:
+            first_seen = event["timestamp"]
+        if not last_seen or event["timestamp"] > last_seen:
+            last_seen = event["timestamp"]
+
+error_counter = Counter()
+packet_counter = Counter()
+for raw in error_lines:
+    line = raw.strip()
+    if not line:
+        continue
+    received_matches = re.findall(r"(\d+)\s+packets received by filter", line)
+    dropped_matches = re.findall(r"(\d+)\s+packets dropped by kernel", line)
+    captured_matches = re.findall(r"(\d+)\s+packets captured", line)
+    if received_matches:
+        packet_counter["packets received"] += sum(int(value) for value in received_matches)
+        continue
+    if dropped_matches:
+        packet_counter["packets dropped"] += sum(int(value) for value in dropped_matches)
+        continue
+    if captured_matches:
+        packet_counter["packets captured"] += sum(int(value) for value in captured_matches)
+        continue
+    if "listening on pflog0" in line:
+        error_counter["tcpdump listening on pflog0"] += 1
+    elif "tcpdump:" in line:
+        error_counter[line] += 1
+    else:
+        error_counter[line] += 1
+
+logger = running_pid(pid_file) or running_pid(legacy_pid_file)
+
+received = packet_counter.get("packets received", 0)
+dropped = packet_counter.get("packets dropped", 0)
+logger_text = logger or "not recorded"
+logger_text = good(logger_text) if logger else warn(logger_text)
+
+print(title("PFKit report"))
+print(f"  window : {first_seen or 'unknown'} -> {last_seen or 'unknown'}")
+print(f"  logs   : {state_dir}")
+print(f"  logger : {logger_text}")
+print(
+    "  totals : "
+    f"{accent(str(total_blocks))} blocks, "
+    f"{accent(str(len(unique_flows)))} flows, "
+    f"{accent(str(sum(error_counter.values())))} logger notes"
+)
+if packet_counter:
+    dropped_text = good(str(dropped)) if dropped == 0 else warn(str(dropped))
+    print(f"  tcpdump: {received} received, {dropped_text} dropped")
+print()
+
+if total_blocks == 0:
+    print(section("Summary"))
+    print("  No retained PF block events found.")
+    print()
+else:
+    top_reasons = ", ".join(f"{name}={count}" for name, count in by_reason.most_common(4))
+    top_dest = by_dest.most_common(1)[0][0] if by_dest else "none"
+    top_flow = unique_flows.most_common(1)[0][0] if unique_flows else "none"
+    print(section("Summary"))
+    print(f"  Main classes : {top_reasons or 'none'}")
+    print(f"  Top target   : {top_dest}")
+    print(f"  Top flow     : {top_flow}")
+    print()
+
+print_top("Block classes", by_reason, 6)
+print()
+print_top("Interfaces", by_interface, 6)
+print()
+print_top("Top destinations", by_dest, 6)
+print()
+print_top("Top flows", unique_flows, 6)
+if error_counter:
+    print()
+    print_top("Logger notes", error_counter, 6)
+PY
 }
 
 clear_logger() {
@@ -228,11 +491,11 @@ clear_logger() {
 
 usage() {
   cat <<'EOF'
-usage: pfkit-log.sh [start|stop|status|tail|cat|path|clear] [lines]
+usage: pfkit-log.sh [start|stop|tail|cat|path|clear|report] [lines]
 EOF
 }
 
-cmd="${1:-status}"
+cmd="${1:-report}"
 if [[ $# -gt 0 ]]; then
   shift
 fi
@@ -244,14 +507,14 @@ case "$cmd" in
   stop)
     stop_logger
     ;;
-  status)
-    status_logger
-    ;;
   tail)
     tail_logger "${1:-50}"
     ;;
   cat)
     cat_logger
+    ;;
+  report)
+    report_logger
     ;;
   path)
     ensure_state_dir

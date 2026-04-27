@@ -6,36 +6,46 @@ PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, 
 
 ## Layout
 
-- `bin/`: public entrypoints (`pfo`, `pfs`, `pfk`) plus internal helpers used by those wrappers.
+- `bin/`: the `pfkit` dispatcher plus private helpers used by its subcommands.
 - `anchors/`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`.
 - `config/`: environment inputs (`pfkit.env`) used by render/apply.
 
-Internal helpers under `bin/` are intentionally tracked as hidden component commands.
-They validate through inventory/manifest, but do not appear in public `legend`.
+Only public `pfkit.*` command wrappers appear in `legend`.
+Private helper scripts do not declare command metadata.
 
 ## Quick start
 
 ```bash
-sudo pfo
+sudo pfkit.start
 ```
 
 Validate:
 
 ```bash
-sudo pfs
+sudo pfkit.logs report
 ```
 
 ## Control Surface
 
-- `pfo` — install wiring if needed, apply the tracked pfkit rules, and start block logging
-- `pfs` — show concise PF on/off state plus recent block-log output
-- `pfk` — stop block logging, unload the `pfkit` anchor, and disable PF globally
+- `pfkit.start` — repair files/wiring, apply tracked rules, enable PF, and start block logging
+- `pfkit.stop` — stop block logging, unload the `pfkit` anchor, and disable PF globally
+- `pfkit.status` — show whether PFKit, PF rules, logger, and `pflog0` are running
+- `pfkit.update` — repair files/wiring and apply tracked PFKit rules without changing logger state
+- `pfkit.logs` — report, tail, print, or clear retained block-log capture files
 
-Why `pfk` now maps to a real PF shutdown:
+## PF Mapping
 
-- `pfk` now does call `pfctl -d` after stopping pfkit logging and clearing the `pfkit` anchor.
+- `pfkit.status` is read-only: it checks global PF state, the loaded `pfkit` anchor, logger pid, and `pflog0`.
+- `pfkit.update` repairs repo/system wiring, renders the anchor, loads it with `pfctl -a pfkit -f`, and enables PF if needed.
+- `pfkit.start` runs `pfkit.update`, ensures `pflog0` exists, and starts the block-log capture.
+- `pfkit.stop` stops capture, clears the `pfkit` anchor, and disables global PF with `pfctl -d`.
+- `pfkit.logs` reads retained PFKit log files; it is not a raw `pfctl` passthrough.
+
+Why `pfkit.stop` maps to a real PF shutdown:
+
+- `pfkit.stop` calls `pfctl -d` after stopping pfkit logging and clearing the `pfkit` anchor.
 - This is intentionally wider than “stop pfkit”: the packet filter is turned off for the host.
-- `pfo` is the path that brings PF back up and reapplies the tracked anchor.
+- `pfkit.start` is the path that brings PF back up and reapplies the tracked anchor.
 
 ## Config knobs (`config/pfkit.env`)
 
@@ -43,7 +53,7 @@ Why `pfk` now maps to a real PF shutdown:
 - `DNS_MODE` — `router` (force DNS to gateway) or `direct` (force to specific IPs).
 - `DNS_ALLOWED` — space-delimited IPs when `DNS_MODE=direct`.
 - `ALLOW_LAN_CIDRS` — LAN ranges allowed.
-- `BASELINE_PROFILE` — terse statement of the intended egress posture shown in `pfs`.
+- `BASELINE_PROFILE` — terse statement of the intended egress posture shown in PFKit reports.
 - `ALLOW_TCP_PORTS` — space-delimited outbound TCP ports allowed in normal mode.
 - `ALLOW_UDP_PORTS` — optional extra outbound UDP ports allowed in addition to DNS.
 - `BLOCK_ARBITRARY_UDP` — block outbound UDP except DNS and `ALLOW_UDP_PORTS` (default 1).
@@ -69,15 +79,15 @@ Why `pfk` now maps to a real PF shutdown:
 - Blocks mDNS by default for a tighter host posture.
 - Blocks `utun*` by default and keeps AWDL / llw disabled unless you explicitly unblock them.
 - Supports separate inbound and outbound IP/CIDR blacklists ahead of the main policy.
-- Resolves a small Google sign-in hostname set into `/32`s for Google-only HTTPS mode and caches the results for `pfs`.
+- Resolves a small Google sign-in hostname set into `/32`s for Google-only HTTPS mode and caches the results for reports.
 - Allows a narrow hostname-based HTTPS exception list for sites that must work without opening the broader web.
 - Blocks DoT/DoQ on 853 when enabled.
 - Blocks QUIC/HTTP3 on UDP 443 when enabled so browsers stay on TCP 443.
-- Can restrict HTTPS to the configured Google hostname set without dumping a huge CIDR inventory in `pfs`.
+- Can restrict HTTPS to the configured Google hostname set without dumping a huge CIDR inventory in normal reports.
 - Logs every explicit block rule in the anchor.
 - Logs allowed DNS with `log (all)` so `pflog0` shows the PF decision path for approved resolvers.
 - Adds `pfkit:` rule labels so `pfctl -s labels` exposes per-rule counters even when live capture is quiet.
-- Background block logging writes text logs under `~/dev/logs/pfkit/`, and `pfs` tails that file directly.
+- Background block logging writes text logs under `~/dev/logs/pfkit/`, and `pfkit.logs` reads that file directly.
 
 ## Policy Notes
 
@@ -85,11 +95,13 @@ Why `pfk` now maps to a real PF shutdown:
 - `pfkit` is still host-level PF policy, not per-process containment for Firefox.
 - The default normal-mode posture is now surgical: DNS only to approved resolvers, TCP only to `ALLOW_TCP_PORTS`, and UDP blocked unless explicitly excepted.
 
-## Status
+## Logs
 
-- Live PF status: `sudo pfs`
-- Raw block-log tail: `sudo pfs --tail`
-- Optional raw CIDR dump: `sudo pfs --cidrs`
+- Short retained-log report: `sudo pfkit.logs report`
+- Running/not-running status: `sudo pfkit.status`
+- Raw block-log tail: `sudo pfkit.logs tail`
+- Full retained block log: `sudo pfkit.logs cat`
+- Log path: `sudo pfkit.logs path`
 
 ## Blacklist examples
 
@@ -101,5 +113,5 @@ BLACKLIST_OUT_CIDRS="198.51.100.7 203.0.113.0/24"
 Apply after editing:
 
 ```bash
-sudo pfo
+sudo pfkit.update
 ```

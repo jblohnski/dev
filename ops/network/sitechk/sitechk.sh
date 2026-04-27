@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=sitechk name="Site Check" group=net run=user desc="Verify DNS, TLS, and HTTP identity signals for a site"
+# dev-cmd: alias=sitechk name="Site Check (sitechk)" group=net run=user desc="Verify DNS, TLS, and HTTP identity signals for a site"
 # check_site_identity.sh
 #
 # Purpose:

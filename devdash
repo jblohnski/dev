@@ -170,7 +170,7 @@ PY
 battery="$(pmset -g batt 2>/dev/null | tail -n +2 | paste -sd ' ' - || true)"
 [[ -n "$battery" ]] || battery="unavailable"
 
-pf_status="$(sudo -n "$ROOT/ops/network/pf/bin/pfs.sh" 2>/dev/null | awk 'NF {print; exit}' || true)"
+pf_status="$(sudo -n "$ROOT/ops/network/pf/bin/pfkit-status.sh" 2>/dev/null | awk 'NF {print; exit}' || true)"
 [[ -n "$pf_status" ]] || pf_status="unavailable"
 
 repo_state="$(git -C "$ROOT" status --short 2>/dev/null || true)"

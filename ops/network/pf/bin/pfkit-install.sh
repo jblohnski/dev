@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit.install name="pfkit install" group=net run=sudo legend=hide desc="Install pfkit anchor wiring into /etc/pf.conf and the pf anchors directory"
+# Internal helper: install pfkit anchor wiring into /etc/pf.conf and the pf anchors directory.
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
@@ -23,8 +23,10 @@ mkdir -p /etc/pf.anchors
 # Backup once per install
 [[ -f "$PFCONF" && ! -f "$PFCONF.pfkit.bak" ]] && cp "$PFCONF" "$PFCONF.pfkit.bak"
 
-printf '%s\n' '# pfkit placeholder; rendered rules are written by pfkit-apply.sh' > "$ANCHOR_DST"
-chmod 644 "$ANCHOR_DST"
+if [[ ! -f "$ANCHOR_DST" ]]; then
+  printf '%s\n' '# pfkit placeholder; rendered rules are written by pfkit-apply.sh' > "$ANCHOR_DST"
+  chmod 644 "$ANCHOR_DST"
+fi
 
 pfconf_before="$(cat "$PFCONF" 2>/dev/null || true)"
 tmp="$(mktemp)"

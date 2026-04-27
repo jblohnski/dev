@@ -14,6 +14,10 @@ def is_valid(cmd: Mapping[str, Any]) -> bool:
         return False
     if not _non_empty_string(cmd.get("name")):
         return False
+    if not _non_empty_string(cmd.get("path")):
+        return False
+    if not _non_empty_string(cmd.get("run")):
+        return False
     if not _non_empty_string(cmd.get("desc")):
         return False
     if not _non_empty_string(cmd.get("group")):

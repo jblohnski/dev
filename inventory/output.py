@@ -18,32 +18,35 @@ from inventory.shared import SCHEMA_VERSION, Style, group_key, matches_filters, 
 
 def render_command_group(commands: list[dict[str, str]], show_paths: bool, style: Style, indent: str = "    ") -> None:
     cmd_width = max((len(display_command_name(record)) for record in commands), default=0)
+    name_width = max((len((record.get("name") or display_command_name(record)).strip()) for record in commands), default=0)
     for record in commands:
         cmd = display_command_name(record)
+        name = (record.get("name") or cmd).strip()
         cmd_text = style.wrap(cmd, style.cmd)
         padding = " " * (max(cmd_width - len(cmd), 0) + 2)
-        print(f"{indent}{cmd_text}{padding}{style.wrap(record['desc'], style.desc)}")
+        name_text = style.wrap(name, style.name)
+        name_padding = " " * (max(name_width - len(name), 0) + 2)
+        print(f"{indent}{cmd_text}{padding}{name_text}{name_padding}{style.wrap(record['desc'], style.desc)}")
         if show_paths:
-            name = record.get("name", "").strip()
             label = f"@ {command_path(record)}"
-            if name and name.lower() != cmd.lower():
-                label = f"{label} [{name}]"
             print(f"{indent}  {style.wrap(label, style.desc)}")
 
 
 def render_group_legend(commands: list[dict[str, str]], show_paths: bool, style: Style) -> None:
     aliases = [display_command_name(record) for record in commands]
     alias_width = max((len(alias) for alias in aliases), default=0)
+    names = [(record.get("name") or display_command_name(record)).strip() for record in commands]
+    name_width = max((len(name) for name in names), default=0)
     for record in commands:
         alias = display_command_name(record)
+        name = (record.get("name") or alias).strip()
         alias_text = style.wrap(alias, style.cmd)
         alias_padding = " " * (max(alias_width - len(alias), 0) + 2)
-        print(f"    {alias_text}{alias_padding}{style.wrap(record['desc'], style.desc)}")
+        name_text = style.wrap(name, style.name)
+        name_padding = " " * (max(name_width - len(name), 0) + 2)
+        print(f"    {alias_text}{alias_padding}{name_text}{name_padding}{style.wrap(record['desc'], style.desc)}")
         if show_paths:
-            name = record.get("name", "").strip()
             label = f"@ {command_path(record)}"
-            if name and name.lower() != alias.lower():
-                label = f"{label} [{name}]"
             print(f"      {style.wrap(label, style.desc)}")
 
 
