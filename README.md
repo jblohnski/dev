@@ -63,7 +63,8 @@ Rules:
 - commands attach to the nearest explicit `component` or `subcomponent`
 - `alias` is the exact interactive command token
 - `name` is a terse no-space/no-dot identifier, not a formal label
-- public command names should contain the exact alias, usually as the whole name or a prefix
+- public command aliases are compact invocation tokens, ideally four characters or fewer
+- public command names are terse capability labels, ideally twelve characters or fewer
 - command location is derived from the script or shell file path
 - every command object exposes `path_key` (`path#alias`) and `ref` (`scope/component/group/name`)
 - groups are fixed and explicit: `sys`, `audit`, `net`
@@ -102,7 +103,7 @@ python3 ./component-scan.sh manifest
 Keep the contract small:
 
 - human-facing command identity is `alias`, `name`, `path`, `path_key`, `ref`, `run`, `desc`, `group`
-- `legend` displays alias, name, and description; `--paths` adds the implementation location
+- `legend` displays a combined `(alias) name` column and a compact description; `--paths` adds the implementation location
 - shell publishing should come from scan output, not handwritten alias duplication
 - inventory is there to describe the tree, not create a second bureaucracy around it
 - public commands should express durable repo-owned capability, not personal one-off launch shortcuts
@@ -125,7 +126,7 @@ Main helpers:
 - `dl`: legend
 - `dv`: validate
 - `dd`: machine status dashboard
-- `am`, `as`, `ar`: compact audit monitor/status/report aliases
+- `au`, `am`, `as`, `ar`: compact audit run/monitor/status/report aliases
 
 Publish shell changes with:
 
@@ -143,14 +144,14 @@ Reports are written under `audit/report/zeek/`.
 Useful entrypoints:
 
 ```bash
-audit
+au
 as
 am current
 ar
 am zeek --top 10
 am start en0
 am logs --last 30m --top 5
-sysclean --yes
+sycl --yes
 ```
 
 ## Conventions

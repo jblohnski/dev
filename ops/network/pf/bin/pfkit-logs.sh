@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit-logs name=pfkit-logs group=net run=sudo desc="Report, tail, print, or clear retained PFKit block logs"
+# dev-cmd: alias=pflg name=pfkit-logs group=net run=sudo desc="Manage PFKit logs"
 
 set -euo pipefail
 

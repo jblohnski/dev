@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit-status name=pfkit-status group=net run=sudo desc="Show whether PFKit, PF rules, logger, and pflog0 are running"
+# dev-cmd: alias=pfst name=pfkit-status group=net run=sudo desc="Check PFKit"
 
 set -euo pipefail
 

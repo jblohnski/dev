@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=wifiscan name=wifiscan group=net run=user desc="Scan nearby Wi-Fi networks via CoreWLAN with macOS permission diagnostics"
+# dev-cmd: alias=wfs name=wifiscan group=net run=user desc="Scan Wi-Fi"
 
 set -euo pipefail
 

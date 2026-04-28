@@ -15,6 +15,17 @@ from inventory.discovery import (
 )
 from inventory.shared import SCHEMA_VERSION, Style, group_key, matches_filters, node_key, order_key
 
+LEGEND_DESC_WIDTH = 28
+LEGEND_ALIAS_WIDTH = 4
+
+
+def compact_text(value: str, limit: int) -> str:
+    text = " ".join(value.split())
+    if len(text) <= limit:
+        return text
+    clipped = text[: limit + 1].rsplit(" ", 1)[0].rstrip()
+    return clipped or text[:limit].rstrip()
+
 
 def render_command_group(commands: list[dict[str, str]], show_paths: bool, style: Style, indent: str = "    ") -> None:
     cmd_width = max((len(display_command_name(record)) for record in commands), default=0)
@@ -33,18 +44,17 @@ def render_command_group(commands: list[dict[str, str]], show_paths: bool, style
 
 
 def render_group_legend(commands: list[dict[str, str]], show_paths: bool, style: Style) -> None:
-    aliases = [display_command_name(record) for record in commands]
-    alias_width = max((len(alias) for alias in aliases), default=0)
     names = [(record.get("name") or display_command_name(record)).strip() for record in commands]
     name_width = max((len(name) for name in names), default=0)
     for record in commands:
         alias = display_command_name(record)
         name = (record.get("name") or alias).strip()
         alias_text = style.wrap(alias, style.cmd)
-        alias_padding = " " * (max(alias_width - len(alias), 0) + 2)
+        alias_padding = " " * (max(LEGEND_ALIAS_WIDTH - len(alias), 0) + 1)
         name_text = style.wrap(name, style.name)
         name_padding = " " * (max(name_width - len(name), 0) + 2)
-        print(f"    {alias_text}{alias_padding}{name_text}{name_padding}{style.wrap(record['desc'], style.desc)}")
+        desc = compact_text(record["desc"], LEGEND_DESC_WIDTH)
+        print(f"    {alias_text}{alias_padding}{name_text}{name_padding}{style.wrap(desc, style.desc)}")
         if show_paths:
             label = f"@ {command_path(record)}"
             print(f"      {style.wrap(label, style.desc)}")

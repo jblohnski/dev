@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit-stop name=pfkit-stop group=net run=sudo desc="Disable PF globally, stop logging, and unload PFKit rules"
+# dev-cmd: alias=pfof name=pfkit-stop group=net run=sudo desc="Stop PFKit"
 
 set -euo pipefail
 

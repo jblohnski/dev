@@ -10,28 +10,28 @@ PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, 
 - `anchors/`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`.
 - `config/`: environment inputs (`pfkit.env`) used by render/apply.
 
-Only public `pfkit-*` command wrappers appear in `legend`.
+Public legend aliases are compact; their names still point at the `pfkit-*` wrappers.
 Private helper scripts do not declare command metadata.
 
 ## Quick start
 
 ```bash
-sudo pfkit-start
+sudo pfon
 ```
 
 Validate:
 
 ```bash
-sudo pfkit-logs report
+sudo pflg report
 ```
 
 ## Control Surface
 
-- `pfkit-start` — repair files/wiring, apply tracked rules, enable PF, and start block logging
-- `pfkit-stop` — stop block logging, unload the `pfkit` anchor, and disable PF globally
-- `pfkit-status` — show whether PFKit, PF rules, logger, and `pflog0` are running
-- `pfkit-update` — repair files/wiring and apply tracked PFKit rules without changing logger state
-- `pfkit-logs` — report, tail, print, or clear retained block-log capture files
+- `(pfon) pfkit-start` — repair files/wiring, apply tracked rules, enable PF, and start block logging
+- `(pfof) pfkit-stop` — stop block logging, unload the `pfkit` anchor, and disable PF globally
+- `(pfst) pfkit-status` — show whether PFKit, PF rules, logger, and `pflog0` are running
+- `(pfup) pfkit-update` — repair files/wiring and apply tracked PFKit rules without changing logger state
+- `(pflg) pfkit-logs` — report, tail, print, or clear retained block-log capture files
 
 ## PF Mapping
 
@@ -97,11 +97,11 @@ Why `pfkit-stop` maps to a real PF shutdown:
 
 ## Logs
 
-- Short retained-log report: `sudo pfkit-logs report`
-- Running/not-running status: `sudo pfkit-status`
-- Raw block-log tail: `sudo pfkit-logs tail`
-- Full retained block log: `sudo pfkit-logs cat`
-- Log path: `sudo pfkit-logs path`
+- Short retained-log report: `sudo pflg report`
+- Running/not-running status: `sudo pfst`
+- Raw block-log tail: `sudo pflg tail`
+- Full retained block log: `sudo pflg cat`
+- Log path: `sudo pflg path`
 
 ## Blacklist examples
 
@@ -113,5 +113,5 @@ BLACKLIST_OUT_CIDRS="198.51.100.7 203.0.113.0/24"
 Apply after editing:
 
 ```bash
-sudo pfkit-update
+sudo pfup
 ```

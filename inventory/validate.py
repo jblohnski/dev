@@ -8,6 +8,10 @@ from inventory.commands import command_object
 from inventory.discovery import is_legend_eligible
 from inventory.shared import SECTION_RE, SHELL_SECTION_OWNER, VALID_GROUPS, VALID_KINDS, VALID_RUN, is_excluded, parse_md_meta, parse_sh_meta, rel_str
 
+PUBLIC_ALIAS_MAX = 4
+PUBLIC_NAME_MAX = 12
+PUBLIC_DESC_MAX = 32
+
 
 INTERNAL_SCRIPT_PREFIXES = (
     "ops/network/pf/bin/pfkit",
@@ -100,8 +104,13 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
             errors.append(f"{record['path']}: command alias must avoid dot notation")
         if name and (" " in name or "." in name):
             errors.append(f"{record['path']}: command name must be terse with no spaces or dots")
-        if is_legend_eligible(record) and alias and name and alias not in name:
-            errors.append(f"{record['path']}: public command name must contain alias '{alias}'")
+        if is_legend_eligible(record):
+            if len(alias) > PUBLIC_ALIAS_MAX:
+                errors.append(f"{record['path']}: public command alias must be <= {PUBLIC_ALIAS_MAX} chars")
+            if len(name) > PUBLIC_NAME_MAX:
+                errors.append(f"{record['path']}: public command name must be <= {PUBLIC_NAME_MAX} chars")
+            if len(desc) > PUBLIC_DESC_MAX:
+                errors.append(f"{record['path']}: public command desc must be <= {PUBLIC_DESC_MAX} chars")
         existing_path = alias_paths.get(alias)
         if alias and existing_path and existing_path != record["path"]:
             errors.append(f"duplicate command alias '{alias}' in {record['path']} and {existing_path}")

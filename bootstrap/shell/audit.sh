@@ -3,15 +3,18 @@
 export AUDIT_DIR="${AUDIT_DIR:-$HOME/dev/audit}"
 export ZEEK_LOG_DIR="${ZEEK_LOG_DIR:-${DEV_LOG_ROOT:-$HOME/dev/logs}/zeek}"
 
-# dev-cmd: alias=audit name=audit group=audit run=user desc="Run the system audit and emit the core trust-oriented summary"
+# dev-cmd: alias=audit name=audit group=audit run=user legend=hide desc="Run system audit"
 audit() {
   "$AUDIT_DIR/audit.sh" "$@"
 }
 
+# dev-cmd: alias=au name=audit group=audit run=user desc="Run audit summary"
+alias au='audit'
+
 # dev-cmd: alias=audit-monitor name=audit-monitor group=audit run=user legend=hide desc="Manage audit logging capture, monitor traces, and focused deep-dive helpers"
 alias audit-monitor='audit_monitor'
 
-# dev-cmd: alias=am name=am-audit-monitor group=audit run=user desc="Manage audit logging capture, monitor traces, and focused deep-dive helpers"
+# dev-cmd: alias=am name=audit-mon group=audit run=user desc="Manage audit monitor"
 alias am='audit_monitor'
 audit_monitor() {
   local cmd="${1:-status}"
@@ -258,7 +261,7 @@ audit_print_zeek_excerpt() {
 # dev-cmd: alias=audit-status name=audit-status group=audit run=user legend=hide desc="Show current audit state with monitor, latest artifacts, system logs, and Zeek summary"
 alias audit-status='audit_status'
 
-# dev-cmd: alias=as name=as-audit-status group=audit run=user desc="Show current audit state with monitor, latest artifacts, system logs, and Zeek summary"
+# dev-cmd: alias=as name=audit-stat group=audit run=user desc="Show audit state"
 alias as='audit_status'
 audit_status() {
   local audit_json
@@ -321,7 +324,7 @@ audit_current() {
 # dev-cmd: alias=audit-report name=audit-report group=audit run=user legend=hide desc="Show the latest audit output, trust summary, and Zeek report material"
 alias audit-report='audit_report'
 
-# dev-cmd: alias=ar name=ar-audit-report group=audit run=user desc="Show the latest audit output, trust summary, and Zeek report material"
+# dev-cmd: alias=ar name=audit-rpt group=audit run=user desc="Show audit report"
 alias ar='audit_report'
 audit_report() {
   local cmd="${1:-show}"

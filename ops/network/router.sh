@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=router name=router group=net run=user desc="Audit router/Wi-Fi security posture and exposure"
+# dev-cmd: alias=rtr name=router group=net run=user desc="Audit router"
 # router_harden_audit.sh
 # Minimal LAN/Wi-Fi security audit helper
 # macOS + Linux compatible
