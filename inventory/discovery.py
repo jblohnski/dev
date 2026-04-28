@@ -365,6 +365,7 @@ def catalog_item_for_dir(record: dict[str, str], by_rel: dict[str, dict[str, str
     return {
         "key": short_taxonomy_key(taxon),
         "path_key": node_key(record),
+        "ref": "/".join(taxon),
         "top_level": scope,
         "path": record["path"],
         "docs_path": docs_path_for_rel(record["rel"], by_rel),
@@ -406,6 +407,7 @@ def catalog_item_for_cmd(
     return {
         "key": short_taxonomy_key(taxon),
         "path_key": node_key(record),
+        "ref": "/".join(taxon),
         "top_level": scope,
         "path": record["path"],
         "docs_path": docs_path_for_rel(owner_rel, by_rel),

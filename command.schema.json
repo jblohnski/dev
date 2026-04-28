@@ -4,8 +4,10 @@
   "definition": "canonical public command object used by legend, index, and dashboard display.",
   "required": {
     "alias": "string; canonical invocation token shown in human-facing views",
-    "name": "string; human-facing label",
+    "name": "string; terse no-space/no-dot command identifier",
     "path": "string; repo-relative implementation location",
+    "path_key": "string; stable repo-path reference formatted as path#alias",
+    "ref": "string; stable taxonomy-style reference formatted as scope/component/group/name",
     "run": "user|sudo; execution privilege expectation",
     "desc": "string; concise summary",
     "group": "sys|audit|net; fixed simple command category"
@@ -13,7 +15,9 @@
   "rules": [
     "commands are the invokable subset of discovered records",
     "alias is required for human-facing command views",
-    "public command objects expose alias, name, path, run, desc, and group",
+    "command names are terse identifiers, not formal labels",
+    "command aliases and names avoid dot notation",
+    "public command objects expose alias, name, path, path_key, ref, run, desc, and group",
     "group must be one of sys, audit, or net"
   ]
 }

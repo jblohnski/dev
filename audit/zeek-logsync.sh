@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=zsync name="Zeek Sync" group=audit run=user legend=hide desc="Merge local Zeek log files into the canonical configured log dir"
+# dev-cmd: alias=zsync name=zsync group=audit run=user legend=hide desc="Merge local Zeek log files into the canonical configured log dir"
 
 set -euo pipefail
 

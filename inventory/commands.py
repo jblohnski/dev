@@ -12,12 +12,28 @@ def command_path(record: dict[str, str]) -> str:
     return f"{record.get('path', '')}#{alias}"
 
 
+def command_ref(record: dict[str, Any]) -> str:
+    name = (record.get("name") or display_command_name(record)).strip()
+    return "/".join(
+        part
+        for part in (
+            "dev" if record.get("source") == "script" else "shell",
+            record.get("component", ""),
+            record.get("group", ""),
+            name,
+        )
+        if part
+    )
+
+
 def command_object(record: dict[str, Any]) -> dict[str, Any]:
     alias = display_command_name(record)
     return {
         "alias": alias,
         "name": record.get("name", "") or alias,
         "path": record.get("path", ""),
+        "path_key": command_path(record),
+        "ref": command_ref(record),
         "run": record.get("run", "user"),
         "desc": record.get("desc", ""),
         "group": record.get("group"),

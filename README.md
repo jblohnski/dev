@@ -49,7 +49,7 @@ Directory identity:
 Command metadata:
 
 ```bash
-# dev-cmd: alias=token name="Human Label" group=sys|audit|net run=user|sudo tags="tag-one tag-two" legend=hide desc="one-line summary"
+# dev-cmd: alias=token name=terse-token group=sys|audit|net run=user|sudo tags="tag-one tag-two" legend=hide desc="one-line summary"
 ```
 
 Kinds:
@@ -62,8 +62,10 @@ Rules:
 
 - commands attach to the nearest explicit `component` or `subcomponent`
 - `alias` is the exact interactive command token
-- `name` is the formal human label and must contain the exact alias when public, usually in parentheses
+- `name` is a terse no-space/no-dot identifier, not a formal label
+- public command names should contain the exact alias, usually as the whole name or a prefix
 - command location is derived from the script or shell file path
+- every command object exposes `path_key` (`path#alias`) and `ref` (`scope/component/group/name`)
 - groups are fixed and explicit: `sys`, `audit`, `net`
 - tags/keywords are short space-delimited words for lightweight taxonomy
 - if a discovered record does not resolve to a real alias, it does not belong in `legend`
@@ -99,7 +101,7 @@ python3 ./component-scan.sh manifest
 
 Keep the contract small:
 
-- human-facing command identity is `alias`, `name`, `path`, `run`, `desc`, `group`
+- human-facing command identity is `alias`, `name`, `path`, `path_key`, `ref`, `run`, `desc`, `group`
 - `legend` displays alias, name, and description; `--paths` adds the implementation location
 - shell publishing should come from scan output, not handwritten alias duplication
 - inventory is there to describe the tree, not create a second bureaucracy around it

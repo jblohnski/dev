@@ -96,6 +96,10 @@ def validate(root: Path, dir_records: list[dict[str, str]], script_records: list
             errors.append(f"{record['path']}: discovered command record has invalid group '{group}'")
         if not desc:
             errors.append(f"{record['path']}: discovered command record missing desc")
+        if alias and "." in alias:
+            errors.append(f"{record['path']}: command alias must avoid dot notation")
+        if name and (" " in name or "." in name):
+            errors.append(f"{record['path']}: command name must be terse with no spaces or dots")
         if is_legend_eligible(record) and alias and name and alias not in name:
             errors.append(f"{record['path']}: public command name must contain alias '{alias}'")
         existing_path = alias_paths.get(alias)

@@ -1,6 +1,6 @@
 ## dev
 
-# dev-cmd: alias=devzip name="Dev Zip (devzip)" group=sys run=user desc="Zip up only sources for a given directory"
+# dev-cmd: alias=devzip name=devzip group=sys run=user desc="Zip up only sources for a given directory"
 devzip() {
   local root="${1:-$HOME/dev}"
   local out="${2:-devsrc.zip}"

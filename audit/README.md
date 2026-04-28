@@ -9,7 +9,7 @@ The public audit surface is intentionally small:
 - `as`: show the current audit view with monitor, artifacts, logs, and Zeek summary
 - `ar`: read the latest output and refresh Zeek report material
 
-Legacy aliases `audit.monitor`, `audit.status`, and `audit.report` still work, but the compact names are the preferred public surface.
+Legacy aliases `audit-monitor`, `audit-status`, and `audit-report` still work, but the compact names are the preferred public surface.
 
 The scripts in this directory are implementation detail for that public surface.
 

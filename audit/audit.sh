@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=aud name="Audit Snapshot" group=audit run=user legend=hide desc="Quick macOS audit with network/process focus + lightweight delta"
+# dev-cmd: alias=aud name=aud group=audit run=user legend=hide desc="Quick macOS audit with network/process focus + lightweight delta"
 
 set -euo pipefail
 

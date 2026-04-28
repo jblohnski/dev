@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-# dev-cmd: alias=wbt name="Wi-Fi BSSID Tree (wbt)" group=net run=user desc="Group scanned Wi-Fi SSIDs by BSSID with backend diagnostics"
+# dev-cmd: alias=wbt name=wbt-wifi-bssid-tree group=net run=user desc="Group scanned Wi-Fi SSIDs by BSSID with backend diagnostics"
 #
 # dev:network:wifi
 # BSSID → SSID association tree

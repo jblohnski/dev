@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=zs name="Zeek Summary" group=audit run=user legend=hide desc="Summarize raw Zeek logs with a quick overview or optional lnav queries"
+# dev-cmd: alias=zs name=zs group=audit run=user legend=hide desc="Summarize raw Zeek logs with a quick overview or optional lnav queries"
 
 set -euo pipefail
 

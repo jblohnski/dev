@@ -10,42 +10,42 @@ PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, 
 - `anchors/`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`.
 - `config/`: environment inputs (`pfkit.env`) used by render/apply.
 
-Only public `pfkit.*` command wrappers appear in `legend`.
+Only public `pfkit-*` command wrappers appear in `legend`.
 Private helper scripts do not declare command metadata.
 
 ## Quick start
 
 ```bash
-sudo pfkit.start
+sudo pfkit-start
 ```
 
 Validate:
 
 ```bash
-sudo pfkit.logs report
+sudo pfkit-logs report
 ```
 
 ## Control Surface
 
-- `pfkit.start` — repair files/wiring, apply tracked rules, enable PF, and start block logging
-- `pfkit.stop` — stop block logging, unload the `pfkit` anchor, and disable PF globally
-- `pfkit.status` — show whether PFKit, PF rules, logger, and `pflog0` are running
-- `pfkit.update` — repair files/wiring and apply tracked PFKit rules without changing logger state
-- `pfkit.logs` — report, tail, print, or clear retained block-log capture files
+- `pfkit-start` — repair files/wiring, apply tracked rules, enable PF, and start block logging
+- `pfkit-stop` — stop block logging, unload the `pfkit` anchor, and disable PF globally
+- `pfkit-status` — show whether PFKit, PF rules, logger, and `pflog0` are running
+- `pfkit-update` — repair files/wiring and apply tracked PFKit rules without changing logger state
+- `pfkit-logs` — report, tail, print, or clear retained block-log capture files
 
 ## PF Mapping
 
-- `pfkit.status` is read-only: it checks global PF state, the loaded `pfkit` anchor, logger pid, and `pflog0`.
-- `pfkit.update` repairs repo/system wiring, renders the anchor, loads it with `pfctl -a pfkit -f`, and enables PF if needed.
-- `pfkit.start` runs `pfkit.update`, ensures `pflog0` exists, and starts the block-log capture.
-- `pfkit.stop` stops capture, clears the `pfkit` anchor, and disables global PF with `pfctl -d`.
-- `pfkit.logs` reads retained PFKit log files; it is not a raw `pfctl` passthrough.
+- `pfkit-status` is read-only: it checks global PF state, the loaded `pfkit` anchor, logger pid, and `pflog0`.
+- `pfkit-update` repairs repo/system wiring, renders the anchor, loads it with `pfctl -a pfkit -f`, and enables PF if needed.
+- `pfkit-start` runs `pfkit-update`, ensures `pflog0` exists, and starts the block-log capture.
+- `pfkit-stop` stops capture, clears the `pfkit` anchor, and disables global PF with `pfctl -d`.
+- `pfkit-logs` reads retained PFKit log files; it is not a raw `pfctl` passthrough.
 
-Why `pfkit.stop` maps to a real PF shutdown:
+Why `pfkit-stop` maps to a real PF shutdown:
 
-- `pfkit.stop` calls `pfctl -d` after stopping pfkit logging and clearing the `pfkit` anchor.
+- `pfkit-stop` calls `pfctl -d` after stopping pfkit logging and clearing the `pfkit` anchor.
 - This is intentionally wider than “stop pfkit”: the packet filter is turned off for the host.
-- `pfkit.start` is the path that brings PF back up and reapplies the tracked anchor.
+- `pfkit-start` is the path that brings PF back up and reapplies the tracked anchor.
 
 ## Config knobs (`config/pfkit.env`)
 
@@ -87,7 +87,7 @@ Why `pfkit.stop` maps to a real PF shutdown:
 - Logs every explicit block rule in the anchor.
 - Logs allowed DNS with `log (all)` so `pflog0` shows the PF decision path for approved resolvers.
 - Adds `pfkit:` rule labels so `pfctl -s labels` exposes per-rule counters even when live capture is quiet.
-- Background block logging writes text logs under `~/dev/logs/pfkit/`, and `pfkit.logs` reads that file directly.
+- Background block logging writes text logs under `~/dev/logs/pfkit/`, and `pfkit-logs` reads that file directly.
 
 ## Policy Notes
 
@@ -97,11 +97,11 @@ Why `pfkit.stop` maps to a real PF shutdown:
 
 ## Logs
 
-- Short retained-log report: `sudo pfkit.logs report`
-- Running/not-running status: `sudo pfkit.status`
-- Raw block-log tail: `sudo pfkit.logs tail`
-- Full retained block log: `sudo pfkit.logs cat`
-- Log path: `sudo pfkit.logs path`
+- Short retained-log report: `sudo pfkit-logs report`
+- Running/not-running status: `sudo pfkit-status`
+- Raw block-log tail: `sudo pfkit-logs tail`
+- Full retained block log: `sudo pfkit-logs cat`
+- Log path: `sudo pfkit-logs path`
 
 ## Blacklist examples
 
@@ -113,5 +113,5 @@ BLACKLIST_OUT_CIDRS="198.51.100.7 203.0.113.0/24"
 Apply after editing:
 
 ```bash
-sudo pfkit.update
+sudo pfkit-update
 ```

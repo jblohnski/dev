@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-cmd: alias=pfkit.start name="PFKit Start (pfkit.start)" group=net run=sudo desc="Enable PF, update PFKit rules, and start logging"
+# dev-cmd: alias=pfkit-start name=pfkit-start group=net run=sudo desc="Enable PF, update PFKit rules, and start logging"
 
 set -euo pipefail
 
