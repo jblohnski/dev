@@ -6,10 +6,12 @@ PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, 
 
 ## Layout
 
-The component is intentionally flat. Public legend commands and their private helpers live directly in this directory.
+The component is intentionally flat. Public legend commands and private helpers live directly in this directory.
 
-- `pfkit-start.sh`, `pfkit-stop.sh`, `pfkit-update.sh`, `pfkit-status.sh`, `pfkit-logs.sh`: public command wrappers
-- `pfkit.sh`, `pfkit-apply.sh`, `pfkit-log.sh`: private helpers used by the wrappers
+- `pfkit-start.sh`, `pfkit-stop.sh`, `pfkit-status.sh`: public lifecycle wrappers
+- `pfkit.sh`: public `pfup` command and private dispatcher for lifecycle wrappers
+- `pfkit-log.sh`: public `pflg` command and private logger implementation
+- `pfkit-apply.sh`: private render/load implementation used by `pfkit.sh`
 - `pfkit.anchor`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`
 - `pfkit.env`: environment inputs used by render/apply
 

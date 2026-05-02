@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# dev-cmd: alias=pflg name=pfkit-logs group=net run=sudo desc="manage pfkit logs"
 # Internal helper: manage retained PFKit block logs and logger lifecycle.
 # Helper for pfkit log capture lifecycle. Intended to be driven by pfkit.sh.
 
@@ -158,6 +159,7 @@ ensure_pflog_interface() {
 
 start_logger() {
   if running_pid_from "$(pid_file)" >/dev/null 2>&1; then
+    [[ -n "${PFKIT_QUIET:-}" ]] && return
     printf '%s  %s\n' "$(paint '1;32' running)" "pfkit logger already running"
     printf '  pid : %s\n' "$(running_pid)"
     printf '  log : %s\n' "$(log_file)"
@@ -185,6 +187,7 @@ start_logger() {
   echo "$!" > "$(pid_file)"
   sleep 1
   if running_pid >/dev/null 2>&1; then
+    [[ -n "${PFKIT_QUIET:-}" ]] && return
     printf '%s  %s\n' "$(paint '1;32' running)" "pfkit logger started"
     printf '  pid : %s\n' "$(running_pid)"
     printf '  log : %s\n' "$(log_file)"
@@ -201,6 +204,7 @@ stop_logger() {
   pidfile="$(pid_file)"
   if ! pid="$(running_pid)"; then
     rm -f "$pidfile"
+    [[ -n "${PFKIT_QUIET:-}" ]] && return
     printf '%s  %s\n' "$(paint '1;33' stopped)" "pfkit logger not running"
     return
   fi
@@ -210,6 +214,7 @@ stop_logger() {
     kill -TERM "$pid" 2>/dev/null || true
   fi
   rm -f "$pidfile"
+  [[ -n "${PFKIT_QUIET:-}" ]] && return
   printf '%s  %s\n' "$(paint '1;31' stopped)" "pfkit logger stopped"
 }
 

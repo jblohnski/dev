@@ -47,11 +47,10 @@ dev_publish_discovered_commands() {
   local alias_name rel_path runmode alias_value
   while IFS=$'\t' read -r alias_name rel_path runmode; do
     [[ -n "$alias_name" && -n "$rel_path" ]] || continue
-    if (( ${+aliases[$alias_name]} || ${+functions[$alias_name]} )); then
-      continue
-    fi
+    unalias "$alias_name" 2>/dev/null || true
+    unset -f "$alias_name" 2>/dev/null || true
     if [[ "$runmode" == "sudo" ]]; then
-      alias_value="sudo \"\$DEV_ROOT/$rel_path\""
+      alias_value="sudo FORCE_COLOR=1 \"\$DEV_ROOT/$rel_path\""
     else
       alias_value="\"\$DEV_ROOT/$rel_path\""
     fi

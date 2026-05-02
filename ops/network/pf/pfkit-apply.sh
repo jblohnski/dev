@@ -326,16 +326,27 @@ if [[ -n "$unresolved_tokens" ]]; then
   exit 1
 fi
 
-printf "%s\n" "$rendered" > "$ANCHOR_DST"
-chmod 644 "$ANCHOR_DST"
+if [[ ! -f "$ANCHOR_DST" ]] || ! cmp -s <(printf "%s\n" "$rendered") "$ANCHOR_DST"; then
+  printf "%s\n" "$rendered" > "$ANCHOR_DST"
+  chmod 644 "$ANCHOR_DST"
+  if [[ -n "${PFKIT_UPDATE_REPORT:-}" ]]; then
+    printf '%s\n' "$ANCHOR_DST" >> "$PFKIT_UPDATE_REPORT"
+  fi
+fi
 
 if ! grep -q '^anchor "pfkit"$' "$PFCONF" || ! grep -q '^load anchor "pfkit" from "/etc/pf\.anchors/pfkit\.anchor"' "$PFCONF"; then
   echo "pfkit is not wired into $PFCONF; run pfup first" >&2
   exit 1
 fi
 
-pfctl -q -a pfkit -nf "$ANCHOR_DST" >/dev/null
-pfctl -q -a pfkit -f "$ANCHOR_DST" >/dev/null
+if ! pfctl -q -a pfkit -nf "$ANCHOR_DST" >/dev/null 2>&1; then
+  echo "pfkit: system pf validation failed" >&2
+  exit 1
+fi
+if ! pfctl -q -a pfkit -f "$ANCHOR_DST" >/dev/null 2>&1; then
+  echo "pfkit: system pf load failed" >&2
+  exit 1
+fi
 pfctl -q -e >/dev/null 2>&1 || true
 
 if [[ -n "${PFKIT_QUIET:-}" ]]; then

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# dev-cmd: alias=pfup name=pfkit-update group=net run=sudo desc="update pfkit"
 # Internal dispatcher for pfkit start, stop, update, and logs commands.
 set -euo pipefail
 
@@ -48,14 +49,16 @@ ensure_wired() {
 
 install_wiring() {
   local pfconf="/etc/pf.conf"
-  local tmp
+  local before after tmp
   mkdir -p /etc/pf.anchors
   [[ -f "$pfconf" && ! -f "$pfconf.pfkit.bak" ]] && cp "$pfconf" "$pfconf.pfkit.bak"
   [[ -f "$ANCHOR_DST" ]] || {
     printf '%s\n' '# pfkit placeholder; rendered rules are written by pfkit-apply.sh' > "$ANCHOR_DST"
     chmod 644 "$ANCHOR_DST"
+    mark_update "$ANCHOR_DST"
   }
 
+  before="$(cat "$pfconf" 2>/dev/null || true)"
   tmp="$(mktemp)"
   grep -vE '^# pfkit \(installed\)$|^anchor "pfkit"$|^anchor "pfkit/\*"$|^load anchor "pfkit" from "/etc/pf\.anchors/pfkit\.anchor"$' "$pfconf" > "$tmp"
   cat "$tmp" > "$pfconf"
@@ -68,8 +71,11 @@ install_wiring() {
     echo 'load anchor "pfkit" from "/etc/pf.anchors/pfkit.anchor"'
   } >> "$pfconf"
 
-  pfctl -q -nf "$pfconf" >/dev/null
-  pfctl -q -f "$pfconf" >/dev/null
+  after="$(cat "$pfconf" 2>/dev/null || true)"
+  [[ "$before" == "$after" ]] || mark_update "$pfconf"
+
+  run_quiet pfctl -q -nf "$pfconf"
+  run_quiet pfctl -q -f "$pfconf"
   pfctl -q -e >/dev/null 2>&1 || true
 }
 
@@ -104,23 +110,56 @@ paint_state() {
   esac
 }
 
+state_color() {
+  local value="$1"
+  case "$value" in
+    on|running|present|loaded|active)
+      printf '1;32'
+      ;;
+    partial|stopped|missing)
+      printf '1;33'
+      ;;
+    off|inactive|cleared)
+      printf '1;31'
+      ;;
+    *)
+      printf '2'
+      ;;
+  esac
+}
+
+row() {
+  local key="$1" value="$2" extra="${3:-}"
+  if [[ -n "$extra" ]]; then
+    printf '  %s  %s  %s\n' "$(paint '1;36' "$(printf '%-7s' "$key")")" "$(paint "$(state_color "$value")" "$(printf '%-7s' "$value")")" "$extra"
+  else
+    printf '  %s  %s\n' "$(paint '1;36' "$(printf '%-7s' "$key")")" "$value"
+  fi
+}
+
+run_quiet() {
+  if ! "$@" >/dev/null 2>&1; then
+    echo "pfkit: system pf command failed" >&2
+    return 1
+  fi
+}
+
+mark_update() {
+  [[ -n "${PFKIT_UPDATE_REPORT:-}" ]] || return 0
+  printf '%s\n' "$1" >> "$PFKIT_UPDATE_REPORT"
+}
+
 status_pfkit() {
-  local status_line pfkit_rules logger_state logger_pid pf_state pfkit_state pflog_state overall
+  local status_line pfkit_rules logger_state logger_pid pf_state log_state summary_state log_dir
   status_line="$(pfctl -q -s info 2>/dev/null | sed -n '/^Status:/p' || true)"
   pfkit_rules="$(pfctl -q -a pfkit -sr 2>/dev/null || true)"
   pf_state="off"
-  pfkit_state="off"
-  pflog_state="missing"
   logger_state="stopped"
   logger_pid=""
 
   [[ "$status_line" == *"Enabled"* ]] && pf_state="on"
-  [[ -n "$pfkit_rules" ]] && pfkit_state="on"
-  if ifconfig pflog0 >/dev/null 2>&1; then
-    pflog_state="present"
-  fi
 
-  local log_dir="${DEV_LOG_ROOT:-$REPO_ROOT/logs}/pfkit"
+  log_dir="${DEV_LOG_ROOT:-$REPO_ROOT/logs}/pfkit"
   if [[ -f "$log_dir/blocks.pid" ]]; then
     logger_pid="$(cat "$log_dir/blocks.pid" 2>/dev/null || true)"
     if [[ -n "$logger_pid" ]] &&
@@ -130,62 +169,65 @@ status_pfkit() {
     fi
   fi
 
-  overall="stopped"
-  if [[ "$pf_state" == "on" && "$pfkit_state" == "on" && "$logger_state" == "running" ]]; then
-    overall="running"
-  elif [[ "$pf_state" == "on" && "$pfkit_state" == "on" ]]; then
-    overall="partial"
-  fi
-  if [[ "$overall" == "running" ]]; then
-    printf '%s  %s\n' "$(paint '1;32' running)" "pfkit active"
-  elif [[ "$overall" == "partial" ]]; then
-    printf '%s  %s\n' "$(paint '1;33' partial)" "pfkit rules loaded; logger stopped"
+  log_state="off"
+  [[ "$logger_state" == "running" ]] && log_state="on"
+
+  if [[ "$pf_state" == "on" && -n "$pfkit_rules" ]]; then
+    summary_state="on"
   else
-    printf '%s  %s\n' "$(paint '1;31' stopped)" "pfkit inactive"
+    summary_state="off"
   fi
 
-  printf '  pf      : %s\n' "$(paint_state "$pf_state")"
-  printf '  anchor  : %s\n' "$(paint_state "$pfkit_state")"
-  printf '  logger  : %s%s\n' "$(paint_state "$logger_state")" "${logger_pid:+ pid=$logger_pid}"
-  printf '  pflog0  : %s\n' "$(paint_state "$pflog_state")"
-  printf '  log     : %s\n' "$(paint '2' "$log_dir/blocks.log")"
+  printf '%s  %s\n' "$(paint_state "$summary_state")" "pfkit"
+  row pf "$pf_state"
+  row log "$log_state" "$(paint '2' "$log_dir/blocks.log")"
 }
 
 update_pfkit() {
-  local quiet="${1:-}"
+  local quiet="${1:-}" report updated_files
+  report="$(mktemp)"
+  export PFKIT_UPDATE_REPORT="$report"
   ensure_repo_files
   if ! ensure_wired; then
     install_wiring
   fi
-  PFKIT_QUIET=1 bash "$ROOT_DIR/pfkit-apply.sh"
+  PFKIT_QUIET=1 PFKIT_UPDATE_REPORT="$report" bash "$ROOT_DIR/pfkit-apply.sh"
   if [[ "$quiet" != "quiet" ]]; then
-    printf '%s  %s\n' "$(paint '1;32' updated)" "pfkit rules loaded"
-    status_pfkit
+    updated_files="$(sort -u "$report" 2>/dev/null || true)"
+    if [[ -n "$updated_files" ]]; then
+      printf '%s  %s\n' "$(paint '1;32' updated)" "pfkit files"
+      while IFS= read -r file; do
+        [[ -n "$file" ]] || continue
+        row file "$file"
+      done <<<"$updated_files"
+    else
+      printf '%s  %s\n' "$(paint '1;33' updated)" "no file changes"
+    fi
   fi
+  rm -f "$report"
 }
 
 start_pfkit() {
   update_pfkit quiet
-  bash "$ROOT_DIR/pfkit-log.sh" start
+  PFKIT_QUIET=1 bash "$ROOT_DIR/pfkit-log.sh" start
   status_pfkit
 }
 
 stop_pfkit() {
-  bash "$ROOT_DIR/pfkit-log.sh" stop
+  PFKIT_QUIET=1 bash "$ROOT_DIR/pfkit-log.sh" stop
 
   if ensure_wired; then
     printf '%s\n' '# pfkit stopped' > "$ANCHOR_DST"
     chmod 644 "$ANCHOR_DST"
-    pfctl -q -a pfkit -nf "$ANCHOR_DST" >/dev/null
-    pfctl -q -a pfkit -f "$ANCHOR_DST" >/dev/null
+    run_quiet pfctl -q -a pfkit -nf "$ANCHOR_DST"
+    run_quiet pfctl -q -a pfkit -f "$ANCHOR_DST"
   fi
 
   pfctl -d >/dev/null 2>&1 || true
 
   printf '%s  %s\n' "$(paint '1;31' stopped)" "pfkit stopped"
-  printf '  pf      : off\n'
-  printf '  anchor  : cleared\n'
-  printf '  logger  : stopped\n'
+  row pf off
+  row log off
 }
 
 logs_pfkit() {
@@ -204,7 +246,7 @@ logs_pfkit() {
   esac
 }
 
-cmd="${1:-help}"
+cmd="${1:-update}"
 if [[ $# -gt 0 ]]; then
   shift
 fi
