@@ -6,12 +6,12 @@ PF toolkit for macOS that locks DNS to audited targets, blocks multicast noise, 
 
 ## Layout
 
-- `bin/`: the `pfkit` dispatcher plus private helpers used by its subcommands.
-- `anchors/`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`.
-- `config/`: environment inputs (`pfkit.env`) used by render/apply.
+The component is intentionally flat. Public legend commands and their private helpers live directly in this directory.
 
-Public legend aliases are compact; their names still point at the `pfkit-*` wrappers.
-Private helper scripts do not declare command metadata.
+- `pfkit-start.sh`, `pfkit-stop.sh`, `pfkit-update.sh`, `pfkit-status.sh`, `pfkit-logs.sh`: public command wrappers
+- `pfkit.sh`, `pfkit-apply.sh`, `pfkit-log.sh`: private helpers used by the wrappers
+- `pfkit.anchor`: anchor template rendered into `/etc/pf.anchors/pfkit.anchor`
+- `pfkit.env`: environment inputs used by render/apply
 
 ## Quick start
 
@@ -47,7 +47,7 @@ Why `pfkit-stop` maps to a real PF shutdown:
 - This is intentionally wider than “stop pfkit”: the packet filter is turned off for the host.
 - `pfkit-start` is the path that brings PF back up and reapplies the tracked anchor.
 
-## Config knobs (`config/pfkit.env`)
+## Config knobs (`pfkit.env`)
 
 - `EXT_IF` — optional override; defaults to the interface for the default route.
 - `DNS_MODE` — `router` (force DNS to gateway) or `direct` (force to specific IPs).

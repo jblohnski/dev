@@ -14,7 +14,7 @@ PUBLIC_DESC_MAX = 32
 
 
 INTERNAL_SCRIPT_PREFIXES = (
-    "ops/network/pf/bin/pfkit",
+    "ops/network/pf/pfkit",
 )
 
 ROOT_SCRIPT_ALLOWLIST = {

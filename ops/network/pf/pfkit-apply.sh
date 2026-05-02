@@ -3,42 +3,92 @@
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
-  echo "pfkit-apply: macOS only" >&2
+  echo "pfkit-apply: macos only" >&2
   exit 1
 fi
 
 if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
-  echo "Run with sudo" >&2
+  echo "run with sudo" >&2
   exit 1
 fi
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$ROOT_DIR/../../.." && pwd)"
-ENV_FILE="$ROOT_DIR/config/pfkit.env"
-TEMPLATE="$ROOT_DIR/anchors/pfkit.anchor"
+ENV_FILE="$ROOT_DIR/pfkit.env"
+TEMPLATE="$ROOT_DIR/pfkit.anchor"
 ANCHOR_DST="/etc/pf.anchors/pfkit.anchor"
 PFCONF="/etc/pf.conf"
-HOST_RESOLVE_HELPER="$ROOT_DIR/bin/pfkit-resolve-hosts.py"
 STATE_DIR="${DEV_LOG_ROOT:-$REPO_ROOT/logs}/pfkit"
 
 if [[ ! -f "$ENV_FILE" ]]; then
-  echo "Missing config: $ENV_FILE" >&2
+  echo "missing config: $ENV_FILE" >&2
   exit 1
 fi
 
 if [[ ! -f "$PFCONF" ]]; then
-  echo "Missing pf config: $PFCONF" >&2
+  echo "missing pf config: $PFCONF" >&2
   exit 1
 fi
 
 # shellcheck disable=SC1090
 source "$ENV_FILE"
 
+resolve_hosts() {
+  local state_name="$1"
+  shift
+  python3 - "$STATE_DIR" "$state_name" "$@" <<'PY'
+from __future__ import annotations
+
+import json
+import socket
+import sys
+from ipaddress import IPv4Network
+from pathlib import Path
+
+state_dir = Path(sys.argv[1])
+state_name = sys.argv[2]
+hosts = sys.argv[3:]
+
+ranges: list[str] = []
+resolved: dict[str, list[str]] = {}
+failures: dict[str, str] = {}
+
+for host in hosts:
+    try:
+        ips = sorted(
+            {
+                item[4][0]
+                for item in socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
+                if ":" not in item[4][0]
+            }
+        )
+    except socket.gaierror as error:
+        failures[host] = str(error)
+        continue
+    if not ips:
+        failures[host] = "no ipv4 addresses"
+        continue
+    resolved[host] = ips
+    ranges.extend(str(IPv4Network(f"{ip}/32")) for ip in ips)
+
+if state_dir:
+    state_dir.mkdir(parents=True, exist_ok=True)
+    (state_dir / state_name).write_text(
+        json.dumps({"resolved": resolved, "failures": failures}, indent=2, sort_keys=True) + "\n"
+    )
+
+for host, reason in failures.items():
+    print(f"pfkit-resolve: {host}: {reason}", file=sys.stderr)
+
+print(" ".join(sorted(set(ranges))))
+PY
+}
+
 EXT_IF="${EXT_IF:-$(route -n get default | awk '/interface:/{print $2}')}"
 ROUTER_IP="$(route -n get default | awk '/gateway:/{print $2}')"
 
 if [[ -z "$EXT_IF" || -z "$ROUTER_IP" ]]; then
-  echo "Failed to detect EXT_IF or ROUTER_IP" >&2
+  echo "failed to detect ext_if or router_ip" >&2
   exit 1
 fi
 
@@ -48,10 +98,10 @@ case "${DNS_MODE:-router}" in
     ;;
   direct)
     DNS_OK="${DNS_ALLOWED:-}"
-    [[ -z "$DNS_OK" ]] && { echo "DNS_MODE=direct requires DNS_ALLOWED" >&2; exit 1; }
+    [[ -z "$DNS_OK" ]] && { echo "dns_mode=direct requires dns_allowed" >&2; exit 1; }
     ;;
   *)
-    echo "Invalid DNS_MODE: ${DNS_MODE:-}" >&2
+    echo "invalid dns_mode: ${DNS_MODE:-}" >&2
     exit 1
     ;;
 esac
@@ -89,35 +139,27 @@ EXTRA_HTTPS_HOSTS_RENDERED=""
 if [[ "$GOOGLE_ONLY_MODE" == "1" ]]; then
   case "$GOOGLE_ENDPOINT_MODE" in
     official_default_domains|hosts)
-      if [[ ! -f "$HOST_RESOLVE_HELPER" ]]; then
-        echo "Missing host resolve helper: $HOST_RESOLVE_HELPER" >&2
-        exit 1
-      fi
-      GOOGLE_ALLOWED_RENDERED="$(python3 "$HOST_RESOLVE_HELPER" --state-dir "$STATE_DIR" --state-name google-hosts.json $GOOGLE_ALLOWED_HOSTS)"
+      GOOGLE_ALLOWED_RENDERED="$(resolve_hosts google-hosts.json $GOOGLE_ALLOWED_HOSTS)"
       [[ -n "$GOOGLE_ALLOWED_RENDERED" ]] || {
-        echo "GOOGLE_ENDPOINT_MODE=$GOOGLE_ENDPOINT_MODE requires resolvable GOOGLE_ALLOWED_HOSTS" >&2
+        echo "google_endpoint_mode=$GOOGLE_ENDPOINT_MODE requires resolvable google_allowed_hosts" >&2
         exit 1
       }
       ;;
     manual)
       GOOGLE_ALLOWED_RENDERED="$GOOGLE_ALLOWED"
       [[ -n "$GOOGLE_ALLOWED_RENDERED" ]] || {
-        echo "GOOGLE_ENDPOINT_MODE=manual requires GOOGLE_ALLOWED" >&2
+        echo "google_endpoint_mode=manual requires google_allowed" >&2
         exit 1
       }
       ;;
     *)
-      echo "Invalid GOOGLE_ENDPOINT_MODE: $GOOGLE_ENDPOINT_MODE" >&2
+      echo "invalid google_endpoint_mode: $GOOGLE_ENDPOINT_MODE" >&2
       exit 1
       ;;
   esac
 
   if [[ -n "$EXTRA_HTTPS_ALLOWED_HOSTS" ]]; then
-    if [[ ! -f "$HOST_RESOLVE_HELPER" ]]; then
-      echo "Missing host resolve helper: $HOST_RESOLVE_HELPER" >&2
-      exit 1
-    fi
-    EXTRA_HTTPS_HOSTS_RENDERED="$(python3 "$HOST_RESOLVE_HELPER" --state-dir "$STATE_DIR" --state-name extra-https-hosts.json $EXTRA_HTTPS_ALLOWED_HOSTS 2>/dev/null || true)"
+    EXTRA_HTTPS_HOSTS_RENDERED="$(resolve_hosts extra-https-hosts.json $EXTRA_HTTPS_ALLOWED_HOSTS 2>/dev/null || true)"
   fi
 fi
 
@@ -279,7 +321,7 @@ s#__GOOGLE_ALLOWED__#$ENV{GOOGLE_ALLOWED_RENDERED}#g;
 
 unresolved_tokens="$(printf '%s\n' "$rendered" | grep -oE '__[A-Z0-9_]+__' | sort -u || true)"
 if [[ -n "$unresolved_tokens" ]]; then
-  echo "Unresolved pf anchor template tokens:" >&2
+  echo "unresolved pf anchor template tokens:" >&2
   printf '  %s\n' $unresolved_tokens >&2
   exit 1
 fi
@@ -288,37 +330,39 @@ printf "%s\n" "$rendered" > "$ANCHOR_DST"
 chmod 644 "$ANCHOR_DST"
 
 if ! grep -q '^anchor "pfkit"$' "$PFCONF" || ! grep -q '^load anchor "pfkit" from "/etc/pf\.anchors/pfkit\.anchor"' "$PFCONF"; then
-  echo "pfkit is not wired into $PFCONF; run pfkit-install first" >&2
+  echo "pfkit is not wired into $PFCONF; run pfup first" >&2
   exit 1
 fi
 
-pfctl -a pfkit -nf "$ANCHOR_DST"
-pfctl -a pfkit -f "$ANCHOR_DST"
-pfctl -e 2>/dev/null || true
+pfctl -q -a pfkit -nf "$ANCHOR_DST" >/dev/null
+pfctl -q -a pfkit -f "$ANCHOR_DST" >/dev/null
+pfctl -q -e >/dev/null 2>&1 || true
 
-echo ">> Applied pfkit"
-echo "   ext_if     : $EXT_IF"
-echo "   router_ip  : $ROUTER_IP"
-echo "   dns_mode   : ${DNS_MODE:-router}"
-echo "   dns_ok     : $DNS_OK"
-echo "   baseline   : $BASELINE_PROFILE"
-echo "   google_mode: $GOOGLE_ENDPOINT_MODE"
-echo "   google_only: $GOOGLE_ONLY_MODE"
-echo "   extra_https: ${EXTRA_HTTPS_ALLOWED_HOSTS:-none}"
-echo "   bl_in      : ${BLACKLIST_IN_CIDRS:-none}"
-echo "   bl_out     : ${BLACKLIST_OUT_CIDRS:-none}"
-echo "   tcp_ports  : ${ALLOW_TCP_PORTS_RENDERED:-none}"
-echo "   udp_ports  : ${ALLOW_UDP_PORTS_RENDERED:-none}"
-echo "   block_udp  : $BLOCK_ARBITRARY_UDP"
-echo "   block_p2p  : $BLOCK_APPLE_P2P"
-echo "   block_mdns : ${BLOCK_MDNS:-0}"
-echo "   block_dot  : ${BLOCK_DOT:-0}"
-echo "   block_quic : ${BLOCK_QUIC:-1}"
-echo "   block_utun : $BLOCK_UTUN"
-echo "   utuns      : ${utun_ifaces//$'\n'/ }"
-echo
-echo "Validate:"
-echo "  sudo pfctl -s info | sed -n '/^Status:/p'"
-echo "  sudo pfctl -sr | grep 'anchor '"
-echo "  sudo pfctl -a pfkit -sr"
-echo "  sudo pfctl -s labels | grep 'pfkit:'"
+if [[ -n "${PFKIT_QUIET:-}" ]]; then
+  exit 0
+fi
+
+use_color() {
+  [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 && -z "${NO_COLOR:-}" ]]
+}
+
+paint() {
+  local code="$1" text="$2"
+  if use_color; then
+    printf '\033[%sm%s\033[0m' "$code" "$text"
+  else
+    printf '%s' "$text"
+  fi
+}
+
+printf '%s  %s\n' "$(paint '1;32' applied)" "pfkit rules loaded"
+printf '  ext_if     : %s\n' "$EXT_IF"
+printf '  dns_mode   : %s\n' "${DNS_MODE:-router}"
+printf '  dns_ok     : %s\n' "$DNS_OK"
+printf '  baseline   : %s\n' "$BASELINE_PROFILE"
+printf '  tcp_ports  : %s\n' "${ALLOW_TCP_PORTS_RENDERED:-none}"
+printf '  udp_ports  : %s\n' "${ALLOW_UDP_PORTS_RENDERED:-none}"
+printf '  block_udp  : %s\n' "$BLOCK_ARBITRARY_UDP"
+printf '  block_mdns : %s\n' "${BLOCK_MDNS:-0}"
+printf '  block_quic : %s\n' "${BLOCK_QUIC:-1}"
+printf '  block_utun : %s\n' "$BLOCK_UTUN"

@@ -5,18 +5,17 @@
 set -euo pipefail
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
-  echo "pfkit-log: macOS only" >&2
+  echo "pfkit-log: macos only" >&2
   exit 1
 fi
 
 if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
-  echo "Run with sudo" >&2
+  echo "run with sudo" >&2
   exit 1
 fi
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$ROOT_DIR/../../.." && pwd)"
-RUNNER="$ROOT_DIR/bin/pfkit-log-runner.sh"
 
 resolve_owner() {
   if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]]; then
@@ -70,11 +69,13 @@ legacy_stderr_file() {
 }
 
 running_pid_from() {
-  local pidfile="$1" pid
+  local pidfile="$1" pid command
   [[ -f "$pidfile" ]] || return 1
   pid="$(<"$pidfile")"
   [[ -n "$pid" ]] || return 1
   kill -0 "$pid" 2>/dev/null || return 1
+  command="$(ps -p "$pid" -o command= 2>/dev/null || true)"
+  [[ "$command" == *"pfkit-log.sh run"* ]] || return 1
   printf '%s\n' "$pid"
 }
 
@@ -120,6 +121,19 @@ log_notice() {
   printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*" >> "$(log_file)"
 }
 
+use_color() {
+  [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 1 && -z "${NO_COLOR:-}" ]]
+}
+
+paint() {
+  local code="$1" text="$2"
+  if use_color; then
+    printf '\033[%sm%s\033[0m' "$code" "$text"
+  else
+    printf '%s' "$text"
+  fi
+}
+
 running_pid() {
   running_pid_from "$(pid_file)" && return 0
   running_pid_from "$(legacy_pid_file)"
@@ -144,15 +158,16 @@ ensure_pflog_interface() {
 
 start_logger() {
   if running_pid_from "$(pid_file)" >/dev/null 2>&1; then
-    echo ">> pfkit block logger already running (pid $(running_pid))"
-    echo "   log: $(log_file)"
+    printf '%s  %s\n' "$(paint '1;32' running)" "pfkit logger already running"
+    printf '  pid : %s\n' "$(running_pid)"
+    printf '  log : %s\n' "$(log_file)"
     return
   fi
 
   if running_pid_from "$(legacy_pid_file)" >/dev/null 2>&1; then
     local legacy_pid
     legacy_pid="$(running_pid_from "$(legacy_pid_file)")"
-    echo ">> stopping legacy pfkit block logger (pid $legacy_pid)"
+    printf '%s  legacy logger pid=%s\n' "$(paint '1;33' stopping)" "$legacy_pid"
     kill "$legacy_pid" 2>/dev/null || true
     wait "$legacy_pid" 2>/dev/null || true
     rm -f "$(legacy_pid_file)"
@@ -161,19 +176,19 @@ start_logger() {
   if ! ensure_pflog_interface; then
     log_notice "pfkit logger unavailable: pflog0 missing; block capture not started"
     echo "pfkit-log: failed to create or find pflog0; block capture not started" >&2
-    echo "   log: $(log_file)" >&2
+    echo "  log: $(log_file)" >&2
     exit 1
   fi
 
   ensure_state_dir
-  nohup bash "$RUNNER" >>"$(log_file)" 2>>"$(stderr_file)" </dev/null &
+  nohup bash "$0" run >>"$(log_file)" 2>>"$(stderr_file)" </dev/null &
   echo "$!" > "$(pid_file)"
   sleep 1
   if running_pid >/dev/null 2>&1; then
-    echo ">> pfkit block logger started"
-    echo "   pid : $(running_pid)"
-    echo "   log : $(log_file)"
-    echo "   err : $(stderr_file)"
+    printf '%s  %s\n' "$(paint '1;32' running)" "pfkit logger started"
+    printf '  pid : %s\n' "$(running_pid)"
+    printf '  log : %s\n' "$(log_file)"
+    printf '  err : %s\n' "$(stderr_file)"
     return
   fi
 
@@ -186,13 +201,16 @@ stop_logger() {
   pidfile="$(pid_file)"
   if ! pid="$(running_pid)"; then
     rm -f "$pidfile"
-    echo ">> pfkit block logger is not running"
+    printf '%s  %s\n' "$(paint '1;33' stopped)" "pfkit logger not running"
     return
   fi
-  kill "$pid" 2>/dev/null || true
-  wait "$pid" 2>/dev/null || true
+  kill -INT "$pid" 2>/dev/null || true
+  sleep 1
+  if kill -0 "$pid" 2>/dev/null; then
+    kill -TERM "$pid" 2>/dev/null || true
+  fi
   rm -f "$pidfile"
-  echo ">> pfkit block logger stopped"
+  printf '%s  %s\n' "$(paint '1;31' stopped)" "pfkit logger stopped"
 }
 
 tail_logger() {
@@ -212,6 +230,8 @@ from __future__ import annotations
 
 import re
 import sys
+import os
+import subprocess
 from collections import Counter
 from pathlib import Path
 
@@ -240,9 +260,16 @@ def running_pid(path: Path) -> str:
         return ""
     if not pid:
         return ""
-    proc = Path("/proc") / pid
-    if proc.exists():
-        return pid
+    try:
+        os.kill(int(pid), 0)
+    except (OSError, ValueError):
+        return ""
+    try:
+        command = subprocess.check_output(["ps", "-p", pid, "-o", "command="], text=True, stderr=subprocess.DEVNULL)
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+    if "pfkit-log.sh run" not in command:
+        return ""
     return pid
 
 
@@ -440,7 +467,7 @@ dropped = packet_counter.get("packets dropped", 0)
 logger_text = logger or "not recorded"
 logger_text = good(logger_text) if logger else warn(logger_text)
 
-print(title("PFKit report"))
+print(title("pfkit report"))
 print(f"  window : {first_seen or 'unknown'} -> {last_seen or 'unknown'}")
 print(f"  logs   : {state_dir}")
 print(f"  logger : {logger_text}")
@@ -456,29 +483,29 @@ if packet_counter:
 print()
 
 if total_blocks == 0:
-    print(section("Summary"))
-    print("  No retained PF block events found.")
+    print(section("summary"))
+    print("  no retained pf block events found.")
     print()
 else:
     top_reasons = ", ".join(f"{name}={count}" for name, count in by_reason.most_common(4))
     top_dest = by_dest.most_common(1)[0][0] if by_dest else "none"
     top_flow = unique_flows.most_common(1)[0][0] if unique_flows else "none"
-    print(section("Summary"))
-    print(f"  Main classes : {top_reasons or 'none'}")
-    print(f"  Top target   : {top_dest}")
-    print(f"  Top flow     : {top_flow}")
+    print(section("summary"))
+    print(f"  classes : {top_reasons or 'none'}")
+    print(f"  target  : {top_dest}")
+    print(f"  flow    : {top_flow}")
     print()
 
-print_top("Block classes", by_reason, 6)
+print_top("block classes", by_reason, 6)
 print()
-print_top("Interfaces", by_interface, 6)
+print_top("interfaces", by_interface, 6)
 print()
-print_top("Top destinations", by_dest, 6)
+print_top("top destinations", by_dest, 6)
 print()
-print_top("Top flows", unique_flows, 6)
+print_top("top flows", unique_flows, 6)
 if error_counter:
     print()
-    print_top("Logger notes", error_counter, 6)
+    print_top("logger notes", error_counter, 6)
 PY
 }
 
@@ -486,13 +513,75 @@ clear_logger() {
   ensure_state_dir
   : > "$(log_file)"
   : > "$(stderr_file)"
-  echo ">> cleared $(log_file)"
+  printf '%s  %s\n' "$(paint '1;33' cleared)" "$(log_file)"
 }
 
 usage() {
   cat <<'EOF'
 usage: pfkit-log.sh [start|stop|tail|cat|path|clear|report] [lines]
 EOF
+}
+
+run_logger() {
+  if ! ifconfig pflog0 >/dev/null 2>&1; then
+    echo "pfkit-log: pflog0 missing" >&2
+    exit 1
+  fi
+
+  local fifo tcpdump_pid
+  fifo="${TMPDIR:-/tmp}/pfkit-log.$$.fifo"
+  tcpdump_pid=""
+
+  cleanup() {
+    local status=$?
+    trap - EXIT INT TERM
+    if [[ -n "$tcpdump_pid" ]] && kill -0 "$tcpdump_pid" 2>/dev/null; then
+      kill -INT "$tcpdump_pid" 2>/dev/null || true
+      wait "$tcpdump_pid" 2>/dev/null || true
+    fi
+    rm -f "$fifo"
+    exit "$status"
+  }
+
+  trap cleanup EXIT INT TERM
+  rm -f "$fifo"
+  mkfifo "$fifo"
+  tcpdump -l -n -e -tttt -i pflog0 > "$fifo" &
+  tcpdump_pid=$!
+
+  awk '
+    function flush_prev() {
+      if (prev == "") {
+        return
+      }
+      if (count > 1) {
+        print prev " [x" count "]"
+      } else {
+        print prev
+      }
+      fflush()
+    }
+
+    {
+      lower = tolower($0)
+      if (lower !~ /(^|[[:space:]])block([[:space:]]|$)/) {
+        next
+      }
+
+      if ($0 == prev) {
+        count++
+        next
+      }
+
+      flush_prev()
+      prev = $0
+      count = 1
+    }
+
+    END {
+      flush_prev()
+    }
+  ' < "$fifo"
 }
 
 cmd="${1:-report}"
@@ -522,6 +611,9 @@ case "$cmd" in
     ;;
   clear)
     clear_logger
+    ;;
+  run)
+    run_logger
     ;;
   *)
     usage >&2
