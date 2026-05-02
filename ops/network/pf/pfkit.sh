@@ -131,10 +131,40 @@ state_color() {
 row() {
   local key="$1" value="$2" extra="${3:-}"
   if [[ -n "$extra" ]]; then
-    printf '  %s  %s  %s\n' "$(paint '1;36' "$(printf '%-7s' "$key")")" "$(paint "$(state_color "$value")" "$(printf '%-7s' "$value")")" "$extra"
+    printf '  %s  %s  %s\n' "$(paint '1;36' "$(printf '%-5s' "$key")")" "$(paint "$(state_color "$value")" "$(printf '%-3s' "$value")")" "$extra"
   else
-    printf '  %s  %s\n' "$(paint '1;36' "$(printf '%-7s' "$key")")" "$value"
+    printf '  %s  %s\n' "$(paint '1;36' "$(printf '%-5s' "$key")")" "$value"
   fi
+}
+
+print_recent_blocks() {
+  local log_dir="$1"
+  python3 - "$log_dir" <<'PY'
+from __future__ import annotations
+
+import re
+import sys
+from pathlib import Path
+
+log_dir = Path(sys.argv[1])
+paths = [log_dir / "blocks.log", *(log_dir / f"blocks.log.{index}" for index in range(1, 4))]
+events: list[tuple[str, str]] = []
+
+for path in paths:
+    if not path.is_file():
+        continue
+    try:
+        lines = path.read_text(errors="ignore").splitlines()
+    except OSError:
+        continue
+    for line in lines:
+        match = re.match(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})", line)
+        if match:
+            events.append((match.group(1), line.strip()))
+
+for _, line in sorted(events, key=lambda item: item[0])[-5:]:
+    print(line)
+PY
 }
 
 run_quiet() {
@@ -181,6 +211,16 @@ status_pfkit() {
   printf '%s  %s\n' "$(paint_state "$summary_state")" "pfkit"
   row pf "$pf_state"
   row log "$log_state" "$(paint '2' "$log_dir/blocks.log")"
+  recent_blocks=()
+  while IFS= read -r line; do
+    recent_blocks+=("$line")
+  done < <(print_recent_blocks "$log_dir")
+  if (( ${#recent_blocks[@]} > 0 )); then
+    row last "$(paint '2' "${#recent_blocks[@]}")"
+    for line in "${recent_blocks[@]}"; do
+      printf '  %s  %s\n' "$(paint '1;36' '     ')" "$(paint '2' "$line")"
+    done
+  fi
 }
 
 update_pfkit() {
